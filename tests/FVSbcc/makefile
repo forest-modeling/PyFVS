@@ -1,7 +1,10 @@
 
 # $Id: makefile 734 2013-03-22 22:39:10Z ncrookston.fs@gmail.com $
 
-#all : climbc mgmtbc wsbw
+all : return
+return:
+
+#climbc mgmtbc wsbw
 
 #climbc : 
 #	@echo Test ClimBC, basic functionality 
