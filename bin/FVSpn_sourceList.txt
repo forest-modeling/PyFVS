@@ -496,7 +496,6 @@
 ../pn/src/pvref6.f
 ../pn/src/sichg.f
 ../pn/src/sitset.f
-../pn/src/smhtgf.f
 ../pn/src/varvol.f
 ../so/src/avht40.f
 ../so/src/r6crwd.f
@@ -572,6 +571,7 @@
 ../wc/src/logs.f
 ../wc/src/morts.f
 ../wc/src/regent.f
+../wc/src/smhgdg.f
 ../ws/src/r5crwd.f
 ../dfb/src/dfbin.f
 ../dfb/src/dfblkdpn.f
