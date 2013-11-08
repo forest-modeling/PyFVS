@@ -571,7 +571,7 @@
 ../wc/src/regent.f
 ../wc/src/sichg.f
 ../wc/src/sitset.f
-../wc/src/smhtgf.f
+../wc/src/smhgdg.f
 ../wc/src/varvol.f
 ../ws/src/r5crwd.f
 ../rd/src/rdin.f
