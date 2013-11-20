@@ -15,7 +15,6 @@ return:
 #	rm ClimBC.tmp ClimBC.tmp.save
 #	@echo Test ClimBC ended
 #	
- 
 #mgmtbc : 
 #	@echo "Test MgmtBC (with blanks in filenames)"
 #	-../../bin/FVSbcc < "Mgmt BC.rsp"
