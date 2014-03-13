@@ -5660,6 +5660,22 @@ C
       ICFLAG=237
       IDT=1
       IF (LNOTBK(1)) IDT=IFIX(ARRAY(1))
+C
+C     IF THE KEYWORD RECORD HAS THE 'PARMS' OPTION, CALL OPNEWC
+C     TO PROCESS IT.
+C
+      IF (IPRMPT.GT.0) THEN
+         IF (IPRMPT.NE.2) THEN
+            CALL KEYDMP (JOSTND,IRECNT,KEYWRD,ARRAY,KARD)
+            CALL ERRGRO (.TRUE.,25)
+         ELSE
+            CALL OPNEWC (KODE,JOSTND,IREAD,IDT,ICFLAG,KEYWRD,KARD,
+     >                   IPRMPT,IRECNT,ICYC)
+            CALL fvsGetRtnCode(IRTNCD)
+            IF (IRTNCD.NE.0) RETURN
+         ENDIF
+         GOTO 10
+      ENDIF
       CALL SPDECD (4,IS,NSP(1,1),JOSTND,IRECNT,KEYWRD,
      &             ARRAY,KARD)
       IF (IS.EQ.-999) GOTO 10
@@ -5671,7 +5687,7 @@ C
       PRMS(2)=24.     ! UPPER DBH
       PRMS(4)=1.4     ! Q FACTOR
       PRMS(5)=2.      ! DIA. CLASS WIDTH
-      PRMS(6)=0.      ! BA, SDI, OR TPA <=0 IS DEFAULT MEANS BA
+      PRMS(6)=0.      ! BA, SDI, OR TPA TARGET VALUE
 C
       IF (LNOTBK(2))PRMS(1)=ARRAY(2)       ! LOWER DBH
       IF (LNOTBK(3))PRMS(2)=ARRAY(3)       ! UPPER DBH
