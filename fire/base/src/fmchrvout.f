@@ -2,6 +2,7 @@
       IMPLICIT NONE
 C----------
 C  $Id$
+C  $Id$
 C----------
 *     SINGLE-STAND VERSION
 *     CALLED FROM: FMMAIN
@@ -57,10 +58,10 @@ C
       IF (ITODO.GT.0) THEN
         DO I = 1,ITODO
           CALL OPGET(I,2,JYR,IACTK,NPRM,PRMS)
-          IF (JYR .NE. IYR) GO TO 35
-          CALL OPDONE (I,JYR)
-          ICHRVB = JYR
-          ICHRVE = JYR + PRMS(1)
+C          IF (JYR .NE. IYR) GO TO 35
+          CALL OPDONE (I,IYR)
+          ICHRVB = IYR
+          ICHRVE = IYR + PRMS(1)
           ICHRVI = INT(PRMS(2))
           IF (ICHRVI.EQ.0) ICHRVI=1          
    35   ENDDO
@@ -175,7 +176,8 @@ C
   699   FORMAT(1(/1X,I5))
   700   FORMAT(1X,I5,1X,122('-'))
   701   FORMAT(1X,I5,1X,30X,'******  CARBON REPORT VERSION 1.0 ******')
-  702   FORMAT(1X,I5,1X,38X,'HARVESTED PRODUCTS REPORT')
+  702   FORMAT(1X,I5,1X,38X,'HARVESTED PRODUCTS REPORT ' 
+     >                      '(BASED ON STOCKABLE AREA)')
    44   FORMAT(1X,I5,' STAND ID: ',A26,4X,'MGMT ID: ',A4)
   704   FORMAT(1X,I5,1X,44(' '),'Merch Carbon')
   705   FORMAT(1X,I5,1X,43(' '),15('-'))
