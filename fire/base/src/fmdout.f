@@ -2,6 +2,7 @@
       IMPLICIT NONE
 C----------
 C  $Id$
+C  $Id$
 C----------
 *     SINGLE-STAND VERSION
 *     CALLED FROM: FMMAIN
@@ -65,13 +66,13 @@ C
       IF (ITODO.GT.0) THEN
          DO 35 IFT = 1,ITODO
             CALL OPGET(IFT,2,JYR,IACTK,NPRM,PRMS)
-            IF (JYR .NE. IYR) GO TO 35
-            CALL OPDONE (IFT,JYR)
+C            IF (JYR .NE. IYR) GO TO 35
+            CALL OPDONE (IFT,IYR)
 C
 C           GET THE REPORT PARAMETERS.
 C
-            IFLALB = JYR
-            IFLALE = JYR + PRMS(1)
+            IFLALB = IYR
+            IFLALE = IYR + PRMS(1)
             IFSTEP = INT(PRMS(2))
             IF (IFSTEP.EQ.0) IFSTEP=1
  35      CONTINUE
@@ -91,10 +92,10 @@ C      THE VALUE THAT ARE CALCULATED HERE.)
       IF (ITODO.GT.0) THEN
         DO I = 1,ITODO
           CALL OPGET(I,2,KYR,IACTK,NPRM,PRMS)
-          IF (KYR .NE. IYR) GO TO 41
-          CALL OPDONE (I,KYR)
-          ICRPTB = KYR
-          ICRPTE = KYR + PRMS(1)
+C          IF (KYR .NE. IYR) GO TO 41
+          CALL OPDONE (I,IYR)
+          ICRPTB = IYR
+          ICRPTE = IYR + PRMS(1)
           ICRPTI = INT(PRMS(2))
           IF (ICRPTI.EQ.0) ICRPTI=1
    41   ENDDO
@@ -107,10 +108,10 @@ C     CHECK TO SEE WHETHER THE DOWN WOOD VOLUME REPORT HAS BEEN REQUESTED.
       IF (ITODO.GT.0) THEN
         DO I = 1,ITODO
           CALL OPGET(I,2,KYR,IACTK,NPRM,PRMS)
-          IF (KYR .NE. IYR) GO TO 42
-          CALL OPDONE (I,KYR)
-          IDWRPB = KYR
-          IDWRPE = KYR + PRMS(1)
+C          IF (KYR .NE. IYR) GO TO 42
+          CALL OPDONE (I,IYR)
+          IDWRPB = IYR
+          IDWRPE = IYR + PRMS(1)
           IDWRPI = INT(PRMS(2))
           IF (IDWRPI.EQ.0) IDWRPI=1
    42   ENDDO
@@ -123,10 +124,10 @@ C     CHECK TO SEE WHETHER THE DOWN WOOD COVER REPORT HAS BEEN REQUESTED.
       IF (ITODO.GT.0) THEN
         DO I = 1,ITODO
           CALL OPGET(I,2,KYR,IACTK,NPRM,PRMS)
-          IF (KYR .NE. IYR) GO TO 43
-          CALL OPDONE (I,KYR)
-          IDWCVB = KYR
-          IDWCVE = KYR + PRMS(1)
+C          IF (KYR .NE. IYR) GO TO 43
+          CALL OPDONE (I,IYR)
+          IDWCVB = IYR
+          IDWCVE = IYR + PRMS(1)
           IDWCVI = INT(PRMS(2))
           IF (IDWCVI.EQ.0) IDWCVI=1
    43   ENDDO
@@ -497,7 +498,8 @@ C     IT, THEN DO SO.
   699    FORMAT(2(/1X,I5))
   700    FORMAT(1X,I5,1X,122('-'))
   701    FORMAT(1X,I5,1X,42X,'******  FIRE MODEL VERSION 1.0 ******')
-  702    FORMAT(1X,I5,1X,52X,'ALL FUELS REPORT')
+  702    FORMAT(1X,I5,1X,52X,'ALL FUELS REPORT '
+     &                       '(BASED ON STOCKABLE AREA)')
    44    FORMAT(1X,I5,' STAND ID: ',A26,4X,'MGMT ID: ',A4)
   703    FORMAT(1X,I5,1X,52X,'ESTIMATED FUEL LOADINGS')
   704    FORMAT(1X,I5,22X,'SURFACE FUEL (TONS/ACRE) ',
@@ -575,7 +577,8 @@ C     IT, THEN DO SO.
   799    FORMAT(2(/1X,I5))
   800    FORMAT(1X,I5,1X,134('-'))
   801    FORMAT(1X,I5,1X,42X,'******  FIRE MODEL VERSION 1.0 ******')
-  802    FORMAT(1X,I5,1X,46X,'DOWN DEAD WOOD VOLUME REPORT')
+  802    FORMAT(1X,I5,1X,46X,'DOWN DEAD WOOD VOLUME REPORT '
+     &                       '(BASED ON STOCKABLE AREA)')
 C   44    FORMAT(1X,I5,' STAND ID: ',A26,4X,'MGMT ID: ',A4)
   803    FORMAT(1X,I5,1X,30X,'ESTIMATED DOWN WOOD VOLUME (CUFT/ACRE)',
      &                       ' BY SIZE CLASS (INCHES)')
@@ -638,7 +641,8 @@ C     IT, THEN DO SO.
   899    FORMAT(2(/1X,I5))
   900    FORMAT(1X,I5,1X,122('-'))
   901    FORMAT(1X,I5,1X,42X,'******  FIRE MODEL VERSION 1.0 ******')
-  902    FORMAT(1X,I5,1X,46X,'DOWN DEAD WOOD COVER REPORT')
+  902    FORMAT(1X,I5,1X,46X,'DOWN DEAD WOOD COVER REPORT '
+     &                       '(BASED ON STOCKABLE AREA)')
 C   44    FORMAT(1X,I5,' STAND ID: ',A26,4X,'MGMT ID: ',A4)
   903    FORMAT(1X,I5,1X,30X,'ESTIMATED DOWN WOOD PERCENT COVER (%)',
      &                       ' BY SIZE CLASS (INCHES)')
