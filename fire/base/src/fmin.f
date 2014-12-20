@@ -1028,10 +1028,10 @@ C
       ENDIF
 
       NPARMS= 6
-      PRMS(1) = 10.0
+      PRMS(1) = 0.0
       PRMS(2) = 999.0
       PRMS(3) = 5.0
-      PRMS(4) = 0.0
+      PRMS(4) = 1.0
       PRMS(5) = 0.9
       PRMS(6) = 0.0
 
@@ -2115,7 +2115,8 @@ C
 
  4610 FORMAT(/A8,T12,'CARBON REPORTS WILL BE BASED ON METHOD',
      >      I2, ' (0=FFE, 1=JENKINS)',/T12, 'REPORT UNITS WILL BE',
-     >      I2, ' (0=IMPERIAL, 1= METRIC, 2 = METRIC TONS/ACRE)',/T12,
+     >      I2, ' (0=US(TONS/ACRE), 1=METRIC(METRIC TONS/HA)', 
+     >          ' 2=COMBINED(METRIC TONS/ACRE))',/T12,
      >      'PROPORTION OF DEAD ROOTS DECAYING ANNUALLY WILL BE: ',
      >      F7.4,' (<0 = NO DEAD ROOTS)',/T12,
      >      'SOFTWOOD DIAMETER BREAKPOINT: ', F5.1,/T12,
