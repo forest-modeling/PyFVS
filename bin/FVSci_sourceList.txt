@@ -341,6 +341,7 @@
 ../dbs/src/dbsprssql.f
 ../dbs/src/dbspusget.f
 ../dbs/src/dbspusput.f
+../dbs/src/dbsrd.f
 ../dbs/src/dbsstandin.f
 ../dbs/src/dbsstrclass.f
 ../dbs/src/dbssumry.f
@@ -710,7 +711,6 @@
 ../rd/src/rdrate.f
 ../rd/src/rdrdel.f
 ../rd/src/rdroot.f
-../rd/src/rdrout.f
 ../rd/src/rdsadd.f
 ../rd/src/rdsetp.f
 ../rd/src/rdshrk.f
