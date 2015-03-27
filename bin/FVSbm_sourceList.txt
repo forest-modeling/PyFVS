@@ -270,6 +270,8 @@
 ../common/PDEN.F77
 ../common/PLOT.F77
 ../common/PPDNCM.F77
+../common/PPCNTL.F77
+../common/PPEPRM.F77
 ../common/RANCOM.F77
 ../common/SCREEN.F77
 ../common/SNCOM.F77
@@ -335,6 +337,7 @@
 ../dbs/src/dbsprssql.f
 ../dbs/src/dbspusget.f
 ../dbs/src/dbspusput.f
+../dbs/src/dbsrd.f
 ../dbs/src/dbsstandin.f
 ../dbs/src/dbsstrclass.f
 ../dbs/src/dbssumry.f
@@ -732,7 +735,6 @@
 ../rd/src/rdrate.f
 ../rd/src/rdrdel.f
 ../rd/src/rdroot.f
-../rd/src/rdrout.f
 ../rd/src/rdsadd.f
 ../rd/src/rdsetp.f
 ../rd/src/rdshrk.f
@@ -798,3 +800,5 @@
 ../wsbwe/src/bweuky.f
 ../wsbwe/src/bwewea.f
 ../wsbwe/src/txnote.f
+../wsbwe/src/bweppgt.f
+../wsbwe/src/bwepppt.f
