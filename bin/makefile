@@ -134,6 +134,12 @@ FVSnc$(SLIBSUFX) FVSnc$(PRGSUFX)  : $(addsuffix _sourceList.txt,FVSnc) $(shell c
 FVSne$(SLIBSUFX) FVSne$(PRGSUFX) : $(addsuffix _sourceList.txt,FVSne) $(shell cat $(addsuffix _sourceList.txt,FVSne))
 	$(MAKE) --file=makefile FVSne.setup
 
+FVSoc$(SLIBSUFX) FVSoc$(PRGSUFX) : $(addsuffix _sourceList.txt,FVSoc) $(shell cat $(addsuffix _sourceList.txt,FVSoc))
+	$(MAKE) --file=makefile FVSoc.setup
+
+FVSop$(SLIBSUFX) FVSop$(PRGSUFX) : $(addsuffix _sourceList.txt,FVSop) $(shell cat $(addsuffix _sourceList.txt,FVSop))
+	$(MAKE) --file=makefile FVSop.setup
+
 FVSpn$(SLIBSUFX) FVSpn$(PRGSUFX)  : $(addsuffix _sourceList.txt,FVSpn) $(shell cat $(addsuffix _sourceList.txt,FVSpn))
 	$(MAKE) --file=makefile FVSpn.setup
 
