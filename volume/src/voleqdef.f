@@ -1,6 +1,7 @@
 !== last modified  04-15-2014 reconciled Vol. Eq. No. output from FVS with Cruise dsoftware-RNH
 C 01/18/2013 added FIAVOLEQDEF, R5_PNWEQN and R6_PNWEQN for PNE FIA equations.
 C 03/25/2014 changed default equation for Region 3 (R3_EQN) Ponderosa pine in the forest Apache Sitgreaves, Coconino, Kaibab and Tonto to 300FW2W122.
+C
       SUBROUTINE VOLEQDEF (VAR,REGN,FORST,DIST,SPEC,PROD,VOLEQ,ERRFLAG)
 
 C    SUBROUTINE WILL RETURN THE DEFAULT VOLUME EQUATION NUMBER
@@ -43,103 +44,114 @@ C        SPEC = 3 DIGIT FIA SPECIES CODE
 C//////////////////////////////////////////////////////////////////
       SUBROUTINE GETVARIANT(REGN,FORST,DIST,VAR)
       CHARACTER*2 FORST,DIST,VAR
+      CHARACTER VVER*7
       INTEGER REGN,FORNUM,DISTNUM
       
-      IF(FORST(2:2) .LT. '0') THEN 
-        FORST(2:2) = FORST(1:1)
-        FORST(1:1) = '0'
-        IF(FORST(2:2) .LT. '0') FORST(2:2) = '0'
-      ENDIF
-      IF(DIST(2:2) .LT. '0') THEN
-        DIST(2:2) = DIST(1:1)
-        DIST(1:1) = '0'
-        IF(DIST(2:2) .LT. '0') DIST(2:2) = '0'
-      ENDIF
-      READ(FORST,'(I2)')FORNUM
-      READ(DIST,'(I2)')DISTNUM
-
-      IF(REGN .EQ. 8)THEN
-         VAR = 'SN'
-
-      ELSE IF(REGN.EQ.1)THEN
-         IF(FORNUM.EQ.4 .OR. FORNUM.EQ.5 .OR. FORNUM.EQ.17 .OR. 
-     >      FORNUM.EQ.3 .OR. FORNUM.EQ.14 .OR. FORNUM.EQ.16)THEN
-            VAR = 'IE'
-         ELSE
-            VAR = 'EM'
-         ENDIF
-
-      ELSE IF(REGN.EQ.5) THEN
+      CALL VARVER(VVER)
+      VAR=VVER(:2)
+C      
+C THE FOLLOWING CODE IS WRONG BECAUSE
+C FORESTS LIKE 117=NEZPERCE, MIGHT BE IN CI OR IE/NI OR KT. SO I CHANGED
+C IT TO THE ABOVE 2 LINES. THERE ARE OTHER EXAMPLES, 712=BLM COOS BAY MIGHT
+C BE IN CA, NC, OR PN. ETC. BESIDES, WHY GO THROUGH ALL THIS WHEN THE
+C ABOVE TWO LINES WILL SUFFICE. CODE LEFT HERE COMMENTED OUT FOR THE TIME
+C BEING IN CASE I'M MISSING SOMETHING.  DIXON 5/14/15
+C
+C    IF(FORST(2:2) .LT. '0') THEN 
+C       FORST(2:2) = FORST(1:1)
+C       FORST(1:1) = '0'
+C       IF(FORST(2:2) .LT. '0') FORST(2:2) = '0'
+C     ENDIF
+C     IF(DIST(2:2) .LT. '0') THEN
+C       DIST(2:2) = DIST(1:1)
+C       DIST(1:1) = '0'
+C       IF(DIST(2:2) .LT. '0') DIST(2:2) = '0'
+C     ENDIF
+C     READ(FORST,'(I2)')FORNUM
+C     READ(DIST,'(I2)')DISTNUM
+C
+C     IF(REGN .EQ. 8)THEN
+C        VAR = 'SN'
+C
+C     ELSE IF(REGN.EQ.1)THEN
+C        IF(FORNUM.EQ.4 .OR. FORNUM.EQ.5 .OR. FORNUM.EQ.17 .OR. 
+C    >      FORNUM.EQ.3 .OR. FORNUM.EQ.14 .OR. FORNUM.EQ.16)THEN
+C           VAR = 'IE'
+C        ELSE
+C           VAR = 'EM'
+C        ENDIF
+C
+C     ELSE IF(REGN.EQ.5) THEN
 C       DETERMINE VARIENT BY FOREST AND DISTRICT NUMBER
 C       INLAND CALIFORNIA
-         IF(FORNUM.EQ.5 .OR. FORNUM.EQ.6 .OR. FORNUM.EQ.8 .OR. 
-     >      FORNUM.EQ.11 .OR. FORNUM.EQ.14) THEN
-            VAR = 'CA'
+C        IF(FORNUM.EQ.5 .OR. FORNUM.EQ.6 .OR. FORNUM.EQ.8 .OR. 
+C    >      FORNUM.EQ.11 .OR. FORNUM.EQ.14) THEN
+C           VAR = 'CA'
 C        SOUTHERN OREGON
-         ELSEIF(FORNUM.EQ.9) THEN
-            VAR = 'SO'
+C        ELSEIF(FORNUM.EQ.9) THEN
+C           VAR = 'SO'
 C        WESTERN SIERRA
-         ELSEIF(FORNUM.EQ.17 .OR. FORNUM.EQ.16 .OR. FORNUM.EQ.15 .OR. 
-     >          FORNUM.EQ.13 .OR. FORNUM.EQ.3) THEN
-            VAR = 'WS'
+C        ELSEIF(FORNUM.EQ.17 .OR. FORNUM.EQ.16 .OR. FORNUM.EQ.15 .OR. 
+C    >          FORNUM.EQ.13 .OR. FORNUM.EQ.3) THEN
+C           VAR = 'WS'
 C        KLAMATH/NORTHERN CALIFORNIA
-         ELSEIF(FORNUM.EQ.5) THEN
-            VAR = 'NC'
-         ENDIF
-
-      ELSE IF(REGN.EQ.6) THEN
+C        ELSEIF(FORNUM.EQ.5) THEN
+C           VAR = 'NC'
+C        ENDIF
+C
+C     ELSE IF(REGN.EQ.6) THEN
 C        DETERMINE VARIENT BY FOREST AND DISTRICT NUMBER
 C        BLUE MTN VARIANT
-         IF(FORNUM.EQ.4 .OR. FORNUM.EQ.7 .OR. FORNUM.EQ.14 .OR. 
-     >      FORNUM.EQ.16) THEN
-            VAR = 'BM'
+C        IF(FORNUM.EQ.4 .OR. FORNUM.EQ.7 .OR. FORNUM.EQ.14 .OR. 
+C    >      FORNUM.EQ.16) THEN
+C           VAR = 'BM'
 C        EASTERN CASCADES
-         ELSEIF(FORNUM.EQ.17 .OR. FORNUM.EQ.8 .OR. (FORNUM.EQ.3 .AND. 
-     >          DISTNUM .EQ. 3) .OR. (FORNUM.EQ.6 .AND. 
-     >         (DISTNUM.EQ.1.OR.DISTNUM.EQ.2.OR.DISTNUM.EQ.6))) THEN
+C        ELSEIF(FORNUM.EQ.17 .OR. FORNUM.EQ.8 .OR. (FORNUM.EQ.3 .AND. 
+C    >          DISTNUM .EQ. 3) .OR. (FORNUM.EQ.6 .AND. 
+C    >         (DISTNUM.EQ.1.OR.DISTNUM.EQ.2.OR.DISTNUM.EQ.6))) THEN
 C           MOUNT HOOD Barlow RD
-            VAR = 'EC'
+C           VAR = 'EC'
 C        SOUTHERN OREGON
-         ELSEIF(FORNUM.EQ.1 .OR. FORNUM.EQ. 2 .OR. FORNUM.EQ.20) THEN
-            VAR = 'SO'
+C        ELSEIF(FORNUM.EQ.1 .OR. FORNUM.EQ. 2 .OR. FORNUM.EQ.20) THEN
+C           VAR = 'SO'
 C        WESTERN CASCADES
-         ELSEIF(FORNUM.EQ.5 .OR. FORNUM.EQ.15 .OR. FORNUM.EQ.18 .OR. 
-     >          FORNUM.EQ.10 .OR. FORNUM.EQ.3 .OR. FORNUM.EQ.6) THEN
-            VAR = 'WC'
+C        ELSEIF(FORNUM.EQ.5 .OR. FORNUM.EQ.15 .OR. FORNUM.EQ.18 .OR. 
+C    >          FORNUM.EQ.10 .OR. FORNUM.EQ.3 .OR. FORNUM.EQ.6) THEN
+C           VAR = 'WC'
 C        PACFIC NORTHWEST
-         ELSEIF(FORNUM.EQ.9 .OR. FORNUM.EQ.12) THEN
-            VAR = 'PN'
+C        ELSEIF(FORNUM.EQ.9 .OR. FORNUM.EQ.12) THEN
+C           VAR = 'PN'
 C        NORTHERN CALIFORNIA
-         ELSEIF(FORNUM.EQ.11) THEN
-            VAR = 'NC'
-         ELSEIF(FORNUM.EQ.21) THEN
-            VAR = 'IE'
-         ENDIF
-
-      ELSE IF(REGN.EQ.7) THEN
+C        ELSEIF(FORNUM.EQ.11) THEN
+C           VAR = 'NC'
+C        ELSEIF(FORNUM.EQ.21) THEN
+C           VAR = 'IE'
+C        ENDIF
+C
+C     ELSE IF(REGN.EQ.7) THEN
 C     DETERMINE VARIENT BY FOREST AND DISTRICT NUMBER
-         IF(FORNUM.EQ.2) THEN
-            VAR = 'WC'
-         ELSEIF(FORNUM.EQ.3) THEN
-            VAR = 'NC'
-         ELSE
-            VAR = 'SO'
-         ENDIF
-
-      ELSE IF (REGN .EQ. 9) THEN
-         IF(FORNUM.EQ.13 .OR. FORNUM.EQ.10 .OR. FORNUM.EQ.3 .OR. 
-     >        FORNUM.EQ.9 .OR. FORNUM.EQ.4 .OR. FORNUM.EQ.7 .OR. 
-     >        FORNUM.EQ.2 .OR. FORNUM.EQ.6)THEN
-            VAR = 'LS'
-         ELSE IF(FORNUM.EQ.12 .OR. FORNUM.EQ.8 .OR. FORNUM.EQ.5)THEN
-            VAR = 'CS'
-         ELSE IF(FORNUM.EQ.21 .OR. FORNUM.EQ.20 .OR. FORNUM.EQ.19 .OR. 
-     >           FORNUM.EQ.14 .OR. FORNUM.EQ.22)THEN
-            VAR = 'NE'
-         ENDIF
-
-      ENDIF
-
+C        IF(FORNUM.EQ.2) THEN
+C           VAR = 'WC'
+C        ELSEIF(FORNUM.EQ.3) THEN
+C           VAR = 'NC'
+C        ELSE
+C           VAR = 'SO'
+C        ENDIF
+C
+C     ELSE IF (REGN .EQ. 9) THEN
+C        IF(FORNUM.EQ.13 .OR. FORNUM.EQ.10 .OR. FORNUM.EQ.3 .OR. 
+C    >        FORNUM.EQ.9 .OR. FORNUM.EQ.4 .OR. FORNUM.EQ.7 .OR. 
+C    >        FORNUM.EQ.2 .OR. FORNUM.EQ.6)THEN
+C           VAR = 'LS'
+C        ELSE IF(FORNUM.EQ.12 .OR. FORNUM.EQ.8 .OR. FORNUM.EQ.5)THEN
+C           VAR = 'CS'
+C        ELSE IF(FORNUM.EQ.21 .OR. FORNUM.EQ.20 .OR. FORNUM.EQ.19 .OR. 
+C    >           FORNUM.EQ.14 .OR. FORNUM.EQ.22)THEN
+C           VAR = 'NE'
+C        ENDIF
+C
+C     ENDIF
+C
       RETURN
       END
 
@@ -232,8 +244,8 @@ C
      &     (VAR.EQ.'CI').OR.(VAR.EQ.'ci'))THEN
          VOLEQ = EQNUM(1)
         ENDIF
-      ELSEIF((VAR.EQ.'EM'.OR.VAR.EQ.'em').AND.((ISPC.EQ.745).OR.
-     &       (ISPC.EQ.747).OR.(ISPC.EQ.749)))THEN
+      ELSEIF((VAR.EQ.'EM'.OR.VAR.EQ.'em').AND.((SPEC.EQ.745).OR.
+     &       (SPEC.EQ.747).OR.(SPEC.EQ.749)))THEN
          VOLEQ=EQNUM(40)
       ELSE
          FIRST = 1
@@ -423,7 +435,7 @@ C
    
       IF(SPEC.EQ.202.AND.(FORNUM.EQ.2.OR.FORNUM.EQ.3.OR.
      >                    FORNUM.EQ.7.OR.FORNUM.EQ.10)) THEN
-     	   DONE=46
+         DONE=46
       ELSEIF(SPEC.EQ.15.AND.(FORNUM.EQ.2.OR.FORNUM.EQ.3.OR.
      >                       FORNUM.EQ.7.OR.FORNUM.EQ.10)) THEN
          DONE=48
@@ -520,7 +532,7 @@ C
       LAST = 27
  
 C     White fir
-      IF(SPEC.EQ.15.) THEN
+      IF(SPEC.EQ.15) THEN
          IF (FORNUM.EQ.2.OR.FORNUM.EQ.12.OR.FORNUM.EQ.13.OR.
      >                                               FORNUM.EQ.6)THEN
             VOLEQ = EQNUM(28)
@@ -728,7 +740,8 @@ C
       DONE = 0
 C     white fir
       IF(SPEC.EQ.15)THEN
-          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
+          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca').OR.
+     &       (VAR.EQ.'OC').OR.(VAR.EQ.'oc'))THEN
               IF((FORNUM.EQ.5).OR.(FORNUM.EQ.6).OR.
      >           (FORNUM.EQ.8).OR.(FORNUM.EQ.14))THEN
 C                 VOLEQ=EQNUM(72)
@@ -737,7 +750,8 @@ C                 VOLEQ=EQNUM(72)
           ENDIF
 C     California red fir
       ELSEIF(SPEC.EQ.20)THEN
-          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
+          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca').OR.
+     &       (VAR.EQ.'OC').OR.(VAR.EQ.'oc'))THEN
               IF((FORNUM.EQ.5).OR.(FORNUM.EQ.6).OR.
      >           (FORNUM.EQ.8).OR.(FORNUM.EQ.14))THEN
 C                 VOLEQ=EQNUM(73)
@@ -746,7 +760,8 @@ C                 VOLEQ=EQNUM(73)
           ENDIF
 C     incense cedar
       ELSEIF(SPEC.EQ.81)THEN
-          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
+          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca').OR.
+     &       (VAR.EQ.'OC').OR.(VAR.EQ.'oc'))THEN
               IF((FORNUM.EQ.5).OR.(FORNUM.EQ.6).OR.
      >           (FORNUM.EQ.8).OR.(FORNUM.EQ.14))THEN
 C                 VOLEQ=EQNUM(74)
@@ -754,15 +769,16 @@ C                 VOLEQ=EQNUM(74)
               ENDIF
           ENDIF
 C     Whitebark pine
-      ELSEIF(SPEC.EQ.101.) THEN
-          IF(VAR.EQ."SO" .OR. VAR.EQ."so") THEN
+      ELSEIF(SPEC.EQ.101) THEN
+          IF(VAR.EQ.'SO' .OR. VAR.EQ.'so') THEN
                DONE=30
           ELSE
                DONE=40   
           ENDIF
 C     lodgepole pine
       ELSEIF(SPEC.EQ.108)THEN
-          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
+          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca').OR.
+     &       (VAR.EQ.'OC').OR.(VAR.EQ.'oc'))THEN
               IF((FORNUM.EQ.5).OR.(FORNUM.EQ.6).OR.
      >           (FORNUM.EQ.8).OR.(FORNUM.EQ.14))THEN
               DONE=75
@@ -770,7 +786,8 @@ C     lodgepole pine
           ENDIF
 C     sugar pine
       ELSEIF(SPEC.EQ.117)THEN
-          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
+          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca').OR.
+     &       (VAR.EQ.'OC').OR.(VAR.EQ.'oc'))THEN
               IF((FORNUM.EQ.5).OR.(FORNUM.EQ.6).OR.
      >           (FORNUM.EQ.8).OR.(FORNUM.EQ.14))THEN
                  DONE=76
@@ -778,7 +795,8 @@ C     sugar pine
           ENDIF
 C     ponderosa pine
       ELSEIF(SPEC.EQ.122)THEN
-          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
+          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca').OR.
+     &       (VAR.EQ.'OC').OR.(VAR.EQ.'oc'))THEN
               IF((FORNUM.EQ.5).OR.(FORNUM.EQ.6).OR.
      >           (FORNUM.EQ.8).OR.(FORNUM.EQ.14))THEN
                  DONE=77
@@ -786,7 +804,8 @@ C     ponderosa pine
           ENDIF
 C     Douglas fir
       ELSEIF(SPEC.EQ.202)THEN
-          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
+          IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca').OR.
+     &       (VAR.EQ.'OC').OR.(VAR.EQ.'oc'))THEN
               IF((FORNUM.EQ.5).OR.(FORNUM.EQ.6).OR.
      >           (FORNUM.EQ.8).OR.(FORNUM.EQ.14))THEN
                  DONE=78
@@ -794,20 +813,20 @@ C     Douglas fir
           ENDIF
 C     other softwoods
       ELSEIF(SPEC.EQ.298 .OR. SPEC.EQ.290) THEN
-          IF(VAR.EQ."SO" .OR. VAR.EQ."so") THEN
+          IF(VAR.EQ.'SO' .OR. VAR.EQ.'so') THEN
               DONE=30
-          ELSEIF(VAR.EQ."NC" .OR. VAR.EQ."nc") THEN
+          ELSEIF(VAR.EQ.'NC' .OR. VAR.EQ.'nc') THEN
               DONE=30
           ELSE
               DONE=40
           ENDIF
 C     other hardwoods
       ELSEIF(SPEC.EQ.998.) THEN
-          IF(VAR.EQ."SO" .OR. VAR.EQ."so") THEN
+          IF(VAR.EQ.'SO' .OR. VAR.EQ.'so') THEN
               DONE=70
-          ELSEIF(VAR.EQ."WS" .OR. VAR.EQ."ws") THEN
+          ELSEIF(VAR.EQ.'WS' .OR. VAR.EQ.'ws') THEN
               DONE=67
-          ELSEIF(VAR.EQ."NC" .OR. VAR.EQ."nc") THEN
+          ELSEIF(VAR.EQ.'NC' .OR. VAR.EQ.'nc') THEN
               DONE=70
           ELSE
               DONE=60
@@ -991,7 +1010,7 @@ c      WRITE(ASPEC,'(I3)')SPEC
 c      IF(ASPEC(1:1).EQ.' ')ASPEC(1:1) = '0'
 c     Westside Variants
       IF(VAR.EQ.'PN' .OR. VAR.EQ.'WC' .OR. VAR.EQ.'NC' .OR.
-     >   VAR.EQ.'CA')THEN
+     >   VAR.EQ.'CA' .OR. VAR.EQ.'OC' .OR. VAR.EQ.'OP')THEN
          
 c        Gifford Pinchot
          IF(FORNUM.EQ.3)THEN
@@ -1044,11 +1063,11 @@ c        Mt Baker - Snoqualmie
 c        Rogue River/Siskiyo
          ELSE IF(FORNUM.EQ.10.OR.FORNUM.EQ.11) THEN
              IF(SPEC.EQ.15) THEN
-             	  IF((VAR.NE.'NC').OR.(VAR.NE.'nc'))THEN
+                IF((VAR.NE.'NC').OR.(VAR.NE.'nc'))THEN
                    DONEI = 5
                 ENDIF
              ELSE IF(SPEC.EQ.122) THEN
-             	  IF((VAR.NE.'NC').OR.(VAR.NE.'nc'))THEN
+                IF((VAR.NE.'NC').OR.(VAR.NE.'nc'))THEN
                    DONEI = 4
                 ENDIF
              ELSE IF(SPEC.EQ.202) THEN
@@ -1068,7 +1087,7 @@ c        Olympic
              ELSE IF(SPEC.EQ.98) THEN
                 DONEF = 12
              ELSE IF(SPEC.EQ.263) THEN
-             	  DONEF = 3
+                DONEF = 3
              ENDIF
 c        Umpqua
          ELSE IF(FORNUM.EQ.15) THEN
@@ -1133,15 +1152,15 @@ c           No INGY, find Behre's hyperbola model
             ELSE
                 IF(FIA(DONEF) .LT. 10) THEN
                   WRITE(ASPEC,'(I1)')FIA(DONEF)
-                  VOLEQ(1:9) = "616BEHW00"
+                  VOLEQ(1:9) = '616BEHW00'
                   VOLEQ(10:10) = ASPEC
                 ELSE IF (FIA(DONEF) .LT. 100) THEN
                   WRITE(ASPEC,'(I2)')FIA(DONEF)
-                  VOLEQ(1:8) = "616BEHW0"
+                  VOLEQ(1:8) = '616BEHW0'
                   VOLEQ(9:10) = ASPEC
                 ELSE
                   WRITE(ASPEC,'(I3)')FIA(DONEF)
-                  VOLEQ(1:7) = "616BEHW"
+                  VOLEQ(1:7) = '616BEHW'
                   VOLEQ(8:10) = ASPEC
                 ENDIF
             ENDIF
@@ -1345,15 +1364,15 @@ c           No INGY, find Behre's hyperbola model
             ELSE
                 IF(FIA(DONEF) .LT. 10) THEN
                   WRITE(ASPEC,'(I1)')FIA(DONEF)
-                  VOLEQ(1:9) = "616BEHW00"
+                  VOLEQ(1:9) = '616BEHW00'
                   VOLEQ(10:10) = ASPEC
                 ELSE IF (FIA(DONEF) .LT. 100) THEN
                   WRITE(ASPEC,'(I2)')FIA(DONEF)
-                  VOLEQ(1:8) = "616BEHW0"
+                  VOLEQ(1:8) = '616BEHW0'
                   VOLEQ(9:10) = ASPEC
                 ELSE
                   WRITE(ASPEC,'(I3)')FIA(DONEF)
-                  VOLEQ(1:7) = "616BEHW"
+                  VOLEQ(1:7) = '616BEHW'
                   VOLEQ(8:10) = ASPEC
                 ENDIF
             ENDIF
@@ -1520,58 +1539,70 @@ C
 
       FIRST = 1
       IF(SPEC.EQ.202) THEN
-          IF(VAR.EQ."WC" .OR. VAR.EQ."wc")THEN
-          	DONE=44
-          ELSEIF((VAR.EQ."PN" .OR. VAR.EQ."pn").OR.
-     &       (VAR.EQ."NC" .OR. VAR.EQ."nc").OR.
-     &       (VAR.EQ."CA" .OR. VAR.EQ."ca")) THEN
+          IF(VAR.EQ.'WC' .OR. VAR.EQ.'wc')THEN
+            DONE=44
+          ELSEIF((VAR.EQ.'PN') .OR. (VAR.EQ.'pn') .OR.
+     &       (VAR.EQ.'NC') .OR. (VAR.EQ.'nc') .OR.
+     &       (VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &       (VAR.EQ.'OC') .OR. (VAR.EQ.'oc') .OR.
+     &       (VAR.EQ.'OP') .OR. (VAR.EQ.'op')) THEN
             DONE = 44
             IF(FORNUM.EQ.12)DONE=42
           ELSE
                 DONE = 44
           ENDIF
       ELSEIF(SPEC.EQ.41)THEN
-         IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
-        	  DONE=13
-      	 ENDIF
+         IF((VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &      (VAR.EQ.'OC') .OR. (VAR.EQ.'oc'))THEN
+            DONE=13
+         ENDIF
       ELSEIF(SPEC.EQ.263)THEN
-      	 IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca').OR.
-     &      (VAR.EQ.'PN').OR.(VAR.EQ.'pn'))THEN
-      	 	  DONE=45
-      	 ENDIF
+         IF((VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &      (VAR.EQ.'PN') .OR. (VAR.EQ.'pn') .OR.
+     &      (VAR.EQ.'OC') .OR. (VAR.EQ.'oc') .OR.
+     &      (VAR.EQ.'OP') .OR. (VAR.EQ.'op')) THEN
+            DONE=45
+         ENDIF
       ELSEIF((SPEC.EQ.109).OR.(SPEC.EQ.113).OR.(SPEC.EQ.124).OR.
      &   (SPEC.EQ.127))THEN
-      	 IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
-      	 	  DONE=18
-      	 ENDIF
+         IF((VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &      (VAR.EQ.'OC') .OR. (VAR.EQ.'oc'))THEN
+            DONE=18
+         ENDIF
       ELSEIF(SPEC.EQ.92)THEN
-      	 IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
-      	 	  DONE=14
-      	 ENDIF
+         IF((VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &      (VAR.EQ.'OC') .OR. (VAR.EQ.'oc'))THEN
+            DONE=14
+         ENDIF
       ELSEIF(SPEC.EQ.212)THEN
-      	 IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
-      	 	  DONE=24
-      	 ENDIF
+         IF((VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &      (VAR.EQ.'OC') .OR. (VAR.EQ.'oc'))THEN
+            DONE=24
+         ENDIF
       ELSEIF((SPEC.EQ.801).OR.(SPEC.EQ.805).OR.(SPEC.EQ.807).OR.
      &       (SPEC.EQ.811).OR.(SPEC.EQ.818).OR.(SPEC.EQ.821).OR.
      &       (SPEC.EQ.839).OR.(SPEC.EQ.333).OR.(SPEC.EQ.730))THEN
-      	 IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
-      	 	  DONE=38
-      	 ELSEIF((VAR.EQ.'NC').OR.(VAR.EQ.'nc'))THEN
+         IF((VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &      (VAR.EQ.'OC') .OR. (VAR.EQ.'oc'))THEN
+            DONE=38
+         ELSEIF((VAR.EQ.'NC').OR.(VAR.EQ.'nc'))THEN
             IF(SPEC.EQ.818)DONE=38
          ENDIF
       ELSEIF(SPEC.EQ.542)THEN
-         IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
-        	  DONE=30
-      	 ENDIF
+         IF((VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &      (VAR.EQ.'OC') .OR. (VAR.EQ.'oc'))THEN
+            DONE=30
+         ENDIF
       ELSEIF(SPEC.EQ.251)THEN
-      	 IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
+         IF((VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &      (VAR.EQ.'OC') .OR. (VAR.EQ.'oc'))THEN
            DONE=25
          ENDIF
       ELSEIF(SPEC.EQ.981)THEN
-      	 IF((VAR.EQ.'CA').OR.(VAR.EQ.'ca'))THEN
-        	  DONE=36
-      	 ENDIF
+         IF((VAR.EQ.'CA') .OR. (VAR.EQ.'ca') .OR.
+     &      (VAR.EQ.'OC') .OR. (VAR.EQ.'oc'))THEN
+            DONE=36
+         ENDIF
        ENDIF
 C
 C  FINDS SPECIES INDEX TO FIA ARRAY
@@ -1660,113 +1691,113 @@ C  SN
       IF (FORNUM.EQ.1)THEN
 C              // alabama
               IF (DISTNUM.EQ.1) THEN
-                     GEOAREA = "13";
+                     GEOAREA = '13';
               ELSE IF (DISTNUM.EQ.3) THEN
-                     GEOAREA = "15";
+                     GEOAREA = '15';
               ELSE IF (DISTNUM.EQ.4) THEN
-                     GEOAREA = "16";
+                     GEOAREA = '16';
               ELSE IF (DISTNUM.EQ.5 .OR. DISTNUM.EQ.6) THEN
-                 GEOAREA = "14";
+                 GEOAREA = '14';
               ELSE
-                 GEOAREA = "17";
+                 GEOAREA = '17';
          ENDIF
 
        ELSE IF (FORNUM.EQ.2)THEN
 C                     // daniel boone
-                     GEOAREA = "10";
+                     GEOAREA = '10';
 
        ELSE IF (FORNUM.EQ.3)THEN
 C                     // Chattahoochee/Oconee
-                     GEOAREA = "01";
-                     IF (DISTNUM .EQ. 8) GEOAREA = "06";
+                     GEOAREA = '01';
+                     IF (DISTNUM .EQ. 8) GEOAREA = '06';
 
        ELSE IF (FORNUM.EQ.4 .OR. FORNUM .EQ. 60)THEN
 C                     // Cherokee
 C                      // land between the lakes
-                     GEOAREA = "01";
+                     GEOAREA = '01';
 
        ELSE IF (FORNUM.EQ.5)THEN
 C                     // Florida
-                     GEOAREA = "03";
+                     GEOAREA = '03';
 
        ELSE IF (FORNUM.EQ.6) THEN
 C                     // Kisatchie
-                     GEOAREA = "02";
-                     IF (DISTNUM .EQ. 6) GEOAREA = "09";
+                     GEOAREA = '02';
+                     IF (DISTNUM .EQ. 6) GEOAREA = '09';
 
        ELSE IF (FORNUM .EQ. 7) THEN  
 C                     // Mississippi
                      
               IF (DISTNUM.EQ.1) THEN
-                     GEOAREA = "19";
+                     GEOAREA = '19';
               ELSE IF (DISTNUM.EQ.2) THEN
-                     GEOAREA = "20";
+                     GEOAREA = '20';
               ELSE IF (DISTNUM.EQ.4) THEN
-                     GEOAREA = "21";
+                     GEOAREA = '21';
               ELSE IF (DISTNUM.EQ.5) THEN
-                 GEOAREA = "22";
+                 GEOAREA = '22';
               ELSE IF (DISTNUM.EQ.6) THEN
-                 GEOAREA = "18";
+                 GEOAREA = '18';
               ELSE
-                 GEOAREA = "23";
+                 GEOAREA = '23';
          END IF
 
        ELSE IF (FORNUM .EQ. 8) THEN  
 C                     // GW/Jeff
-          GEOAREA = "11";
+          GEOAREA = '11';
                      
             IF (DISTNUM.EQ.11 .OR. DISTNUM.EQ.12 .OR. DISTNUM.EQ.13 .OR. 
      >         DISTNUM.EQ.14 .OR. DISTNUM.EQ.15 .OR. DISTNUM.EQ.16) THEN
-                     GEOAREA = "12";
+                     GEOAREA = '12';
          END IF
 
        ELSE IF (FORNUM .EQ. 9) THEN
 C                     // Ouachita
-              GEOAREA = "31";
+              GEOAREA = '31';
               IF (DISTNUM.EQ.1 .OR. DISTNUM.EQ.6) THEN
-                     GEOAREA = "30";
+                     GEOAREA = '30';
               ELSE IF (DISTNUM.EQ.12) THEN
-                 GEOAREA = "32";
+                 GEOAREA = '32';
          END IF
        
       ELSE IF (FORNUM .EQ. 10) THEN   
 C                     // Ozark/St Francis
-                     GEOAREA = "04";
-                 IF (DISTNUM .EQ. 7) GEOAREA = "05";
+                     GEOAREA = '04';
+                 IF (DISTNUM .EQ. 7) GEOAREA = '05';
 
        ELSE IF (FORNUM .EQ. 11) THEN
 C                     // North Carolina
-                     GEOAREA = "01";
+                     GEOAREA = '01';
                      IF (DISTNUM .EQ. 3)THEN
-                        GEOAREA = "07";
+                        GEOAREA = '07';
                      ELSE IF (DISTNUM .EQ. 10) THEN
-                            GEOAREA = "08";
+                            GEOAREA = '08';
                      ENDIF
 
        ELSE IF (FORNUM .EQ. 12)THEN
 C                     // Francis Marion/Sumpter
-                 GEOAREA = "24";
+                 GEOAREA = '24';
                      IF(DISTNUM .EQ. 2) THEN
-                        GEOAREA = "01";
+                        GEOAREA = '01';
                      ELSE IF(DISTNUM .EQ. 5)THEN 
-                            GEOAREA = "25";
+                            GEOAREA = '25';
                      ENDIF
 
        ELSE IF (FORNUM.EQ.13) THEN
 C                      // Texas
                      IF(DISTNUM .EQ. 1) THEN
-                        GEOAREA = "26";
+                        GEOAREA = '26';
                      ELSE IF(DISTNUM .EQ. 3)THEN 
-                            GEOAREA = "27";
+                            GEOAREA = '27';
                      ELSE IF(DISTNUM .EQ. 4)THEN 
-                            GEOAREA = "29";
+                            GEOAREA = '29';
                      ELSE
-                            GEOAREA = "28";
+                            GEOAREA = '28';
                      ENDIF
 
        ELSE IF (FORNUM.EQ.36)THEN
 C            // savannah river
-                     GEOAREA = "25";
+                     GEOAREA = '25';
 
       ENDIF
 
@@ -1774,7 +1805,7 @@ C     CREATE THE VOLUME EQUATION NUMBER
       
       VOLEQ(1:1) = '8'
       VOLEQ(2:3) = GEOAREA
-      VOLEQ(4:7) = "DVEE"
+      VOLEQ(4:7) = 'DVEE'
 
 C     FIND CORRECT SPECIES
       DONE = 0
@@ -1864,7 +1895,7 @@ C     SET DIAMETER BY PRODUCT
 
       IF (FORNUM.EQ.1)THEN
 C             // alabama
-              GEOAREA = "4";
+              GEOAREA = '4';
               IF (DISTNUM.EQ.3) GEOAREA = '1'
 
        ELSE IF (FORNUM.EQ.2 .OR. FORNUM.EQ.4 .OR. FORNUM .EQ. 8 .OR. 
@@ -1873,56 +1904,56 @@ C                     // daniel boone
 C                     // Cherokee
 C                     // GW/Jeff
 C                 // land between the lakes
-                     GEOAREA = "3";
+                     GEOAREA = '3';
 
        ELSE IF (FORNUM.EQ.3)THEN
 C                     // Chattahoochee/Oconee
-                     GEOAREA = "3";
-                     IF (DISTNUM .EQ. 8) GEOAREA = "2";
+                     GEOAREA = '3';
+                     IF (DISTNUM .EQ. 8) GEOAREA = '2';
 
        ELSE IF (FORNUM.EQ.5 .OR. FORNUM.EQ.36)THEN
 C                     // Florida
 C           // savannah river
-                     GEOAREA = "1";
+                     GEOAREA = '1';
 
        ELSE IF (FORNUM.EQ.6 .OR. FORNUM.EQ.13) THEN
 C                     // Kisatchie
 C                     // Texas
-                     GEOAREA = "5";
+                     GEOAREA = '5';
 
        ELSE IF (FORNUM .EQ. 7) THEN  
 C                     // Mississippi
-                     GEOAREA = "5";
+                     GEOAREA = '5';
                      
             IF (DISTNUM .EQ. 6) THEN
-                            GEOAREA = "7";
+                            GEOAREA = '7';
                      ELSE IF (DISTNUM.EQ.7 .OR. DISTNUM.EQ.17) THEN
-                            GEOAREA = "4";
+                            GEOAREA = '4';
                      ENDIF
        ELSE IF (FORNUM .EQ. 9) THEN
 C                     // Ouachita
-                     GEOAREA = "6";
+                     GEOAREA = '6';
        ELSE IF (FORNUM .EQ. 10) THEN   
 C                     // Ozark/St Francis
-                     GEOAREA = "6";
-                 IF (DISTNUM .EQ. 7) GEOAREA = "7";
+                     GEOAREA = '6';
+                 IF (DISTNUM .EQ. 7) GEOAREA = '7';
 
        ELSE IF (FORNUM .EQ. 11) THEN
 C                     // North Carolina
-                     GEOAREA = "3";
+                     GEOAREA = '3';
                      IF (DISTNUM .EQ. 3)THEN
-                   GEOAREA = "1";
+                   GEOAREA = '1';
                      ELSE IF (DISTNUM .EQ. 10) THEN
-                            GEOAREA = "2";
+                            GEOAREA = '2';
                      ENDIF
 
        ELSE IF (FORNUM .EQ. 12)THEN
 C                     // Francis Marion/Sumpter
-                 GEOAREA = "2";
+                 GEOAREA = '2';
                      IF(DISTNUM .EQ. 2) THEN
-                        GEOAREA = "3";
+                        GEOAREA = '3';
                      ELSE IF(DISTNUM .EQ. 5)THEN 
-                            GEOAREA = "1";
+                            GEOAREA = '1';
                      ENDIF
       ENDIF
 
@@ -1944,7 +1975,7 @@ C           USE PRODUCT 08 LOGIC
 C           4 INCH TOP
          VOLEQ(3:3) = '4'
        ENDIF
-      VOLEQ(4:7) = "CLKE"
+      VOLEQ(4:7) = 'CLKE'
 
 C     FIND CORRECT SPECIES
       DONE = 0
@@ -2132,7 +2163,7 @@ C     DIRECT VOLUME ESTIMATORS
 C     FIND CORRECT SPECIES
         FIRST = 1
         DONE = 0
-        IF(VAR.EQ."LS" .OR. VAR.EQ."ls") THEN
+        IF(VAR.EQ.'LS' .OR. VAR.EQ.'ls') THEN
           LAST = 69
           DO 5, WHILE (DONE.EQ.0)
           HALF = (LAST - FIRST +1)/2 + FIRST
@@ -2518,15 +2549,15 @@ C FIA DEFAULT VOLUME EQUATION FOR WA AND OR
       INTEGER ERRFLAG,SPEC,FIA(66)
       INTEGER DONE,HALF,FIRST,LAST
       DATA (FIA(I),I=1,66)/  
-     &	  11, 15, 17, 19, 20, 21, 22, 41, 42, 64,
-     &	  66, 72, 73, 81, 92, 93, 98,101,103,106,
-     &	 108,113,116,117,119,122,130,202,211,212,
-     &	 231,242,263,264,298,312,321,351,352,361,
-     &	 375,376,431,475,478,492,500,510,542,590,
-     &	 600,631,660,730,740,746,747,760,768,805,
-     &	 815,818,920,981,998,999/     
+     &    11, 15, 17, 19, 20, 21, 22, 41, 42, 64,
+     &    66, 72, 73, 81, 92, 93, 98,101,103,106,
+     &   108,113,116,117,119,122,130,202,211,212,
+     &   231,242,263,264,298,312,321,351,352,361,
+     &   375,376,431,475,478,492,500,510,542,590,
+     &   600,631,660,730,740,746,747,760,768,805,
+     &   815,818,920,981,998,999/     
       DATA (EQNUMW(I),I=1,66)/  
-c      	  11, 15, 17, 19, 20, 
+c         11, 15, 17, 19, 20, 
      & '632TRFW011','532TRFW015','632TRFW011','632TRFW011','532TRFW021',
 c         21, 22, 41, 42, 64,
      & '532TRFW021','632TRFW011','532TRFW081','632TRFW242','532TRFW060',
@@ -2555,7 +2586,7 @@ c        815,818,920,981,998,
 c       999
      & '500DVEW351'/
       DATA (EQNUME(I),I=1,66)/  
-c      	  11, 15, 17, 19, 20,21,      
+c         11, 15, 17, 19, 20,21,      
      & '616TRFW019','616TRFW019','616TRFW019','616TRFW019','516TRFW021',
 c         21, 22, 41, 42, 64,
      & '516TRFW021','616TRFW019','516TRFW081','616TRFW242','516TRFW060',
