@@ -668,6 +668,8 @@
 ../rd/src/rdoagm.f
 ../rd/src/rdowi.f
 ../rd/src/rdowin.f
+../rd/src/rdppgt.f
+../rd/src/rdpppt.f
 ../rd/src/rdpr.f
 ../rd/src/rdprin.f
 ../rd/src/rdpush.f
