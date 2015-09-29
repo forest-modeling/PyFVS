@@ -168,7 +168,6 @@ C----------
           INQUIRE(UNIT=ISTDAT,exist=LCONN)
           IF (.NOT.LCONN) GOTO 900
         ENDIF
-        WRITE(16,*)' ***** AT LINE 171 IN INTREE-DBSKODE= ',DBSKODE
         READ (ISTDAT,'(A)',END=900) RECORD
         IF (RECORD(1:1).EQ.'*') GOTO 31
         IF (INDEX(RECORD,'-999').GT. 0) GOTO 900
