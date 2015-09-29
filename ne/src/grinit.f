@@ -54,6 +54,9 @@ C
       INCLUDE 'CALCOM.F77'
 C
 C
+      INCLUDE 'TWIGCOM.F77'
+C
+C
 COMMONS
 C----------
       INTEGER I,J,K
@@ -112,6 +115,7 @@ C----------
       SIZCAP(I,3) = 0.
       SIZCAP(I,4) = 999.
       JSPIN(I)=3
+      LEAVESP(I)=.FALSE.
     5 CONTINUE
       LFLAGV = .FALSE.
       LBAMAX = .FALSE.
@@ -308,6 +312,12 @@ C----------
       SITETR(I,J)=0.
    74 CONTINUE
    75 CONTINUE
+C
+C  BAU CARRIED IN TWIGCOM.F77
+C
+      DO I=1,50
+        BAU(I)=0.
+      ENDDO
 C
       RETURN
       END

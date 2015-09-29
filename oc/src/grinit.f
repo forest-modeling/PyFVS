@@ -115,6 +115,7 @@ C----------
       SIZCAP(I,3) = 0.
       SIZCAP(I,4) = 999.
       JSPIN(I)=3
+      LEAVESP(I)=.FALSE.
    5  CONTINUE
       LFLAGV = .FALSE.
       LBAMAX = .FALSE.
@@ -170,7 +171,7 @@ C  ICL4 IS USED TO IMPLEMENT A NEW OPTION WHICH ALLOWS THE USER TO
 C  CONTROL THE NUMBER OF CYCLES A STAND WILL BE TRIPLED.
 C  ICL5 IS USED TO CARRY THE ACTUAL INPUT HABITAT CODE.
 C----------
-      ICL4 = 2
+      ICL4 = 0
       ICL5 = 999
       ICL6 = 0
       IDG = 0
@@ -207,7 +208,7 @@ C----------
       GROSPC = -1.0
       NCYC = 0
       NONSTK = -9999
-      NOTRIP = .TRUE.
+      NOTRIP = .FALSE.
       NPLT = DBLK
       DBCN = ' '
       SAMWT = -1E25
