@@ -13,7 +13,7 @@ Description: 1. Overflow and underflow options where added to compliler trap
                 processes.
 
 Impact on users: Users will notice no changes, but processing speed when output
-                 database is used may improved.
+                 database is used may be improved.
 
 
 Files:
