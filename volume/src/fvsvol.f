@@ -31,7 +31,7 @@ C----------
       INTEGER CUTFLG,BFPFLG,CUPFLG,CDPFLG,SPFLG
       INTEGER IT,ITRNC,ISPC,INTFOR,IERR,IZERO
       INTEGER I1,IREGN,IFC
-      INTEGER I3,I7,I15,I20,I21,I01,I02
+      INTEGER I,II,I3,I7,I15,I20,I21,I01,I02
       INTEGER ITD,BADUM,SIDUM,HTTDUM,IDIST,TLOGS
       REAL VMAX,BARK,BRATIO,H,D,BBF,BBFV,BV,VM,VN,VVN
       REAL FC,DBTBH,TVOL1,TVOL2,TVOL4,TVOL7,TDIBB,TDIBC
@@ -246,6 +246,22 @@ C       **** End of Region 8 special process to get HT2TD(x,2) ****
       I20=20    ! second dimension of LOGVOL(,x) array, dimension of LOGLEN(x)
       I21=21    ! first dimension of LOGDIA(x,) array, dimension of BOLHT(x)
       X1=0.
+
+C     INITIALIZE ARRAYS LOADED BY VOLUME ROUTINES (NVEL)
+C     DIMENSIONS BASED ON VARIABLES SET DIRECTLY ABOVE
+      DO I=1,I21
+        DO II=1,I3
+          LOGDIA(I,II)=0.0
+        ENDDO
+        BOLHT(I)=0.0
+      ENDDO
+      DO I=1,I20
+        DO II=1,I7
+          LOGVOL(II,I)=0.0
+        ENDDO
+        LOGLEN(I)=0.0
+      ENDDO
+
 C----------
 C  CONSTANT CHARACTER ARGUMENTS
 C----------
