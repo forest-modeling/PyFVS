@@ -293,6 +293,7 @@ C       BIND COLUMNS TO THEIR VARIABLES
 
          CASE('HABITAT','PV_CODE')
           ISTANDDATA(5) = 0
+          CHAB = ' '
           IF(DType.EQ.SQL_CHAR.OR.DType.EQ.SQL_VARCHAR.OR.
      -       DType.EQ.SQL_LONGVARCHAR) THEN
             iRet = fvsSQLBindCol (StmtHndlIn,ColNumber,SQL_F_CHAR,
@@ -642,7 +643,7 @@ C
            KODTYP=0
            ICL5=0
            IF(LKECHO)WRITE(JOSTND,'(T12,'' HABITAT/PV_CODE IGNORED.'')')
-         ELSE
+         ELSEIF(CHAB .NE. ' ') THEN
            KODTYP=IFIX(ARRAY2)
            ICL5=KODTYP
            CALL HABTYP (KARD2,ARRAY2)
