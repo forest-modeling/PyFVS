@@ -192,7 +192,7 @@ C----------
       SDIC = 0.
       SDIC2=0.
 C
-      IF(ITRN .LE. 0) GO TO 100
+      IF(ITRN .LE. 0 .OR. SPROB .LE. 0.) GO TO 100
       DO 70 I=1,ITRN
       IF(JPNUM.GT.0 .AND. ITRE(I).NE.JPNUM)GO TO 70
       IF(IWHO .EQ. 1) THEN
