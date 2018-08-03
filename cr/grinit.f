@@ -124,7 +124,8 @@ C
     5 CONTINUE
       LFLAGV = .FALSE.
       LBAMAX = .FALSE.
-      LZEIDE = .FALSE.
+      LZEIDE = .TRUE.
+      CALCSDI = ' '
 C
       BAINIT = 0.0
       CFMIN = 0.
