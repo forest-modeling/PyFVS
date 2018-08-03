@@ -119,7 +119,8 @@ C----------
     5 CONTINUE
       LFLAGV = .FALSE.
       LBAMAX = .FALSE.
-      LZEIDE = .FALSE.
+      LZEIDE = .TRUE.
+      CALCSDI = ' '
       CFMIN = 0.
       TCFMIN = 0.
       BFMIN = 0.
@@ -226,7 +227,7 @@ C----------
       ATBA = 0.
       ATCCF = 0.
       ORMSQD = 0.
-      SDIMAX = 555.0
+      SDIMAX = 0.
       SDIBC = 0.
       SDIAC = 0.
       ISISP = 0
