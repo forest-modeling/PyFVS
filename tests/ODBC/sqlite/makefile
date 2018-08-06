@@ -7,7 +7,7 @@ ie :
 	@echo Test ie ended
 	@echo Test ie2 database read and write
 	rm -f FVSieOut.db
-	-../../../bin/FVSiec --keywordfile=ie2.key 
+	-../../../bin/FVSie --keywordfile=ie2.key 
 	-sqlite3 FVSieOut.db < sqliteTestFVSieOut.sql > ie2.db_dump.txt
 	-diff -w ie2.db_dump.txt ie2.db_dump.txt.save
 	@echo Test ie2 ended
