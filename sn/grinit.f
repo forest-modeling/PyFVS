@@ -66,6 +66,7 @@ C----------
       DATA DBLK/'        '/
       DATA NONE/'NONE'/
 C----------
+      VARACD = 'SN'
       CALL LNKINT
       DO 5 I=1,MAXSP
       IORDER(I) = 0
