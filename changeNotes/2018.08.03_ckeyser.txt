@@ -14,7 +14,7 @@ Description: This update changes the default SDI calculation method to Zeide fro
              the density maximums based on basal area. The SDI maximums in SN are
              now set by species instead of by forest type.
 
-Impact on users: These changes will affect FVS projections.
+Impact on users: These changes will affect FVS projections excluding Regions 1 & 6
 
 Files:
 
