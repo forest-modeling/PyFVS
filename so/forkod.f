@@ -34,7 +34,7 @@ C  701 = INDUSTRY LANDS
 C  702 = INDUSTRY LANDS
 C         **702 is new code introduced to eliminate 
 C           redundancy across variants. 702 will be 
-C           mapped to 701 for processing       
+C           mapped to 701 for processing
 C  514 = SHASTA-TRINITY (MAPPED TO KLAMATH)
 C  799 = WARM SPRINGS INDIAN RESERVATION
 C----------

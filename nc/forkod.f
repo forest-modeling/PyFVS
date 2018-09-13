@@ -70,8 +70,8 @@ C
       ELSEIF(I .EQ. 11)THEN
         WRITE(JOSTND,24)
    24   FORMAT(T12,'SIMPSON TIMBER (715) IS BEING MAPPED TO ',
-     &  '(800) FOR FURTHER PROCESSING.')	
-      	I=6        
+     &  '(800) FOR FURTHER PROCESSING.')
+        I=6        
       ENDIF
       IFOR=I
       IGL=KFOR(I)
