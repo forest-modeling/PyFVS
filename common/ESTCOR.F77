@@ -1,7 +1,15 @@
 CODE SEGMENT ESTCOR
 C----------
-C  **ESTCOR DATE OF LAST REVISION:  06/14/00
+C COMMON $Id$
 C----------
+C
       REAL HCOR(MAXSP)
+C
       COMMON /ESTCOR/ HCOR
+C
+C----------
+C  VARIABLE DEFINITIONS:
+C----------
+C  HCOR --
+C
 C-----END SEGMENT
