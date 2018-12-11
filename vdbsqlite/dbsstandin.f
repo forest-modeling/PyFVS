@@ -199,11 +199,13 @@ C     MAKE SURE WE HAVE AN OPEN CONNECTION
       if (iRet.gt.0) THEN
         iRet = fsql3_errmsg(IinDBref, Msg, MxMsg)
         WRITE (JOSTND,5) TRIM(SQLSTR), Msg(:iRet)
-    5   FORMAT(/T12,"SQL=",A/T12,"Error Msg=",A)
+    5   FORMAT(/T12,'SQL=',A/T12,'Error Msg=',A/,
+     >    '********   ERROR: SQL COMMAND FAILED.')
+        CALL RCDSET (2,.TRUE.)
         RETURN
       endif
 
-C     Get the first record (and do not step through all records.
+C     Get the first record...do not step through all records.
 
       iRet = fsql3_step(IinDBref)
       if (iRet.ne.1) RETURN
@@ -752,7 +754,7 @@ C     SITE INDEX PROCESSING
             SELECT CASE (VARACD)
             CASE('CA','NC','SO','WS')
                IF(LKECHO)WRITE(JOSTND,27)
-   27          FORMAT(38X,'   SITE INDEX IS THAN 8 AND ',
+   27          FORMAT(38X,'   SITE INDEX IS GREATER THAN 8 AND ',
      &                'WILL BE INTERPRETED AS A DUNNING CODE.')
             END SELECT
             CALL DUNN(RSTANDDATA(35))
