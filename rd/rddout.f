@@ -237,7 +237,7 @@ C.... Find tree species in root disease patches.
 
       IF (ITRN .GT. 0) GOTO 804
       WRITE (IOUNIT,4100) IDRDOUT(2)
- 4100 FORMAT ('***** NO TREES IN STAND')
+ 4100 FORMAT (1X,I5,1X,'***** NO TREES IN STAND')
       GOTO 4000
 
  804  CONTINUE             
