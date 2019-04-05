@@ -169,8 +169,8 @@ C
       DOUBLE PRECISION CURVAL(NSRTNUM)
       CHARACTER(LEN=26) STANDID
       CHARACTER(LEN=36) CASEID
-      CHARACTER(LEN=3000) SQLStmt
-      CHARACTER(LEN=200)  VALS
+      CHARACTER(LEN=5000) SQLStmt
+      CHARACTER(LEN=500)  VALS
       INTEGER fsql3_prepare,fsql3_bind_int,fsql3_bind_double,
      >        fsql3_finalize,fsql3_errmsg,fsql3_step
 
