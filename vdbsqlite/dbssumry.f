@@ -9,35 +9,6 @@ C----------
 C
 C     PURPOSE: TO POPULATE A DATABASE WITH THE PROGNOSIS MODEL
 C              OUTPUT.
-C     AUTH: D. GAMMEL -- SEM -- JUNE 2002
-C     INPUT:
-C     IOSUM = THE SUMMARY OUTPUT ARRAY FROM THE PROGNOSIS MODEL.
-C              1: YEAR
-C              2: AGE
-C              3: TREES/ACRE
-C              4: TOTAL CU FT
-C     *        4: MERCH CU FT (PULP AND SAWLOG)
-C              5: MERCH CU FT
-C     *        5: MERCH CU FT (SAWLOG)
-C              6: MERCH BD FT
-C     *        6: MERCH BD FT (SAWLOG)
-C              7: REMOVED TREES/ACRE
-C              8: REMOVED TOTAL CU FT
-C     *        8: REMOVED MERCH CU FT (PULP AND SAWLOG)
-C              9: REMOVED MERCH CU FT
-C     *        9: REMOVED MERCH CU FT (SAWLOG)
-C             10: REMOVED MERCH BD FT
-C     *       10: REMOVED MERCH BD FT (SAWLOG)
-C             11: BASAL AREA/ACRE
-C             12: CCF
-C             13: AVERAGE DOMINATE HEIGHT
-C             14: PERIOD LENGTH (YEARS)
-C             15: ACCRETION (ANNUAL IN CU FT/ACRE)
-C             16: MORTALITY  (ANNUAL IN CU FT/ACRE)
-C             17: SAMPLE WEIGHT
-C             18: FOREST COVER TYPE CODE
-C             19: SIZE CLASS
-C             20: STOCKING CLASS
 C
 COMMONS
 C
@@ -293,7 +264,7 @@ C
 C
 COMMONS
 C
-      INTEGER IYEAR,ICCF,ITOPHT,IOSDI,IPRDLEN,IHRVC
+      INTEGER IYEAR,ICCF,ITOPHT,IOSDI,IPRDLEN,IHRVC,IAGEOUT
       DOUBLE PRECISION DPTPA,DPTPTPA,DPBA,DPQMD,DPTCUFT,DPTPTCUFT,
      > DPMCUFT,DPTPMCUFT,DPBDFT,DPTPBDFT,DPACC,DPMORT,DPMAI,DPRTPA,
      > DPRTCUFT,DPRMCUFT,DPRBDFT
@@ -306,8 +277,8 @@ C
      
       IF(ISUMARY.NE.2) RETURN
 C
-      IYEAR    = IY(ICYC)                                   
-      IAGE     = IOSUM(2,ICYC)
+      IYEAR    = IY(ICYC)
+      IAGEOUT  = IOSUM(2,ICYC)
       ICCF     = IOSUM(12,ICYC)
       ITOPHT   = IOSUM(13,ICYC)
       IOSDI    = ISDIAT(ICYC)
@@ -480,7 +451,7 @@ C
         ColNumber=ColNumber+1
         iRet = fsql3_bind_int(IoutDBref,ColNumber,IHRVC)
         ColNumber=ColNumber+1
-        iRet = fsql3_bind_int(IoutDBref,ColNumber,IAGE)
+        iRet = fsql3_bind_int(IoutDBref,ColNumber,IAGEOUT)
         ColNumber=ColNumber+1
         iRet = fsql3_bind_double(IoutDBref,ColNumber,DPTPA)
         ColNumber=ColNumber+1

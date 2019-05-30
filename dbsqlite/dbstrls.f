@@ -126,6 +126,7 @@ C     Column names change from: TCuFt, MCuFt, BdFt to MCuFt, SCuFt, SBdFt
          iRet = fsql3_exec(IoutDBref,SQLStmtStr) 
          IF (iRet .NE. 0) THEN
            ITREELIST = 0
+           iRet = fsql3_exec (IoutDBref,"Commit;"//Char(0))
            RETURN
          ENDIF
       ENDIF
@@ -141,6 +142,7 @@ C     Column names change from: TCuFt, MCuFt, BdFt to MCuFt, SCuFt, SBdFt
       iRet = fsql3_prepare(IoutDBref,trim(SQLStmtStr)//CHAR(0))
       IF (iRet .NE. 0) THEN
         ITREELIST = 0
+        iRet = fsql3_exec (IoutDBref,"Commit;"//Char(0))
         RETURN
       ENDIF
 
@@ -232,7 +234,8 @@ C
             IF(ISPOUT6.EQ.3)CSPECIES=ADJUSTL(TRIM(PLNJSP(ISP(I)))) 
             
             ColNumber=1
-            iRet = fsql3_bind_int(IoutDBref,ColNumber,TID)
+            iRet = fsql3_bind_text(IoutDBref,ColNumber,TID,
+     >                         LEN_TRIM(TID))
             ColNumber=ColNumber+1
             iRet = fsql3_bind_int(IoutDBref,ColNumber,I)
             ColNumber=ColNumber+1
@@ -308,13 +311,15 @@ C     FOR CYCLE 0 TREELIST, PRINT DEAD TREES WHICH WERE PRESENT IN
 C     THE INVENTORY DATA AT THE BOTTOM OF THE TREELIST.
 C
       IF (ITREELIST .EQ. 0) RETURN
-      IF(.NOT.((IREC2.GE.MAXTP1).OR.(ITPLAB.EQ.3).OR.
-     >         (ICYC.GE.1))) THEN
+      IF ((IREC2.GE.MAXTP1).OR.(ITPLAB.EQ.3).OR.
+     >         (ICYC.GE.1)) THEN
+        iRet = fsql3_exec (IoutDBref,"Commit;"//Char(0))
         iRet = fsql3_finalize(IoutDBref)
         RETURN
       ENDIF
       
       DO I=IREC2,MAXTRE
+      
         P =(PROB(I) / GROSPC) / (FINT/FINTM)
         WRITE(TID,'(I8)') IDTREE(I)
         TID=ADJUSTL(TID)
