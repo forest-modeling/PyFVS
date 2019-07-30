@@ -34,6 +34,8 @@ C  FVS_DM_Sz_Sum        dbsmis      IDM3         case, cycle
 C  FVS_RD_Sum           dbsrd       IRD1         case, cycle 
 C  FVS_RD_Det           dbsrd       IRD2         case, cycle 
 C  FVS_RD_Beetle        dbsrd       IRD3         case, cycle 
+C  FVS_Stats_Species    dbsstats    ISTATS1      case, species
+C  FVS_Stats_Stand      dbsstats    ISTATS2      case, species
 C  FVS_StrClass         dbsstrclass ISTRCLAS     case, cycle 
 C  FVS_Summary2_East    dbssumry2   ISUMARY      case, cycle, RmvCode
 C  FVS_Summary2         dbssumry2   ISUMARY      case, cycle, RmvCode 
@@ -83,7 +85,8 @@ C
       IRD1     = 0
       IRD2     = 0
       IRD3     = 0
-      
+      ISTATS1  = 0
+      ISTATS2  = 0
       RETURN
       END
 
