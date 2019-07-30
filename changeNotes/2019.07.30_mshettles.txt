@@ -1,11 +1,11 @@
-Subject: Addition of the Cruise Statistics Tables to the Database Extension
+Subject: Addition of the Inventory Statistics Tables to the Database Extension
 Name: Mike Shettles
 Date: 07/30/2019
 Variants affected: All
 
 Description: The two tables that are produced with usage of the base model
 STATS keyword have been added to the database extension code for the Q-family.
-The DB-FVS keyword that triggers this is CRUISEST. It creates two tables: 
+The DB-FVS keyword that triggers this is InvStats. It creates two tables: 
 FVS_Stats_Species and FVS_Stats_Stand.
 
 Impact on users:This will primarily affect FVSOnline/Onlocal user's, 
@@ -29,7 +29,7 @@ INTS array, and incremented INTS by 2 in it's declaration.
 ...\FMSCdev\dbsqlite\dbsppput.f--added the ISTATS1 and ISTATS2 variables to the 
 INTS array, and incremented INTS by 2 in it's declaration.
 
-...\FMSCdev\dbsqlite\dbsin.f--incremented KWCNT by 1, added "CRUISEST to the TABLEME
+...\FMSCdev\dbsqlite\dbsin.f--incremented KWCNT by 1, added "INVSTATS" to the TABLEME
 array. Added "3800" to the NUMBER array, and added code to set ISTATS1 and ISTATS2
 to be set to 1.
 
