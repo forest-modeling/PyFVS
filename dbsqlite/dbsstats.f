@@ -1,6 +1,6 @@
       SUBROUTINE DBSSTATS(SPECCD,TPA,BAREA,CFVOL,BFVOL,STDIST1,
      & STDIST2,STDIST3,STDIST4,STDIST5,STDIST6,STDIST7,STDIST8,
-     & LABEL,TBL)
+     & LABEL,TBL,IYEAR)
       IMPLICIT NONE
 C----------
 C DBSQLITE $Id: dbsstats.f 2620 2019-03-08 18:22:51Z nickcrookston $
@@ -19,7 +19,7 @@ C
 C
 COMMONS
 C
-      INTEGER ColNumber,iret1,iret2,TBL,STDIST41
+      INTEGER ColNumber,iret1,iret2,TBL,STDIST41,IYEAR
       REAL STDIST1,STDIST2,STDIST3,STDIST4,STDIST5
       REAL STDIST6,STDIST7,STDIST8
       REAL TPA,BAREA,CFVOL,BFVOL
@@ -54,6 +54,7 @@ C
           SQLStmtStr='CREATE TABLE FVS_Stats_Species('//
      -              'CaseID char(36) null,'//
      -              'StandID Char(26) null,'//
+     -              'Year int null,'//
      -              'Species text null,'//
      -              'BoardFeet real,'//
      -              'CubicFeet real,'//
@@ -68,9 +69,9 @@ C
       ENDIF                
           
         WRITE(SQLStmtStr,*)'INSERT INTO FVS_Stats_Species',
-     -          ' (CaseID,StandID,',
-     -          'Species,BoardFeet,CubicFeet,TreesPerAcre,BasalArea)',
-     -          'VALUES(''',CASEID,''',''',TRIM(NPLT),''',?,?,?,?,?);'
+     -         ' (CaseID,StandID,Year,',
+     -         'Species,BoardFeet,CubicFeet,TreesPerAcre,BasalArea)',
+     -         'VALUES(''',CASEID,''',''',TRIM(NPLT),''',?,?,?,?,?,?);'
      
           
         iRet1 = fsql3_prepare(IoutDBref,trim(SQLStmtStr)//CHAR(0))
@@ -87,6 +88,8 @@ C
         BAREA1=BAREA
         
         ColNumber=1
+        iRet1 = fsql3_bind_int(IoutDBref,ColNumber,IYEAR)
+        ColNumber=ColNumber+1
         iRet1 = fsql3_bind_text(IoutDBref,ColNumber,SPECCD,
      >                                      LEN_TRIM(SPECCD))
         ColNumber=ColNumber+1
@@ -116,6 +119,7 @@ C     DEFINE TAABLENAME
           SQLStmtStr='CREATE TABLE FVS_Stats_Stand('//
      -              'CaseID char(36) null,'//
      -              'StandID Char(26) null,'//
+     -              'Year int null,'//
      -              'Characteristic text null,'//
      -              'Average real,'//
      -              'Standard_Dev real,'//
@@ -133,11 +137,11 @@ C     DEFINE TAABLENAME
       ENDIF
       ENDIF               
         WRITE(SQLStmtStr,*)'INSERT INTO FVS_Stats_Stand',
-     -         ' (CaseID,StandID,',
+     -         ' (CaseID,StandID,Year,',
      -         'Characteristic,Average,Standard_Dev,Coeff_of_Var,',
      -         'Sample_Size,CI_LB,CI_UB,Samp_Error_Percent,',
      -         'Samp_Error_Units) VALUES(''',CASEID,
-     -         ''',''',TRIM(NPLT),''',?,?,?,?,?,?,?,?,?);'
+     -         ''',''',TRIM(NPLT),''',?,?,?,?,?,?,?,?,?,?);'
      
       iRet2 = fsql3_prepare(IoutDBref,trim(SQLStmtStr)//CHAR(0))
       IF (iRet2 .NE. 0) THEN
@@ -160,6 +164,8 @@ C
       STDIST41=NINT(STDIST4)       
       
       ColNumber=1
+      iRet1 = fsql3_bind_int(IoutDBref,ColNumber,IYEAR)
+      ColNumber=ColNumber+1
       iRet2 = fsql3_bind_text(IoutDBref,ColNumber,LABEL,
      >                                  LEN_TRIM(LABEL))      
       ColNumber=ColNumber+1
