@@ -61,7 +61,8 @@ summary tables to an SQLite3 database.
 ...\FMSCdev\dbsqlite\dbsingrow.f--created this new subroutine that writes out the ingrowth
 tables to an SQLite3 database.
 
-...\FMSCdev\dbsqlite\DBSCOM.F77--added the ISTATS1 and ISTATS2 variables as global integers.
+...\FMSCdev\dbsqlite\DBSCOM.F77--added the IREG1, IREG2, IREG3, IREG4, and IREG5 variables 
+as global integers.
 
 ...\FMSCdev\estb\estab.f--added logic to call DBSSITEPREP, DBSPLOTHAB, DBSTALLY, and
 DBSINGROW with needed values that are calculated here for the RegRepts keyword tables
