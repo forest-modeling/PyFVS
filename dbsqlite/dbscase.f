@@ -81,7 +81,9 @@ C-----
      -     IBMBKP.GE.1.OR.
      -     IBMTREE.GE.1.OR.
      -     IBMVOL.GE.1.OR.
-     -     ISTATS1.GE.1.OR.ISTATS2.GE.1) IFORSR = 1
+     -     ISTATS1.GE.1.OR.ISTATS2.GE.1.OR.
+     -     IREG1.GE.1.OR.IREG2.GE.1.OR.IREG3.GE.1.OR.
+     -     IREG4.GE.1.OR.IREG5.GE.1) IFORSR = 1
        ENDIF
        IF(IFORSR.EQ.0) RETURN
 C---------
