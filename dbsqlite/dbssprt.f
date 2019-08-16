@@ -46,7 +46,6 @@ C
           SQLStmtStr='CREATE TABLE FVS_Regen_Sprouts('//
      -              'CaseID Char(36) null,'//
      -              'StandID Char(26) null,'//
-     -              'MgmtID Char(4) null,'//
      -              'Year int null,'//
      -              'Species text null,'//
      -              'SprtTpa int,'//
@@ -60,10 +59,9 @@ C
       ENDIF                
           
         WRITE(SQLStmtStr,*)'INSERT INTO FVS_Regen_Sprouts',
-     -        ' (CaseID,StandID,MgmtID,Year,',
+     -        ' (CaseID,StandID,Year,',
      -        'Species,SprtTpa,SprtAveHt)',
-     -        'VALUES(''',CASEID,''',''',TRIM(NPLT),''',
-     -        ''',TRIM(MGMID),''',?,?,?,?);'     
+     -        'VALUES(''',CASEID,''',''',TRIM(NPLT),''',?,?,?,?);'     
           
         iRet = fsql3_prepare(IoutDBref,trim(SQLStmtStr)//CHAR(0))
           IF (iRet .NE. 0) THEN
