@@ -1,6 +1,6 @@
       SUBROUTINE DBSSTATS(SPECCD,TPA,BAREA,CFVOL,BFVOL,STDIST1,
      & STDIST2,STDIST3,STDIST4,STDIST5,STDIST6,STDIST7,STDIST8,
-     & LABEL,TBL,IYEAR)
+     & STDIST9,LABEL,TBL,IYEAR)
       IMPLICIT NONE
 C----------
 C DBSQLITE $Id: dbsstats.f 2620 2019-03-08 18:22:51Z nickcrookston $
@@ -19,13 +19,13 @@ C
 C
 COMMONS
 C
-      INTEGER ColNumber,iret1,iret2,TBL,STDIST41,IYEAR
+      INTEGER ColNumber,iret1,iret2,TBL,STDIST41,IYEAR,STDIST51
       REAL STDIST1,STDIST2,STDIST3,STDIST4,STDIST5
-      REAL STDIST6,STDIST7,STDIST8
+      REAL STDIST6,STDIST7,STDIST8,STDIST9
       REAL TPA,BAREA,CFVOL,BFVOL
       DOUBLE PRECISION TPA1,BAREA1,CFVOL1,BFVOL1
-      DOUBLE PRECISION STDIST11,STDIST21,STDIST31,STDIST51
-      DOUBLE PRECISION STDIST61,STDIST71,STDIST81
+      DOUBLE PRECISION STDIST11,STDIST21,STDIST31
+      DOUBLE PRECISION STDIST61,STDIST71,STDIST81,STDIST91
       CHARACTER*2000 SQLStmtStr
       CHARACTER*4 SPECCD
       CHARACTER*16 LABEL
@@ -125,6 +125,7 @@ C     DEFINE TAABLENAME
      -              'Standard_Dev real,'//
      -              'Coeff_of_Var real,'//
      -              'Sample_Size int,'//
+     -              'Conf_Level_Percent int,'//
      -              'CI_LB real,'//
      -              'CI_UB real,'//
      -              'Samp_Error_Percent real,'//
@@ -137,11 +138,11 @@ C     DEFINE TAABLENAME
       ENDIF
       ENDIF               
         WRITE(SQLStmtStr,*)'INSERT INTO FVS_Stats_Stand',
-     -         ' (CaseID,StandID,Year,',
-     -         'Characteristic,Average,Standard_Dev,Coeff_of_Var,',
-     -         'Sample_Size,CI_LB,CI_UB,Samp_Error_Percent,',
-     -         'Samp_Error_Units) VALUES(''',CASEID,
-     -         ''',''',TRIM(NPLT),''',?,?,?,?,?,?,?,?,?,?);'
+     -        ' (CaseID,StandID,Year,',
+     -        'Characteristic,Average,Standard_Dev,Coeff_of_Var,',
+     -        'Sample_Size,Conf_Level_Percent,CI_LB,CI_UB,',
+     -        'Samp_Error_Percent,Samp_Error_Units) VALUES(''',CASEID,
+     -        ''',''',TRIM(NPLT),''',?,?,?,?,?,?,?,?,?,?,?);'
      
       iRet2 = fsql3_prepare(IoutDBref,trim(SQLStmtStr)//CHAR(0))
       IF (iRet2 .NE. 0) THEN
@@ -153,15 +154,16 @@ C     ASSIGN REAL VALUES TO DOUBLE PRECISION VARS
 C
       STDIST11=STDIST1            
       STDIST21=STDIST2            
-      STDIST31=STDIST3                      
-      STDIST51=STDIST5            
+      STDIST31=STDIST3                                 
       STDIST61=STDIST6           
       STDIST71=STDIST7            
-      STDIST81=STDIST8 
+      STDIST81=STDIST8
+      STDIST91=STDIST9  
 C
 C     ASSIGN INTEGER VALUE TO REAL VAR FOR SAMPLE SIZE
 C      
       STDIST41=NINT(STDIST4)       
+      STDIST51=NINT(STDIST5)
       
       ColNumber=1
       iRet1 = fsql3_bind_int(IoutDBref,ColNumber,IYEAR)
@@ -177,13 +179,15 @@ C
       ColNumber=ColNumber+1
       iRet2 = fsql3_bind_int(IoutDBref,ColNumber,STDIST41)
       ColNumber=ColNumber+1
-      iRet2 = fsql3_bind_double(IoutDBref,ColNumber,STDIST51)
+      iRet2 = fsql3_bind_int(IoutDBref,ColNumber,STDIST51)
       ColNumber=ColNumber+1                                
       iRet2 = fsql3_bind_double(IoutDBref,ColNumber,STDIST61)
       ColNumber=ColNumber+1                                
       iRet2 = fsql3_bind_double(IoutDBref,ColNumber,STDIST71)
       ColNumber=ColNumber+1                                
-      iRet2 = fsql3_bind_double(IoutDBref,ColNumber,STDIST81)   
+      iRet2 = fsql3_bind_double(IoutDBref,ColNumber,STDIST81) 
+      ColNumber=ColNumber+1                                
+      iRet2 = fsql3_bind_double(IoutDBref,ColNumber,STDIST91)   
       iRet2 = fsql3_step(IoutDBref)
       iRet2 = fsql3_finalize(IoutDBref)
       IF (iRet2.ne.0) then 
