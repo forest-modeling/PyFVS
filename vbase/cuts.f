@@ -1289,6 +1289,7 @@ C         WHICH IS THE PARAMETER 2 -------v
             INEG=1
             IF(DEBUG)WRITE(JOSTND,*)' CUT LESS - IT, DBH(IT), PREM =',
      &        IT,DBH(IT),PREM
+            IF(PREM .LE. 0.0) GO TO 1048
             GO TO 1047
           ELSE
             PREM=PREM+0.2
