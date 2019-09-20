@@ -27,7 +27,6 @@ C----------
 C----------
 C  DUMMY ARGUMENT NOT USED WARNING SUPPRESSION SECTION
 C----------
-        IF(.TRUE.)RETURN
         CDANUW = SPECCD(1:1)
         RDANUW = TPA1
         RDANUW = BA1
@@ -54,7 +53,6 @@ C----------
 C----------
 C  DUMMY ARGUMENT NOT USED WARNING SUPPRESSION SECTION
 C----------
-        IF(.TRUE.)RETURN
         CDANUW = SPECCD(1:1)
         RDANUW = TPASUM
         RDANUW = HTAVE
@@ -71,7 +69,6 @@ C----------
 C----------
 C  DUMMY ARGUMENT NOT USED WARNING SUPPRESSION SECTION
 C----------
-        IF(.TRUE.)RETURN
         IDANUW = NOYEAR
         IDANUW = MECHYEAR
         IDANUW = BURNYEAR
@@ -86,7 +83,6 @@ C----------
 C----------
 C  DUMMY ARGUMENT NOT USED WARNING SUPPRESSION SECTION
 C----------
-        IF(.TRUE.)RETURN
         IDANUW = NUMPTS
         CDANUW = HABTYP(1:1)
         CDANUW = SERIES(1:1)
@@ -100,7 +96,6 @@ C----------
 C----------
 C  DUMMY ARGUMENT NOT USED WARNING SUPPRESSION SECTION
 C----------
-        IF(.TRUE.)RETURN
         RDANUW = PRBSTK
         IDANUW = NTALLY
         CDANUW = SPECCD(1:1)
@@ -120,7 +115,6 @@ C----------
 C----------
 C  DUMMY ARGUMENT NOT USED WARNING SUPPRESSION SECTION
 C----------
-        IF(.TRUE.)RETURN
         IDANUW = IYEAR
         RDANUW = INGROW
         CDANUW = SPECCD(1:1)

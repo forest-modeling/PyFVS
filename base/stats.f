@@ -55,11 +55,19 @@ C----------
 C  INITIALIZE.
 C----------
       DO 1 I=1,MAXSP
-      TOTTR(I)=0.0
-      TOTBA(I)=0.0
-      TOTBF(I)=0.0
-      TOTCF(I)=0.0
-      IFLG(I)=0
+      TOTTR(I)= 0.0
+      TOTBA(I)= 0.0
+      TOTBF(I)= 0.0
+      TOTCF(I)= 0.0
+      IFLG(I) = 0
+      ITPA(I) = 0.0
+      IBA(I)  = 0.0
+      IBF(I)  = 0.0
+      ICF(I)  = 0.0
+      TPA(I)  = 0.0
+      BAREA(I)= 0.0
+      BFVOL(I)= 0.0
+      CFVOL(I)= 0.0
     1 CONTINUE
       DO 2 I=1,MAXPLT
       SUMT(I)=0.0
@@ -67,6 +75,15 @@ C----------
       SUMBF(I)=0.0
       SUMCF(I)=0.0
     2 CONTINUE
+      DO I=1,8
+        DO J=1,4
+          IDIST(I,J) = 0.0
+        ENDDO
+      ENDDO
+      SIGLEVEL=0.0
+      ROWS  = 0
+      CNT   = 0
+      IYEAR = 0
 C----------
 C  ACCUMULATE SUMS FOR OVERALL STATISTICS.
 C----------
