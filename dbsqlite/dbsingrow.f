@@ -17,7 +17,7 @@ C
 C
 COMMONS
 C
-      INTEGER ColNumber,iret,IYEAR
+      INTEGER ColNumber,iret,IYEAR,IYEAR1
       REAL INGROW,TPAIN
       DOUBLE PRECISION INGROW1,TPAIN1
       CHARACTER*2000 SQLStmtStr
@@ -72,9 +72,10 @@ C
 
         INGROW1=INGROW
         TPAIN1=TPAIN
+        IYEAR1=IYEAR
 
         ColNumber=1
-        iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR)
+        iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR1)
         ColNumber=ColNumber+1
         iRet = fsql3_bind_double(IoutDBref,ColNumber,INGROW1) 
         ColNumber=ColNumber+1

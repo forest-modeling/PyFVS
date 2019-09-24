@@ -20,7 +20,7 @@ C
 COMMONS
 C
       INTEGER ColNumber,iret,NTALLY,SUMTPA1,SUMPCT1,BESTTPA1
-      INTEGER PASTPA1,PASPCT1,BESTPCT1,IYEAR,TOT
+      INTEGER PASTPA1,PASPCT1,BESTPCT1,IYEAR,TOT,IYEAR1
       REAL PRBSTK,AVEHT,WTAVEHT,TOTTTPAA,TOTTTPAB,TOTTTPA3
       REAL SUMTPA,SUMPCT,BESTTPA,PASTPA,PASPCT,BESTPCT
       DOUBLE PRECISION PRBSTK1,AVEHT1
@@ -109,10 +109,11 @@ C
         PASPCT1=100
         BESTPCT1=100
         SUMPCT1=100
-        ENDIF                                               
+        ENDIF     
+        IYEAR1=IYEAR+1                                          
                           
         ColNumber=1
-        iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR)
+        iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR1)
         ColNumber=ColNumber+1
         iRet = fsql3_bind_double(IoutDBref,ColNumber,PRBSTK1) 
         ColNumber=ColNumber+1
@@ -208,10 +209,11 @@ C
         PASPCT1=100
         BESTPCT1=100
         SUMPCT1=100
-        ENDIF              
+        ENDIF   
+        IYEAR1=IYEAR+1           
                           
         ColNumber=1
-        iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR)
+        iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR1)
         ColNumber=ColNumber+1
         iRet = fsql3_bind_int(IoutDBref,ColNumber,NTALLY)
         ColNumber=ColNumber+1

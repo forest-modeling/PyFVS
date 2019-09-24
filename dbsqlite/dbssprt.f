@@ -3,8 +3,7 @@
       IMPLICIT NONE
 C----------
 C DBSQLITE $Id: dbsstats.f 2620 2019-03-08 18:22:51Z nickcrookston $
-C----------
-C
+C----------C
 C     PURPOSE: TO POPULATE A DATABASE WITH THE PROGNOSIS MODEL
 C              SPROUTING OUTPUT 
 C     AUTH: M. SHETTLES -- FMSC -- AUGUST 2019
@@ -18,7 +17,7 @@ C
 C
 COMMONS
 C
-      INTEGER ColNumber,iret,TOT,IYEAR,TPASUM1
+      INTEGER ColNumber,iret,TOT,IYEAR,TPASUM1,IYEAR1
       REAL TPASUM,HTAVE,TPATOT,WTHTAVE
       DOUBLE PRECISION HTAVE1
       CHARACTER*2000 SQLStmtStr
@@ -78,9 +77,10 @@ C
         TPASUM1=NINT(TPATOT)
         HTAVE1=WTHTAVE
         ENDIF
+        IYEAR1=IYEAR+1
         
         ColNumber=1
-        iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR)
+        iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR1)
         ColNumber=ColNumber+1
         iRet = fsql3_bind_text(IoutDBref,ColNumber,SPECCD,
      >                                      LEN_TRIM(SPECCD))
