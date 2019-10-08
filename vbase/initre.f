@@ -64,8 +64,7 @@ C
 COMMONS
 C
       INTEGER IDUM1,IDUM2,IDUM3,IHAB,NEWYR,ISPEC,IFOREST,INTDIST,IFORST
-      INTEGER IREGN,IRDUM,INUM,IDFLG,IDTYPE,IXF,IXTMP,ITB,ITC,JJTAB
-      INTEGER IFSP,ISTLNB
+      INTEGER IFSP,IREGN,IRDUM,INUM,IDFLG,IDTYPE,IXF,IXTMP,ITB,ITC,JJTAB
       REAL CAPHT,CAPFLG,CAPPRP,CAPDBH,DUM1,XTMP,X,TB,XXG
       REAL TC,SDHI,SDLO,ARRAY(7),PRMS(10)
       INTEGER ITOPD8,IACT,IRC,IDBCYC,NP,K,I1,IGSP,IG,IULIM,IGRP,ISETQFA
@@ -4003,45 +4002,51 @@ C
       IF (IRTNCD.NE.0) RETURN
       GOTO 10
 C
-C  ==========  OPTION NUMBER 118: SYSTEM  ============================SYSTEM
+C  ==========  OPTION NUMBER 118: available  =========================available
 C
 11800 CONTINUE
-C
-C     READ THE SYSTEM COMMAND.
-C
-      READ(IREAD,'(A)',END=80) RECORD
-      IRECNT=IRECNT+1
-      IF (RECORD.EQ.' ') THEN
-         CALL KEYDMP (JOSTND,IRECNT,KEYWRD,ARRAY,KARD)
-         CALL ERRGRO (.TRUE.,4)
-         GOTO 10
-      ENDIF
-      IDT=1
-      IF (LNOTBK(1)) IDT=IFIX(ARRAY(1))
-      IF (.NOT.LNOTBK(1)) THEN
-         IF(LKECHO)WRITE(JOSTND,11810) KEYWRD,RECORD(1:ISTLNB(RECORD))
-11810    FORMAT (/A8,'   SYSTEM CALL:',A)
-         CALL SYSTEM(RECORD)
-      ELSE
-         IF (IPRMPT.GT.0) THEN
-            IF (IPRMPT.NE.2) THEN
-              CALL KEYDMP (JOSTND,IRECNT,KEYWRD,ARRAY,KARD)
-              CALL ERRGRO (.TRUE.,25)
-            ELSE
-              CALL OPNEWC (KODE,JOSTND,IREAD,IDT,100,KEYWRD,KARD,
-     >                      IPRMPT,IRECNT,ICYC)
-              CALL fvsGetRtnCode(IRTNCD)
-              IF (IRTNCD.NE.0) RETURN
-            ENDIF
-         ELSE
-            CALL OPNEW (KODE,IDT,100,0,ARRAY)
-         ENDIF
-         IF (KODE.EQ.0) CALL OPCACT (KODE,RECORD)
-         IF(LKECHO)WRITE(JOSTND,11820) KEYWRD,IDT,
-     &                                 RECORD(1:ISTLNB(RECORD))
-11820    FORMAT (/A8,'   DATE/CYCLE=',I5,'; SYSTEM CALL:',A)
 
-      ENDIF
+C
+C     PROCESS OPTION 118 CODE HERE. PREVIOUS OPTION WAS AN ACTIVITY AND USED
+C     ACTIVITY CODE 100.
+C
+
+CxC                                                                       !Remove these
+CxC     READ THE SYSTEM COMMAND.                                          !Remove these
+CxC                                                                       !Remove these
+Cx      READ(IREAD,'(A)',END=80) RECORD                                   !Remove these
+Cx      IRECNT=IRECNT+1                                                   !Remove these
+Cx      IF (RECORD.EQ.' ') THEN                                           !Remove these
+Cx         CALL KEYDMP (JOSTND,IRECNT,KEYWRD,ARRAY,KARD)                  !Remove these
+Cx         CALL ERRGRO (.TRUE.,4)                                         !Remove these
+Cx         GOTO 10                                                        !Remove these
+Cx      ENDIF                                                             !Remove these
+Cx      IDT=1                                                             !Remove these
+Cx      IF (LNOTBK(1)) IDT=IFIX(ARRAY(1))                                 !Remove these
+Cx      IF (.NOT.LNOTBK(1)) THEN                                          !Remove these
+Cx         IF(LKECHO)WRITE(JOSTND,11810) KEYWRD,RECORD(1:ISTLNB(RECORD))  !Remove these
+Cx11810    FORMAT (/A8,'   SYSTEM CALL:',A)                               !Remove these
+Cx         CALL SYSTEM(RECORD)                                            !Remove these
+Cx      ELSE                                                              !Remove these
+Cx         IF (IPRMPT.GT.0) THEN                                          !Remove these
+Cx            IF (IPRMPT.NE.2) THEN                                       !Remove these
+Cx              CALL KEYDMP (JOSTND,IRECNT,KEYWRD,ARRAY,KARD)             !Remove these
+Cx              CALL ERRGRO (.TRUE.,25)                                   !Remove these
+Cx            ELSE                                                        !Remove these
+Cx              CALL OPNEWC (KODE,JOSTND,IREAD,IDT,100,KEYWRD,KARD,       !Remove these
+Cx     >                      IPRMPT,IRECNT,ICYC)                         !Remove these
+Cx              CALL fvsGetRtnCode(IRTNCD)                                !Remove these
+Cx              IF (IRTNCD.NE.0) RETURN                                   !Remove these
+Cx            ENDIF                                                       !Remove these
+Cx         ELSE                                                           !Remove these
+Cx            CALL OPNEW (KODE,IDT,100,0,ARRAY)                           !Remove these
+Cx         ENDIF                                                          !Remove these
+Cx         IF (KODE.EQ.0) CALL OPCACT (KODE,RECORD)                       !Remove these
+Cx         IF(LKECHO)WRITE(JOSTND,11820) KEYWRD,IDT,                      !Remove these
+Cx     &                                 RECORD(1:ISTLNB(RECORD))         !Remove these
+Cx11820    FORMAT (/A8,'   DATE/CYCLE=',I5,'; SYSTEM CALL:',A)            !Remove these
+Cx                                                                        !Remove these
+Cx      ENDIF                                                             !Remove these
       GOTO 10
 C
 C  ==========  OPTION NUMBER 119: DEFECT  =========================DEFECT
