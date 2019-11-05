@@ -319,14 +319,12 @@ C  POPULATE ARRAYS WITH NON-ZERO VALUES
 C----------
       CNT=0
       DO I=1,MAXSP
-       IF(IBA(I).GT.001)THEN
          CNT=CNT+1
          SPECCD(CNT)=SP(I)
          TPA(CNT)=ITPA(I) 
          BAREA(CNT)=IBA(I) 
          BFVOL(CNT)=IBF(I) 
          CFVOL(CNT)=ICF(I) 
-       ENDIF
       ENDDO   
       
       IYEAR=IY(1)
@@ -335,6 +333,7 @@ C
 C      CALL DBSSTATS FOR POPULATING THE DATABASE WITH
 C      THE CRUISE STATISTICS INFORMATION
 C     
+      
       DO I=1,ROWS
       CALL DBSSTATS(SP(I),TPA(I),BAREA(I),CFVOL(I),
      &   BFVOL(I),IDIST(1,I),IDIST(2,I),IDIST(3,I),
