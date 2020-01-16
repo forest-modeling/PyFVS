@@ -25,7 +25,7 @@ C
       REAL SUMTPA,SUMPCT,BESTTPA,PASTPA,PASPCT,BESTPCT
       DOUBLE PRECISION PRBSTK1,AVEHT1
       CHARACTER*2000 SQLStmtStr
-      CHARACTER*2 SPECCD      
+      CHARACTER*3 SPECCD      
 C
 COMMONS END
 
@@ -110,7 +110,10 @@ C
         BESTPCT1=100
         SUMPCT1=100
         ENDIF     
-        IYEAR1=IYEAR+1                                          
+        IYEAR1=IYEAR+1 
+        IF(SPECCD.NE."ALL")THEN
+        SPECCD=SPECCD(1:2)
+        ENDIF                                         
                           
         ColNumber=1
         iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR1)

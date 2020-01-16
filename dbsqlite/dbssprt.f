@@ -21,7 +21,7 @@ C
       REAL TPASUM,HTAVE,TPATOT,WTHTAVE
       DOUBLE PRECISION HTAVE1
       CHARACTER*2000 SQLStmtStr
-      CHARACTER*2 SPECCD
+      CHARACTER*3 SPECCD
 C
 C
 COMMONS END
@@ -78,6 +78,9 @@ C
         HTAVE1=WTHTAVE
         ENDIF
         IYEAR1=IYEAR+1
+        IF(SPECCD.NE."ALL")THEN
+        SPECCD=SPECCD(1:2)
+        ENDIF
         
         ColNumber=1
         iRet = fsql3_bind_int(IoutDBref,ColNumber,IYEAR1)
