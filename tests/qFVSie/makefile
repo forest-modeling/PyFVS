@@ -60,7 +60,7 @@ econdb :
 	@echo Test econ database read and write
 	rm -f TestDataBase.db
 	-$(WINE) ../../bin/qFVSie --keywordfile=TestDataBase.key 
-	-sqlite3 TestDataBase.db "select Year,SpeciesPlant,Total_Value from FVS_EconHarvestValue;" > TestDataBase.dump
+	-sqlite3 TestDataBase.db "select Year,SpeciesPlants,Total_Value from FVS_EconHarvestValue;" > TestDataBase.dump
 	-sqlite3 TestDataBase.db "select round(pnv,1),Mrch_BoardFoot_Volume from FVS_EconSummary;" >> TestDataBase.dump	
 	-diff -w TestDataBase.dump TestDataBase.dump.save
 	@echo Test calibStats ended
