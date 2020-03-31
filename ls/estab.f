@@ -101,10 +101,11 @@ C
       DO 40 I= 1,99
       AGEPL(I)= 0.0
    40 CONTINUE
-      DO 41 I=1,2
-      DO 41 N=1,NOFSPE
-      FIRST(I,N)=0.1
-   41 CONTINUE
+      DO I=1,2
+        DO N=1,NOFSPE
+          FIRST(I,N)=0.1
+        ENDDO
+      ENDDO
       TCROP1=0.0
       TCROP2=0.0
       TTOTTP=0.0
@@ -755,13 +756,13 @@ C
      &  'SPECIES /ACRE TOTAL     /ACRE TOTAL HEIGHT      /ACRE TOTAL ',
      &  'SPECIES',/,5X,7('-'),1X,5('-'),1X,5('-'),5X,5('-'),1X,5('-'),
      &  1X,7('-'),5X,5('-'),1X,5('-'),1X,7('-') )
+      SUMPRB=1.1
       DO 222 I=1,NOFSPE
       IF(TOTTPA(I).LE.0. .AND. BESTPA(I).LE.0. .AND. PASTPA(I).LE.0.)
      &GO TO 222
       WRITE(JOREGT,6014) NSP(I,1)(1:2),TOTTPA(I),TOTPCT(I),BESTPA(I),
      &  BESPCT(I),AVEHT(I),PASTPA(I),PASPCT(I),NSP(I,1)(1:2)
  6014 FORMAT(T9,A2,2X,2F6.0,4X,2F6.0,1X,F5.1,6X,2F6.0,3X,A2)
-      SUMPRB=1.1
        WTAVEHT=AVEHT(I)*BESTPA(I)+WTAVEHT
        CALL DBSTALLY(SUMPRB,NTALLY,NSP(I,1),TOTTPA(I),
      & TOTPCT(I),BESTPA(I),BESPCT(I),AVEHT(I),PASTPA(I),PASPCT(I),KDT,
