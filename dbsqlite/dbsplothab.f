@@ -42,9 +42,9 @@ C
           SQLStmtStr='CREATE TABLE FVS_Regen_HabType('//
      -              'CaseID text not null,'//
      -              'StandID text not null,'//
-     -              'Series Char(7) null,'//
+     -              'Series text null,'//
      -              'GroupNum int null,'//
-     -              'HabitatType Char(47) null,'//
+     -              'HabitatType text null,'//
      -              'NumPlots int null);'//CHAR(0)
      
       iRet = fsql3_exec(IoutDBref,SQLStmtStr)
