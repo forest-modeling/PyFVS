@@ -38,8 +38,8 @@ C       SITE PREP SUMMARY
 C                  
       IF(iRet.EQ.0) THEN
           SQLStmtStr='CREATE TABLE FVS_Regen_SitePrep('//
-     -              'CaseID char(36) null,'//
-     -              'StandID Char(26) null,'//
+     -              'CaseID text not null,'//
+     -              'StandID text not null,'//
      -              'YearNone int null,'//
      -              'YearMech int null,'//
      -              'YearBurn int null,'//

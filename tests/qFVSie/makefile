@@ -6,6 +6,7 @@ all : iet01 iet02 iet03 iedb compress calibStats econdb firedb climdb \
 
 iet01 : 
 	@echo Test iet01, basic functionality
+	rm -f iet01_Out.db 
 	-$(WINE) ../../bin/qFVSie --keywordfile=iet01.key
 	grep -v "\-999" iet01.sum      > iet01.tmp
 	grep -v "\-999" iet01.sum.save > iet01.tmp.save
@@ -13,11 +14,11 @@ iet01 :
 	rm iet01.tmp iet01.tmp.save
 	-sqlite3 iet01_Out.db < iet01_Out_sqlite.sql > iet01_db_dump.txt
 	-diff -w iet01_db_dump.txt iet01_db_dump.txt.save
-	rm iet01_Out.db 
 	@echo Test iet01 ended
 	
 iet02 : 
 	@echo Test iet02, test use of stop/restart, same as iet01.
+	rm -f iet01_Out.db 
 	-$(WINE) ../../bin/qFVSie --keywordfile=iet01.key --stoppoint=2,2040,iet02.stop
 	-$(WINE) ../../bin/qFVSie --restart=iet02.stop
 	grep -v "\-999" iet01.sum      > iet01.tmp
@@ -26,7 +27,6 @@ iet02 :
 	rm iet01.tmp iet01.tmp.save
 	-sqlite3 iet01_Out.db < iet01_Out_sqlite.sql > iet02_db_dump.txt
 	-diff -w iet02_db_dump.txt iet02_db_dump.txt.save
-	rm iet01_Out.db 
 	@echo Test iet02 ended
 	
 iet03 : 

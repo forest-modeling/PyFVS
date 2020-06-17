@@ -53,8 +53,8 @@ C
      1      (VARACD .EQ. 'NE') .OR. (VARACD .EQ. 'SN')) THEN
 C
             SQLStmtStr='CREATE TABLE FVS_Summary_East('//
-     -                 'CaseID char(36),'//
-     -                 'StandID Char(26),'//
+     -                 'CaseID text not null,'//
+     -                 'StandID text not null,'//
      -                 'Year int,'//
      -                 'Age int,'//
      -                 'Tpa int,'//
@@ -87,8 +87,8 @@ C
 C       WESTERN VARIANT VOLUME NOMENCLATURE
 C
             SQLStmtStr='CREATE TABLE FVS_Summary('//
-     -                 'CaseID char(36),'//
-     -                 'StandID Char(26),'//
+     -                 'CaseID text not null,'//
+     -                 'StandID text not null,'//
      -                 'Year int,'//
      -                 'Age int,'//
      -                 'Tpa int,'//
@@ -343,8 +343,8 @@ C
      >      (VARACD .EQ. 'NE') .OR. (VARACD .EQ. 'SN')) THEN
 C                       
           SQLStmtStr='CREATE TABLE '//TRIM(TABLENAME)//
-     -               ' (CaseID char,'//
-     -                 'StandID char,'//
+     -               ' (CaseID text not null,'//
+     -                 'StandID text not null,'//
      -                 'Year int,'//
      -                 'RmvCode int,'//
      -                 'Age int,'//
@@ -377,8 +377,8 @@ C
 C       WESTERN VARIANT VOLUME NOMENCLATURE
 C
           SQLStmtStr='CREATE TABLE '//TRIM(TABLENAME)//
-     -               ' (CaseID char,'//
-     -                 'StandID char,'//
+     -               ' (CaseID text not null,'//
+     -                 'StandID text not null,'//
      -                 'Year int,'//
      -                 'RmvCode int,'//
      -                 'Age int,'//

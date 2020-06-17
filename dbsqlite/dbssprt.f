@@ -44,8 +44,8 @@ C
 
       IF(iRet.EQ.0) THEN
           SQLStmtStr='CREATE TABLE FVS_Regen_Sprouts('//
-     -      'CaseID Char(36) null,'//
-     -      'StandID Char(26) null,'//
+     -      'CaseID text not null,'//
+     -      'StandID text not null,'//
      -      'Year int null,'//
      -      'SpeciesFVS    text null,'//
      -      'SpeciesPLANTS text null,'//

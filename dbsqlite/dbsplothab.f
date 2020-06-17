@@ -40,11 +40,11 @@ C       SITE PREP SUMMARY
 C                  
       IF(iRet.EQ.0) THEN
           SQLStmtStr='CREATE TABLE FVS_Regen_HabType('//
-     -              'CaseID char(36) null,'//
-     -              'StandID Char(26) null,'//
-     -              'Series Char(7) null,'//
+     -              'CaseID text not null,'//
+     -              'StandID text not null,'//
+     -              'Series text null,'//
      -              'GroupNum int null,'//
-     -              'HabitatType Char(47) null,'//
+     -              'HabitatType text null,'//
      -              'NumPlots int null);'//CHAR(0)
      
       iRet = fsql3_exec(IoutDBref,SQLStmtStr)

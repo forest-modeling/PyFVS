@@ -82,7 +82,7 @@ C
       IF(iRet.EQ.0) THEN
         SQLStmtStr='CREATE TABLE FVS_StrClass ('//
      -    'CaseID text not null,'//
-     -    'StandID text null,'//
+     -    'StandID text not null,'//
      -    'Year int null,'//
      -    'Removal_Code int null,'//
      -    'Stratum_1_DBH real null,'//
