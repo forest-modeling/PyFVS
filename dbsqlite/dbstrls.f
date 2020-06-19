@@ -91,8 +91,8 @@ C     Column names change from: TCuFt, MCuFt, BdFt to MCuFt, SCuFt, SBdFt
       iRet = fsql3_tableexists(IoutDBref,TRIM(TBLNAME)//CHAR(0))
       IF(iRet.EQ.0) THEN
           SQLStmtStr='CREATE TABLE ' // TRIM(TBLNAME) //
-     -             ' (CaseID text,'//
-     -             'StandID text,'//
+     -             ' (CaseID text not null,'//
+     -             'StandID text not null,'//
      -             'Year int null,'//
      -             'PrdLen int null,'//
      -             'TreeId text null,'//

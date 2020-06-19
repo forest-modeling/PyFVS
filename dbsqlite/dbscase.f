@@ -133,8 +133,8 @@ C---------
       IF(IRCODE.EQ.0) THEN
         SQLStmtStr="CREATE TABLE FVS_Cases"//
      -              " (CaseID text primary key,"//
-     -              "Stand_CN text,"//
-     -              "StandID text,"//
+     -              "Stand_CN text not null,"//
+     -              "StandID text not null,"//
      -              "MgmtID text,"//
      -              "RunTitle text,"//
      -              "KeywordFile text,"//

@@ -53,8 +53,8 @@ C
 
       IF(iRet1.EQ.0) THEN
           SQLStmtStr='CREATE TABLE FVS_Stats_Species('//
-     -              'CaseID char(36) null,'//
-     -              'StandID Char(26) null,'//
+     -              'CaseID text not null,'//
+     -              'StandID text not null,'//
      -              'Year int null,'//
      -              'SpeciesFVS    text null,'//
      -              'SpeciesPLANTS text null,'//
@@ -137,8 +137,8 @@ C     DEFINE TABLENAME
           iRet2=fsql3_tableexists(IoutDBref,'FVS_Stats_Stand'//CHAR(0))
       IF(iRet2.EQ.0) THEN
           SQLStmtStr='CREATE TABLE FVS_Stats_Stand('//
-     -              'CaseID char(36) null,'//
-     -              'StandID Char(26) null,'//
+     -              'CaseID text not null,'//
+     -              'StandID text not null,'//
      -              'Year int null,'//
      -              'Characteristic text null,'//
      -              'Average real,'//

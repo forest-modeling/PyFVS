@@ -98,8 +98,8 @@ C     IF IT DOESNT THEN WE NEED TO CREATE IT
       IRCODE = fsql3_tableexists(IoutDBref,TRIM(TBLNAME)//CHAR(0))
       IF(IRCODE.EQ.0) THEN
           SQLStmtStr='CREATE TABLE ' // TRIM(TBLNAME) //
-     -             ' (CaseID text null,'//
-     -             'StandID text null,'//
+     -             ' (CaseID text not null,'//
+     -             'StandID text not null,'//
      -             'Year int null,'//
      -             'PrdLen int null,'//
      -             'TreeId text null,'//
