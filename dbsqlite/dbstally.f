@@ -195,6 +195,22 @@ C
           RETURN
         ENDIF
       ENDIF
+      
+C     ASSIGN FVS, PLANTS AND FIA SPECIES CODES
+C
+      IF (CSP .EQ. "ALL") THEN
+        CSP1 = "ALL"
+        CSP2 = "ALL"
+        CSP3 = "ALL"
+      ELSE
+        DO I = 1,MAXSP
+          IF (CSP(1:2) .EQ. JSP(I)) THEN
+            CSP1 = JSP(I)
+            CSP2 = PLNJSP(I)
+            CSP3 = FIAJSP(I)
+          ENDIF
+        ENDDO
+      ENDIF
 
       WRITE(SQLStmtStr,*)'INSERT INTO FVS_Regen_Tally',
      -    ' (CaseID,StandID,Year,TallyNumber,',

@@ -100,12 +100,14 @@ C
       INTEGER J,IPNT,KODE
 
       IF (LENSTRINGS(1).GT.0) THEN
+        DSNIN=" "
         DO J=1,LENSTRINGS(1)
           CALL CHREAD(CBUFF,IPNT,LNCBUF,DSNIN(J:J),2)
         ENDDO
       ENDIF
 
       IF (LENSTRINGS(2).GT.0) THEN
+        DSNOUT=" "
         DO J=1,LENSTRINGS(2)
           CALL CHREAD(CBUFF,IPNT,LNCBUF,DSNOUT(J:J),2)
         ENDDO
