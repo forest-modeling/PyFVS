@@ -1686,7 +1686,7 @@ C----------
         DO 4505 IG=2,IULIM
         IGSP = ISPGRP(IGRP,IG)
         IF (LNOTBK(3)) DBHMIN(IGSP)=ARRAY(3)
-        IF(LNOTBK(4).AND.(ITOPD8.LE.0.))THEN
+        IF(LNOTBK(4).AND.(ITOPD8.LE.0))THEN
            TOPD(IGSP)=ARRAY(4)
         ENDIF
         IF (LNOTBK(5)) STMP(IGSP)  =ARRAY(5)
@@ -1712,7 +1712,7 @@ C----------
       ELSEIF(IS .EQ. 0)THEN
         DO 4510 IS=1,MAXSP
         IF (LNOTBK(3)) DBHMIN(IS)=ARRAY(3)
-        IF(LNOTBK(4).AND.(ITOPD8.LE.0.))TOPD(IS)=ARRAY(4)
+        IF(LNOTBK(4).AND.(ITOPD8.LE.0))TOPD(IS)=ARRAY(4)
         IF (LNOTBK(5)) STMP(IS)  =ARRAY(5)
         IF (LNOTBK(6)) FRMCLS(IS)=ARRAY(6)
         IF (LNOTBK(7)) METHC(IS) =INT(ARRAY(7))
@@ -1754,7 +1754,7 @@ C----------
 C     SPECIES CODE IS SPECIFIED (IS>0).
 C----------
         IF (LNOTBK(3)) DBHMIN(IS)=ARRAY(3)
-        IF(LNOTBK(4).AND.(ITOPD8.LE.0.))THEN
+        IF(LNOTBK(4).AND.(ITOPD8.LE.0))THEN
            TOPD(IS)=ARRAY(4)
         ENDIF
         IF (LNOTBK(5)) STMP(IS)  =ARRAY(5)
@@ -1804,7 +1804,7 @@ C----------
         IFSP = ISPGRP(IGRP,2)
         IF (.NOT.LNOTBK(3)) ARRAY(3)=DBHMIN(IFSP)
         IF (.NOT.LNOTBK(4)) ARRAY(4)=TOPD(IFSP)
-        IF(LNOTBK(4).AND.(ITOPD8.GT.0.))
+        IF(LNOTBK(4).AND.(ITOPD8.GT.0))
      &    ARRAY(4)=TOPD(IFSP)
         IF (.NOT.LNOTBK(5)) ARRAY(5)=STMP(IFSP)
         IF (.NOT.LNOTBK(6)) ARRAY(6)=FRMCLS(IFSP)
@@ -1831,7 +1831,7 @@ C----------
       ELSEIF(IS .EQ. 0)THEN
         IF (.NOT.LNOTBK(3)) ARRAY(3)=DBHMIN(1)
         IF (.NOT.LNOTBK(4)) ARRAY(4)=TOPD(1)
-        IF(LNOTBK(4).AND.(ITOPD8.GT.0.))
+        IF(LNOTBK(4).AND.(ITOPD8.GT.0))
      &    ARRAY(4)=TOPD(1)
         IF (.NOT.LNOTBK(5)) ARRAY(5)=STMP(1)
         IF (.NOT.LNOTBK(6)) ARRAY(6)=FRMCLS(1)
@@ -1861,7 +1861,7 @@ C     SPECIES CODE IS SPECIFIED (IS>0).
 C----------
         IF (.NOT.LNOTBK(3)) ARRAY(3)=DBHMIN(IS)
         IF (.NOT.LNOTBK(4)) ARRAY(4)=TOPD(IS)
-        IF(LNOTBK(4).AND.(ITOPD8.GT.0.))
+        IF(LNOTBK(4).AND.(ITOPD8.GT.0))
      &    ARRAY(4)=TOPD(IS)
         IF (.NOT.LNOTBK(5)) ARRAY(5)=STMP(IS)
         IF (.NOT.LNOTBK(6)) ARRAY(6)=FRMCLS(IS)
@@ -1937,7 +1937,7 @@ C----------
         DO 4605 IG=2,IULIM
         IGSP = ISPGRP(IGRP,IG)
         IF (LNOTBK(3)) BFMIND(IGSP)=ARRAY(3)
-        IF(LNOTBK(4).AND.(ITOPD8.LE.0.))THEN
+        IF(LNOTBK(4).AND.(ITOPD8.LE.0))THEN
            BFTOPD(IGSP)=ARRAY(4)
         ENDIF
         IF (LNOTBK(5)) BFSTMP(IGSP)=ARRAY(5)
@@ -1963,7 +1963,7 @@ C----------
       ELSEIF(IS .EQ. 0)THEN
         DO 4615 IS=1,MAXSP
         IF (LNOTBK(3)) BFMIND(IS)=ARRAY(3)
-        IF(LNOTBK(4).AND.(ITOPD8.LE.0.))
+        IF(LNOTBK(4).AND.(ITOPD8.LE.0))
      &  BFTOPD(IS)=ARRAY(4)
         IF (LNOTBK(5)) BFSTMP(IS)=ARRAY(5)
         IF (LNOTBK(6)) FRMCLS(IS)=ARRAY(6)
@@ -1998,7 +1998,7 @@ C----------
 C     SPECIES CODE IS SPECIFIED (IS>0).
 C----------
         IF (LNOTBK(3)) BFMIND(IS)=ARRAY(3)
-        IF(LNOTBK(4).AND.(ITOPD8.LE.0.))THEN
+        IF(LNOTBK(4).AND.(ITOPD8.LE.0))THEN
            BFTOPD(IS)=ARRAY(4)
         ENDIF
         IF (LNOTBK(5)) BFSTMP(IS)=ARRAY(5)
@@ -2042,7 +2042,7 @@ C----------
         IFSP = ISPGRP(IGRP,2)
         IF (.NOT.LNOTBK(3)) ARRAY(3)=BFMIND(IFSP)
         IF (.NOT.LNOTBK(4)) ARRAY(4)=BFTOPD(IFSP)
-        IF(LNOTBK(4).AND.(ITOPD8.GT.0.))
+        IF(LNOTBK(4).AND.(ITOPD8.GT.0))
      &    ARRAY(4)=BFTOPD(IFSP)
         IF (.NOT.LNOTBK(5)) ARRAY(5)=BFSTMP(IFSP)
         IF (.NOT.LNOTBK(6)) ARRAY(6)=FRMCLS(IFSP)
@@ -2069,7 +2069,7 @@ C----------
       ELSEIF(IS .EQ. 0)THEN
         IF (.NOT.LNOTBK(3)) ARRAY(3)=BFMIND(1)
         IF (.NOT.LNOTBK(4)) ARRAY(4)=BFTOPD(1)
-        IF(LNOTBK(4).AND.(ITOPD8.GT.0.))
+        IF(LNOTBK(4).AND.(ITOPD8.GT.0))
      &    ARRAY(4)=BFTOPD(1)
         IF (.NOT.LNOTBK(5)) ARRAY(5)=BFSTMP(1)
         IF (.NOT.LNOTBK(6)) ARRAY(6)=FRMCLS(1)
@@ -2098,7 +2098,7 @@ C----------
 C     SPECIES CODE IS SPECIFIED (IS>0).
 C----------
         IF (.NOT.LNOTBK(3)) ARRAY(3)=BFMIND(IS)
-        IF(LNOTBK(4).AND.(ITOPD8.LE.0.))THEN
+        IF(LNOTBK(4).AND.(ITOPD8.LE.0))THEN
            BFTOPD(IS)=ARRAY(4)
         ENDIF
         IF (.NOT.LNOTBK(5)) ARRAY(5)=BFSTMP(IS)
@@ -4754,7 +4754,7 @@ C
         IF(LKECHO)WRITE(JOSTND,12829)KEYWRD,IDT,PRMS(1),PRMS(2)
 12829   FORMAT(/A8,'   DATE/CYCLE=',I5,
      &  '; POINT NUMBER=',F5.0,'; POINT THINNING RESIDUAL ATTRIBUTE=',
-     &  F5.0,' (SILVA RELATIVE DENSITY).')
+     &  F5.0,' (SILVAH RELATIVE DENSITY).')
       ENDIF
             GO TO 10
 C
@@ -5967,7 +5967,7 @@ C
       END SELECT
       GOTO 10
 C
-C  ==========  OPTION NUMBER 49: SPLEAVE ============================SPLEAVE
+C  ==========  OPTION NUMBER 144: SPLEAVE ============================SPLEAVE
 C
 14400 CONTINUE
       IDT=1
@@ -6061,7 +6061,7 @@ C
           CCCOEF = ARRAY(2)
         ENDIF
         IF(LKECHO)WRITE(JOSTND,14505) KEYWRD,ARRAY(2)
-14505   FORMAT (/A8,'   OVERLAP COEFICCIENT=',F8.6)                   
+14505   FORMAT (/A8,'   OVERLAP COEFFICIENT=',F8.6)                   
       ELSE
         PRMS(1)=ARRAY(2)
 C     
