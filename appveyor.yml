@@ -122,6 +122,7 @@ build_script:
     set /p SVN_REV=<bar
     
     set BRANCH_TAG=%APPVEYOR_REPO_BRANCH:-ci=%-r%SVN_REV%
+    echo BRANCH_TAG: %BRANCH_TAG%
 
     REM ************
 
