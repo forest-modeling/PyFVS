@@ -1,0 +1,115 @@
+## @header_message@
+
+cmake_minimum_required (VERSION 3.12)
+
+project(@target_name@
+	LANGUAGES Fortran C CXX
+	)
+
+set(variant_name @target_name@)
+set(varName @variant@)
+
+message(STATUS "FVSvariant = ${variant_name}")
+
+set (CMAKE_Fortran_Format FIXED)
+set (CMAKE_VERBOSE_MAKEFILE ON)
+set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+## TODO: May need to include flags for VS/Intel compilers
+# if (CMAKE_GENERATOR MATCHES "Visual Studio 10")
+  # set (CMAKE_C_FLAGS   "/D_WINDOWS /W3 /Zm100" CACHE STRING "VS10 mod A" FORCE)
+  # set (CMAKE_CXX_FLAGS "/D_WINDOWS /W3 /Zm100" CACHE STRING "VS10 mod B" FORCE)
+  # message(STATUS "Building FVS variant with VS10/Intel")
+
+add_definitions(-DANSI)
+
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+	add_definitions(-DWINDOWS -D_WINDLL -DMS_WIN64)
+endif ()
+
+message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "CXX compiler: ${CMAKE_CXX_COMPILER_ID}")
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # using Clang
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  # using GCC
+  add_definitions(-DCMPgcc)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+  # using Intel C++
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  # using Visual Studio C++
+endif()
+
+set(CMAKE_C_FLAGS "-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION ${CMAKE_C_FLAGS}")
+set(CMAKE_Fortran_FLAGS_Debug "-g -Wall -Wno-integer-division -ffpe-trap=invalid,zero,underflow,overflow,denormal -fbacktrace  ${CMAKE_Fortran_FLAGS_Debug}")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols ${CMAKE_SHARED_LINKER_FLAGS}")
+
+set (include_dirs)
+set (fvs_src)
+set (main_src)
+
+file(STRINGS sourcelist.txt source_files)
+
+set(src_exts ".c;.cpp;.f")
+set(incl_exts ".h;.F77")
+
+foreach (fn ${source_files})
+	get_filename_component (fname   ${fn} NAME CACHE)
+	get_filename_component (pname   ${fn} PATH CACHE)
+	get_filename_component (extname ${fn} EXT  CACHE)
+
+	if (extname IN_LIST incl_exts)
+		list (APPEND include_dirs  ${pname})
+		
+	elseif(extname IN_LIST src_exts)
+		if (fname STREQUAL "main.f")
+			list (APPEND main_src ${fn})
+		else()
+			list (APPEND fvs_src ${fn})
+		endif()
+	
+	endif()
+
+	unset (fname   CACHE)
+	unset (pname   CACHE)
+	unset (extname CACHE)
+  
+endforeach(fn)
+
+list (REMOVE_DUPLICATES include_dirs)
+# Append the build folder so the .mod files can be located
+list (APPEND include_dirs ${CMAKE_CURRENT_BINARY_DIR})
+
+include_directories(BEFORE ${include_dirs})
+
+# Compile sources, stage in an object library
+add_library(OBJS_${variant_name} OBJECT ${fvs_src})
+
+add_library(lib${variant_name} SHARED $<TARGET_OBJECTS:OBJS_${variant_name}>)
+add_library(lib${variant_name}_static STATIC $<TARGET_OBJECTS:OBJS_${variant_name}>)
+
+add_executable (${variant_name} ${main_src} $<TARGET_OBJECTS:OBJS_${variant_name}>)
+# target_link_libraries(${variant_name} lib${variant_name}_static)
+# target_link_libraries(${variant_name} lib${variant_name})
+
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set (flags "-static")
+endif ()
+
+# FIXME: Make sure this doesn't clobber file names on Linux
+string(TOLOWER ${variant_name} out_name)
+set_target_properties(${variant_name} PROPERTIES
+	LINKER_LANGUAGE Fortran
+	OUTPUT_NAME ${out_name}
+	LINK_FLAGS ${flags})
+	
+set_target_properties(lib${variant_name} PROPERTIES
+	LINKER_LANGUAGE Fortran
+	OUTPUT_NAME ${out_name}
+	LINK_FLAGS ${flags})
+
+set_target_properties(lib${variant_name}_static PROPERTIES
+	LINKER_LANGUAGE Fortran
+	OUTPUT_NAME ${out_name}
+	LINK_FLAGS ${flags})

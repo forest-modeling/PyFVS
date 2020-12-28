@@ -1,0 +1,204 @@
+version: '{branch}.{build}'
+image: Visual Studio 2017
+# clone_script:
+# - cmd: >-
+    # REM choco install git
+
+    # REM git --version
+
+
+    # git clone --depth 10 --branch=%APPVEYOR_REPO_BRANCH% https://github.com/tharen/open-fvs-mirror %APPVEYOR_BUILD_FOLDER%
+
+    # cd %APPVEYOR_BUILD_FOLDER%
+
+    # git checkout %APPVEYOR_REPO_BRANCH%
+
+
+    # set LC_ALL=en_US.utf8
+
+    # git log --grep=^git-svn-id: -n1 > foo
+
+    # grep -Po '.*git-svn-id:.*@\K.*?(?=\s)' < foo > bar
+
+    # set /p OLD_SVN=<bar
+
+
+    # set sfroot=branches/
+
+    # if /I "%APPVEYOR_REPO_BRANCH%"=="trunk" (set sfroot="")
+
+
+    # REM Link the SVN repo and rebase
+
+    # git config --add svn-remote.sourceforge.url https://svn.code.sf.net/p/open-fvs/code
+
+    # git config --add svn-remote.sourceforge.fetch %sfroot%%APPVEYOR_REPO_BRANCH%:refs/remotes/sourceforge/%APPVEYOR_REPO_BRANCH%
+
+    # git update-ref refs/remotes/sourceforge/%APPVEYOR_REPO_BRANCH% refs/remotes/origin/%APPVEYOR_REPO_BRANCH%
+
+    # REM type .git\config
+
+    # REM git svn rebase > nul
+
+    # git svn fetch sourceforge
+
+    # git svn rebase
+
+
+    # git log --grep=^git-svn-id: -n1 > foo
+
+    # grep -Po '.*git-svn-id:.*@\K.*?(?=\s)' < foo > bar
+
+    # set /p NEW_SVN=<bar
+
+
+    # REM Update the commit ID
+
+    # git rev-parse HEAD>foo
+
+    # set /p APPVEYOR_REPO_COMMIT=<foo
+
+
+    # REM Update the commit ID
+
+    # git log -1>foo
+
+    # set /p APPVEYOR_REPO_COMMIT_MESSAGE=<foo
+
+    # set APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED=""
+
+
+    # echo Old rev %OLD_SVN% New rev %NEW_SVN%
+
+    # if "%OLD_SVN%"=="%NEW_SVN%" (set SKIP=REM)
+
+    # git remote add temp https://tharen:%access_token%@github.com/tharen/open-fvs-mirror.git
+
+    # git push temp %APPVEYOR_REPO_BRANCH%
+    
+environment:
+  APPVEYOR_RDP_PASSWORD: QWErty-12345
+  MINGW_PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64
+  access_token:
+    secure: 86uUkYvxMTzebFONUvAK7QYDRMxZW8Nl9LVmIW/gBKGy2mQZAT9cV3QcLFktiSng
+  github_user: tharen
+  CMAKE_BUILD_TYPE: Release
+  BRANCH_TAG: r%SVN_REV%-%APPVEYOR_REPO_BRANCH:-ci=%
+  ARCHIVE_NAME: open-fvs-%FVS_VARIANT%-%BRANCH_TAG%-w64
+  MINICONDA: C:\Miniconda3
+  matrix:
+  - FVS_VARIANT: wc
+  - FVS_VARIANT: pn
+  - FVS_VARIANT: ie
+  - FVS_VARIANT: ca
+  - FVS_VARIANT: so
+  - FVS_VARIANT: bm
+  - FVS_VARIANT: oc
+  - FVS_VARIANT: op
+  - FVS_VARIANT: nc
+  - FVS_VARIANT: ec
+  - FVS_VARIANT: ci
+  - FVS_VARIANT: ws
+  
+install:
+- cmd: >-
+    set PATH=%MINICONDA%;%MINICONDA%\Scripts;%PATH%
+
+    set PATH=%MINGW_PATH%\bin;%PATH%
+
+    call activate base
+
+    REM conda create -y -c conda-forge -n fvs -python=3.8 cmake ninja
+
+    REM call activate fvs
+    
+    pip install cmake ninja
+    
+build_script:
+- cmd: >-
+    REM Get the SVN revision number
+
+    set LC_ALL=en_US.utf8
+
+    git log --grep=^git-svn-id: -n1 > foo
+
+    grep -Po '.*git-svn-id:.*@\K.*?(?=\s)' < foo > bar
+
+    set /p SVN_REV=<bar
+
+
+    REM ************
+
+    REM Do the build
+
+    REM ************
+
+
+    gcc -v
+
+    where python
+
+    where cmake
+
+    where ninja
+
+
+    mkdir build
+
+    cmake -S . -B build -G "Ninja" -DFVS_VARIANTS=%FVS_VARIANT% -DCMAKE_BUILD_TYPE=Release
+
+    cmake --build build
+
+
+    REM Create the zipfile artifact
+
+    cmake --build build --target zip
+
+
+    REM powershell.exe $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+
+test_script:
+- cmd: >-
+    REM Change to the variant test folder
+
+    cd %APPVEYOR_BUILD_FOLDER%\tests\qFVS%FVS_VARIANT%
+
+
+    set var=%FVS_VARIANT:~0,2%
+
+    set kwd=.\%var%t01.key
+
+    set fvs=%APPVEYOR_BUILD_FOLDER%\build\open-fvs\bin\FVS%FVS_VARIANT%.exe
+
+
+    dir
+
+
+    echo %kwd%
+
+    %fvs% --keywordfile=%kwd% > test.log 2>&1 & exit 0
+
+
+    set vn=%FVS_VARIANT:~0,2%
+
+    grep -v "\-999" %vn%t01.sum      > %vn%t01.tmp
+
+    grep -v "\-999" %vn%t01.sum.save > %vn%t01.tmp.save
+
+    diff -w %vn%t01.tmp %vn%t01.tmp.save & exit 0
+
+
+artifacts:
+- path: build\*.zip
+
+deploy:
+- provider: GitHub
+  tag: svn-%BRANCH_TAG%
+  description: 'This is an automated [AppVeyor CI](https://ci.appveyor.com/project/tharen/builds/%APPVEYOR_BUILD_VERSION%) build of a commit to [SVN](https://sourceforge.net/p/open-fvs/code/).\n\nNOTE: This is an unofficial and unsupported Open-FVS build. Official supported releases of FVS can be obtained [here](https://www.fs.fed.us/fvs/software/complete.php).'
+  auth_token:
+    secure: 86uUkYvxMTzebFONUvAK7QYDRMxZW8Nl9LVmIW/gBKGy2mQZAT9cV3QcLFktiSng
+  draft: false
+  prerelease: true
+  force_update: true
+  
