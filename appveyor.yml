@@ -83,7 +83,6 @@ environment:
     secure: 86uUkYvxMTzebFONUvAK7QYDRMxZW8Nl9LVmIW/gBKGy2mQZAT9cV3QcLFktiSng
   github_user: tharen
   CMAKE_BUILD_TYPE: Release
-  BRANCH_TAG: r%SVN_REV%-%APPVEYOR_REPO_BRANCH%:-ci=%
   ARCHIVE_NAME: open-fvs-%FVS_VARIANT%-%BRANCH_TAG%-w64
   MINICONDA: C:\Miniconda3
   matrix:
@@ -113,6 +112,8 @@ install:
     REM call activate fvs
     
     pip install cmake ninja
+    
+    set BRANCH_TAG=r%SVN_REV%-%APPVEYOR_REPO_BRANCH%:-ci=%
     
 build_script:
 - cmd: >-
