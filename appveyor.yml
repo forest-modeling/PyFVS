@@ -75,11 +75,16 @@ image: Visual Studio 2017
     # git remote add temp https://tharen:%access_token%@github.com/tharen/open-fvs-mirror.git
 
     # git push temp %APPVEYOR_REPO_BRANCH%
-
+    
 environment:
+  APPVEYOR_RDP_PASSWORD: QWErty-12345
   MINGW_PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64
+  access_token:
+    secure: 86uUkYvxMTzebFONUvAK7QYDRMxZW8Nl9LVmIW/gBKGy2mQZAT9cV3QcLFktiSng
+  github_user: tharen
   CMAKE_BUILD_TYPE: Release
-  ARCHIVE_NAME: open-fvs_%FVS_VARIANT%_%BRANCH_TAG%_w64
+  BRANCH_TAG: r%SVN_REV%-%APPVEYOR_REPO_BRANCH:-ci=%
+  ARCHIVE_NAME: open-fvs-%FVS_VARIANT%-%BRANCH_TAG%-w64
   MINICONDA: C:\Miniconda3
   matrix:
   - FVS_VARIANT: wc
@@ -106,9 +111,9 @@ install:
     REM conda create -y -c conda-forge -n fvs -python=3.8 cmake ninja
 
     REM call activate fvs
-
+    
     pip install cmake ninja
-
+    
 build_script:
 - cmd: >-
     REM Get the SVN revision number
@@ -121,15 +126,13 @@ build_script:
 
     set /p SVN_REV=<bar
 
-    set BRANCH_TAG=%APPVEYOR_REPO_BRANCH:-ci=%-r%SVN_REV%
-
-    echo BRANCH_TAG: %BRANCH_TAG%
 
     REM ************
 
     REM Do the build
 
     REM ************
+
 
     gcc -v
 
@@ -139,17 +142,21 @@ build_script:
 
     where ninja
 
+
     mkdir build
 
     cmake -S . -B build -G "Ninja" -DFVS_VARIANTS=%FVS_VARIANT% -DCMAKE_BUILD_TYPE=Release
 
     cmake --build build
 
+
     REM Create the zipfile artifact
 
     cmake --build build --target zip
 
+
     REM powershell.exe $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 
 test_script:
 - cmd: >-
@@ -157,17 +164,21 @@ test_script:
 
     cd %APPVEYOR_BUILD_FOLDER%\tests\qFVS%FVS_VARIANT%
 
+
     set var=%FVS_VARIANT:~0,2%
 
     set kwd=.\%var%t01.key
 
     set fvs=%APPVEYOR_BUILD_FOLDER%\build\open-fvs\bin\FVS%FVS_VARIANT%.exe
 
+
     dir
+
 
     echo %kwd%
 
     %fvs% --keywordfile=%kwd% > test.log 2>&1 & exit 0
+
 
     set vn=%FVS_VARIANT:~0,2%
 
@@ -175,9 +186,8 @@ test_script:
 
     grep -v "\-999" %vn%t01.sum.save > %vn%t01.tmp.save
 
-    REM diff -w %vn%t01.tmp %vn%t01.tmp.save & exit 0
+    diff -w %vn%t01.tmp %vn%t01.tmp.save & exit 0
 
-    diff -w %vn%t01.tmp %vn%t01.tmp.save
 
 artifacts:
 - path: build\*.zip
