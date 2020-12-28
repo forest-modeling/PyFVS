@@ -77,13 +77,9 @@ image: Visual Studio 2017
     # git push temp %APPVEYOR_REPO_BRANCH%
     
 environment:
-  APPVEYOR_RDP_PASSWORD: QWErty-12345
   MINGW_PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64
-  access_token:
-    secure: 86uUkYvxMTzebFONUvAK7QYDRMxZW8Nl9LVmIW/gBKGy2mQZAT9cV3QcLFktiSng
-  github_user: tharen
   CMAKE_BUILD_TYPE: Release
-  ARCHIVE_NAME: open-fvs-%FVS_VARIANT%-%BRANCH_TAG%-w64
+  ARCHIVE_NAME: open-fvs_%FVS_VARIANT%_%BRANCH_TAG%_w64
   MINICONDA: C:\Miniconda3
   matrix:
   - FVS_VARIANT: wc
