@@ -1,26 +1,55 @@
-# Open-FVS Trunk
+# Open-FVS Mirror
 
-This is a continuous integration branch of the Open-FVS/trunk mirror.
+This is a mirror of the official Open-FVS code. This is an unofficial 
+mirror provided as a convenience to the FVS user community. Compiled
+binaries are provided as-is.
 
-This is an unofficial mirror provided as a convenience to the FVS user
-community. Users are referred to the USFS [website](https://www.fs.fed.us/fvs/) 
+Users are referred to the USFS [website](https://www.fs.fed.us/fvs/) 
 for supported versions of FVS.
 
-SVN - [trunk][trunk_svn]
-  
-GitHub - 
-[trunk](https://github.com/forest-modeling/open-fvs-mirror/tree/trunk)
-([trunk-ci](https://github.com/forest-modeling/open-fvs-mirror/tree/trunk-ci))
+The mirror was created using Git-SVN. Currently this is intended to be
+a one-way copy of the SVN repository. Upstream contributions can be
+submitted by cloning/forking this repository and pushing directly to the 
+SVN repository. Instructions on setting up a SVN remote on a local 
+instance are available [here](docs/mirror_notes.md).
+
+# Mirrored Branches
+
+Only a subset of branches are mirrored. These are kept pure, e.g. 
+only SVN commits are included in these branches. Other branches 
+can generally be added on request.
+
+ - [trunk](https://github.com/tharen/open-fvs-mirror/tree/trunk)
+ - [FMSCrelease](https://github.com/tharen/open-fvs-mirror/tree/FMSCrelease)
+ - [FMSCdev](https://github.com/tharen/open-fvs-mirror/tree/FMSCdev)
+ - [PyFVS](https://github.com/tharen/open-fvs-mirror/tree/PyFVS)
 
 # CI Builds
 Continuos integration builds are performed as new commits are added 
 from the SVN repository. CI builds are provided by AppVeyor and Travis-CI.
-Compiled binaries are tested against against assumed good outputs for consistency.
-Successful builds are tagged and binary artifacts are uploaded to GitHub releases.
+Successful builds are tagged and binary artifacts are automatically uploaded
+to GitHub releases. Each mirrored branch is tracked by a companion '-ci' branch.
 
 | Branch | AppVeyor | Travis-CI |
 | ------ | :------: | :-------: |
-|[trunk][trunk_svn]|[![Build status](https://ci.appveyor.com/api/projects/status/ww7ygykde0kdly3c/branch/trunk-ci?svg=true)][trunk_appveyor]||
+|[trunk][11]|[![Build status](https://ci.appveyor.com/api/projects/status/eyyqq4a57xk0ttt0/branch/trunk-ci?svg=true)][13]||
+|[FMSCrelease][21]|[![Build status](https://ci.appveyor.com/api/projects/status/eyyqq4a57xk0ttt0/branch/FMSCrelease-ci?svg=true)][23]||
+|[FMSCdev][31]|[![Build status](https://ci.appveyor.com/api/projects/status/eyyqq4a57xk0ttt0/branch/FMSCdev-ci?svg=true)][33]||
+|[PyFVS][41]|[![Build status](https://ci.appveyor.com/api/projects/status/eyyqq4a57xk0ttt0/branch/PyFVS-ci?svg=true)][43]||
 
-[trunk_svn]: https://sourceforge.net/p/open-fvs/code/HEAD/tree/trunk/
-[trunk_appveyor]: https://ci.appveyor.com/project/tharen/open-fvs-mirror/branch/trunk-ci
+[11]: https://sourceforge.net/p/open-fvs/code/HEAD/tree/trunk/
+[13]: https://ci.appveyor.com/project/tharen/open-fvs-mirror/branch/trunk-ci
+
+[21]: https://sourceforge.net/p/open-fvs/code/HEAD/tree/FMSCrelease/
+[23]: https://ci.appveyor.com/project/tharen/open-fvs-mirror/branch/FMSCrelease-ci
+
+[31]: https://sourceforge.net/p/open-fvs/code/HEAD/tree/FMSCdev/
+[33]: https://ci.appveyor.com/project/tharen/open-fvs-mirror/branch/FMSCdev-ci
+
+[41]: https://sourceforge.net/p/open-fvs/code/HEAD/tree/PyFVS/
+[43]: https://ci.appveyor.com/project/tharen/open-fvs-mirror/branch/PyFVS-ci
+
+## Main Branch
+
+The "main" branch is an orphan and is maintained for documentation and 
+to provide a GitHub landing page. 
