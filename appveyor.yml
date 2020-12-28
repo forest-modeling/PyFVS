@@ -113,8 +113,6 @@ install:
     
     pip install cmake ninja
     
-    set BRANCH_TAG=r%SVN_REV%-%APPVEYOR_REPO_BRANCH%:-ci=%
-    
 build_script:
 - cmd: >-
     REM Get the SVN revision number
@@ -126,7 +124,8 @@ build_script:
     grep -Po '.*git-svn-id:.*@\K.*?(?=\s)' < foo > bar
 
     set /p SVN_REV=<bar
-
+    
+    set BRANCH_TAG=r%SVN_REV%-%APPVEYOR_REPO_BRANCH:-ci=%
 
     REM ************
 
