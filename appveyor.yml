@@ -175,7 +175,8 @@ test_script:
 
     grep -v "\-999" %vn%t01.sum.save > %vn%t01.tmp.save
 
-    #diff -w %vn%t01.tmp %vn%t01.tmp.save & exit 0
+    REM diff -w %vn%t01.tmp %vn%t01.tmp.save & exit 0
+
     diff -w %vn%t01.tmp %vn%t01.tmp.save
 
 artifacts:
