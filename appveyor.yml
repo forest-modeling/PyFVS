@@ -139,21 +139,17 @@ build_script:
 
     where ninja
 
-
     mkdir build
 
     cmake -S . -B build -G "Ninja" -DFVS_VARIANTS=%FVS_VARIANT% -DCMAKE_BUILD_TYPE=Release
 
     cmake --build build
 
-
     REM Create the zipfile artifact
 
     cmake --build build --target zip
 
-
     REM powershell.exe $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
 
 test_script:
 - cmd: >-
@@ -161,21 +157,17 @@ test_script:
 
     cd %APPVEYOR_BUILD_FOLDER%\tests\qFVS%FVS_VARIANT%
 
-
     set var=%FVS_VARIANT:~0,2%
 
     set kwd=.\%var%t01.key
 
     set fvs=%APPVEYOR_BUILD_FOLDER%\build\open-fvs\bin\FVS%FVS_VARIANT%.exe
 
-
     dir
-
 
     echo %kwd%
 
     %fvs% --keywordfile=%kwd% > test.log 2>&1 & exit 0
-
 
     set vn=%FVS_VARIANT:~0,2%
 
@@ -183,8 +175,8 @@ test_script:
 
     grep -v "\-999" %vn%t01.sum.save > %vn%t01.tmp.save
 
-    diff -w %vn%t01.tmp %vn%t01.tmp.save & exit 0
-
+    #diff -w %vn%t01.tmp %vn%t01.tmp.save & exit 0
+    diff -w %vn%t01.tmp %vn%t01.tmp.save
 
 artifacts:
 - path: build\*.zip
