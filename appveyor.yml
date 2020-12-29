@@ -75,7 +75,7 @@ image: Visual Studio 2017
     # git remote add temp https://tharen:%access_token%@github.com/tharen/open-fvs-mirror.git
 
     # git push temp %APPVEYOR_REPO_BRANCH%
-    
+
 environment:
   MINGW_PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64
   CMAKE_BUILD_TYPE: Release
@@ -106,9 +106,9 @@ install:
     REM conda create -y -c conda-forge -n fvs -python=3.8 cmake ninja
 
     REM call activate fvs
-    
+
     pip install cmake ninja
-    
+
 build_script:
 - cmd: >-
     REM Get the SVN revision number
@@ -120,8 +120,9 @@ build_script:
     grep -Po '.*git-svn-id:.*@\K.*?(?=\s)' < foo > bar
 
     set /p SVN_REV=<bar
-    
+
     set BRANCH_TAG=%APPVEYOR_REPO_BRANCH:-ci=%-r%SVN_REV%
+
     echo BRANCH_TAG: %BRANCH_TAG%
 
     REM ************
@@ -129,7 +130,6 @@ build_script:
     REM Do the build
 
     REM ************
-
 
     gcc -v
 
