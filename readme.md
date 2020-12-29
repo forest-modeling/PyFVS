@@ -8,7 +8,7 @@ for supported versions of FVS.
 
 SVN - [trunk][trunk_svn]
   
-GitHub -   
+GitHub - 
 [trunk](https://github.com/forest-modeling/open-fvs-mirror/tree/trunk)
 ([trunk-ci](https://github.com/forest-modeling/open-fvs-mirror/tree/trunk-ci))
 
@@ -20,7 +20,7 @@ Successful builds are tagged and binary artifacts are uploaded to GitHub release
 
 | Branch | AppVeyor | Travis-CI |
 | ------ | :------: | :-------: |
-|[trunk][trunk_svn]|[![Build status](https://ci.appveyor.com/api/projects/status/ww7ygykde0kdly3c?svg=true)][trunk_appveyor]||
+|[trunk][trunk_svn]|[![Build status](https://ci.appveyor.com/api/projects/status/ww7ygykde0kdly3c/branch/trunk-ci?svg=true)][trunk_appveyor]||
 
 [trunk_svn]: https://sourceforge.net/p/open-fvs/code/HEAD/tree/trunk/
 [trunk_appveyor]: https://ci.appveyor.com/project/tharen/open-fvs-mirror/branch/trunk-ci
