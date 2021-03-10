@@ -1166,8 +1166,8 @@ C
      &          ' RESIDUAL CLASS BA =',F8.1)
       GOTO 10
 C
-C  ==========  OPTION NUMBER 30: SALVAGE  ===========================SALVAGE
-C
+C  ==========  OPTION NUMBER 30: xSALVAGE  ===========================xSALVAGE
+C Taken out of service to avoid accidental use as same keyword in FFE extension 
  4000 CONTINUE
       ICFLAG=229
       GO TO 3805
