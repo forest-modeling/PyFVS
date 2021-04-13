@@ -88,7 +88,7 @@ endif
 all : $(addsuffix $(SLIBSUFX),$(FVSprgs)) $(addsuffix $(PRGSUFX),$(FVSprgs)))
 
 clean :
-	rm -frv *_buildDir $(addsuffix $(SLIBSUFX),$(FVSprgs)) $(addsuffix $(PRGSUFX),$(FVSprgs)))
+	rm -frv *_buildDir $(addsuffix $(SLIBSUFX),$(FVSprgs)) $(addsuffix $(PRGSUFX),$(FVSprgs))
 
 ifndef sourceFileList
 
