@@ -155,7 +155,7 @@ test_script:
 - cmd: >-
     REM Change to the variant test folder
 
-    cd %APPVEYOR_BUILD_FOLDER%\tests\qFVS%FVS_VARIANT%
+    cd %APPVEYOR_BUILD_FOLDER%\tests\FVS%FVS_VARIANT%
 
     set var=%FVS_VARIANT:~0,2%
 
