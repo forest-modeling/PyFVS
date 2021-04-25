@@ -44,7 +44,7 @@
 # Run incremental builds by calling cmake --build <dir>
 #   Most build systems will restrict builds to modified files 
 
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required (VERSION 3.13)
 
 project(Open-FVS
 	LANGUAGES Fortran C CXX
@@ -57,10 +57,10 @@ string(TOLOWER ${FVS_VARIANTS} FVS_VARIANTS)
 # Get the list of variants to configure
 if (FVS_VARIANTS STREQUAL "all")
 	# Enumerate all available variants
-    file(GLOB source_lists "${PROJECT_SOURCE_DIR}/bin/qFVS*_sourceList.txt")
+    file(GLOB source_lists "${PROJECT_SOURCE_DIR}/bin/FVS*_sourceList.txt")
 	set(FVS_VARIANTS "")
 	foreach (lst ${source_lists})
-		STRING(REGEX MATCH "qFVS(..)_sourceList\.txt$" foo ${lst})
+		STRING(REGEX MATCH "FVS(..)_sourceList\.txt$" foo ${lst})
 		list(APPEND FVS_VARIANTS ${CMAKE_MATCH_1})
 	endforeach ()
 
@@ -71,7 +71,7 @@ else ()
 	string(REPLACE " " ";" FVS_VARIANTS "${FVS_VARIANTS}")
 	
 	foreach (var ${FVS_VARIANTS})
-		set(pth "${PROJECT_SOURCE_DIR}/bin/qFVS${var}_sourceList.txt")
+		set(pth "${PROJECT_SOURCE_DIR}/bin/FVS${var}_sourceList.txt")
 		if (NOT EXISTS ${pth})
 			list(REMOVE_ITEM FVS_VARIANTS ${var})
 			message(STATUS "*** Variant ${var} source list does not exist: ${pth}") 
@@ -96,7 +96,7 @@ set(all_targets "")
 foreach (variant ${FVS_VARIANTS})
 
 	set(target_name "FVS${variant}")
-	set(sl "q${target_name}_sourceList.txt") # Using the q-variant source lists
+	set(sl "${target_name}_sourceList.txt") # Using the variant source lists
 	get_filename_component(slfn "bin/${sl}" ABSOLUTE)
 
 	# Read the source file list
