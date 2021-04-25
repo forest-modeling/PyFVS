@@ -133,14 +133,16 @@ build_script:
     where ninja
 
     mkdir build
+    
+    cd build
 
-    cmake -S . -B build -G "Ninja" -DFVS_VARIANTS=%FVS_VARIANT% -DCMAKE_BUILD_TYPE=Release
+    cmake .. -G "Ninja" -DFVS_VARIANTS=%FVS_VARIANT% -DCMAKE_BUILD_TYPE=Release
 
-    cmake --build build
+    cmake --build .
 
     REM Create the zipfile artifact
 
-    cmake --build build --target zip
+    cmake --build . --target zip
 
     REM powershell.exe $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
