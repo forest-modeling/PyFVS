@@ -77,7 +77,6 @@ image: Visual Studio 2017
     # git push temp %APPVEYOR_REPO_BRANCH%
 
 environment:
-  MINGW_PATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64
   CMAKE_BUILD_TYPE: Release
   ARCHIVE_NAME: open-fvs_%FVS_VARIANT%_%BRANCH_TAG%_w64
   MINICONDA: C:\Miniconda3
@@ -99,15 +98,9 @@ install:
 - cmd: >-
     set PATH=%MINICONDA%;%MINICONDA%\Scripts;%PATH%
 
-    set PATH=%MINGW_PATH%\bin;%PATH%
-
     call activate base
 
-    REM conda create -y -c conda-forge -n fvs -python=3.8 cmake ninja
-
-    REM call activate fvs
-
-    pip install cmake ninja
+    conda install -y -c conda-forge cmake ninja m2w64-gcc-fortran
 
 build_script:
 - cmd: >-
