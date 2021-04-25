@@ -79,7 +79,7 @@ image: Visual Studio 2017
 environment:
   CMAKE_BUILD_TYPE: Release
   ARCHIVE_NAME: open-fvs_%FVS_VARIANT%_%BRANCH_TAG%_w64
-  MINICONDA: C:\Miniconda3
+  MINICONDA: C:\Miniconda3-x64
   matrix:
   - FVS_VARIANT: wc
   - FVS_VARIANT: pn
