@@ -1,7 +1,7 @@
       SUBROUTINE SBB(ISPC,D,H,Z,IFLAG)
       IMPLICIT NONE
 C----------
-C AK $Id$
+C AK $Id: sbb.f 2472 2018-08-20 21:22:34Z gedixon $
 C----------
 C
 C THIS ROUTINE LOOKS UP A Z GIVEN SPECIES, DBH, AND HT.

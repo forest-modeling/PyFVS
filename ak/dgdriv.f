@@ -107,10 +107,15 @@ C
 C  SPECIES ORDER
 C  1    2    3    4    5    6    7    8    9   10   11  12  13
 C WS  WRC  PSF   MH   WH  AYC   LP   SS   SAF  RA   CW  OH  OS
+C  SPECIES ORDER:
+C  1   2   3   4   5   6   7   8   9   10  11  12
+C  SF  AF  YC  TA  WS  LS  BE  SS  LP  RC  WH  MH
+C
+C  13  14  15  16  17  18  19  20  21  22  23
+C  OS  AD  RA  PB  AB  BA  AS  CW  WI  SU  OH
 C----------
-      DATA PSIGSQ/
-     &  0.0408,  0.0586,  0.1556,  0.0970,  0.0858,  0.1433,
-     &  0.0636,  0.0970,  0.0970,  0.0809,  0.0809,  0.0636,  0.0858/
+      DATA PSIGSQ / 23*0.089827273 /
+
 C-----------
 C  CHECK FOR DEBUG.
 C-----------
@@ -158,9 +163,15 @@ C----------
 C----------
 C  OUTPUT MODEL COEFFICIENTS FOR DEBUG
 C----------
-      IF(DEBUG) WRITE(JOSTND,9002) SIGMA,XDMULT,BKRAT,COR
- 9002 FORMAT(/11(F11.5))
+      IF(DEBUG) THEN
+        WRITE(JOSTND,9002) 'SIGMA',SIGMA
+        WRITE(JOSTND,9002) 'XDMULT',XDMULT
+        WRITE(JOSTND,9002) 'BKRAT',BKRAT
+        WRITE(JOSTND,9002) 'COR', COR
+      ENDIF
+ 9002 FORMAT('IN DGDRIV - ',A6,/23(F11.5))
       SFINT=IY(ICYC+1)-IY(1)
+      IF(DEBUG)WRITE(JOSTND,*) 'IN DGDRIV - SFINT= ',SFINT
       DO 50 ISPC=1,MAXSP
 C----------
 C  COMPUTE SERIAL CORRELATION ADJUSTED FPR PERIOD LENGTH.
@@ -173,8 +184,19 @@ C----------
       SSIGMA=SQRT(ALOG(EVARP2))
       RHO=ALOG(1.0+CORR*SQRT((EVARP1-1.0)*(EVARP2-1.0)))/
      &         (SIG1*SSIGMA)
+C*******************************************************************
+C    DUMMY LIMIT IN RHO, JUST TO GET VALID CALCULATION FOR RHOCP  **
+C*******************************************************************
+c      IF (RHO .GT. 0.2) RHO = 0.2
+C*******************************************************************
       RHOCP=SQRT(1.0-RHO*RHO)
       XDGROW=ALOG(XDMULT(ISPC))
+      IF(DEBUG)WRITE(JOSTND,*) 'IN DGDRIV - ISPC =',ISPC,' ',
+     &  'VARYP1, EVARP1, SIG1, VARYP2, EVARP2 =',
+     &   VARYP1, EVARP1, SIG1, VARYP2, EVARP2
+      IF(DEBUG)WRITE(JOSTND,*) 'IN DGDRIV - ',
+     &  'SSIGMA, RHO, RHOCP, XDGROW =',
+     &   SSIGMA, RHO, RHOCP, XDGROW
 C----------
 C  IN THE FIRST CYCLE DEFINE THE GOAL FOR ATTENUATING CORRECTION
 C  TERMS FOR THE SMALL TREE HEIGHT INCREMENT MODEL AND THE LARGE
