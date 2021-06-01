@@ -1,153 +1,228 @@
-      SUBROUTINE HTCALC(I,ISPC,XSITE,AG,HGUESS,POTHTG)
+      SUBROUTINE HTCALC (N,ISPC,AGET,H,HTMAX,HTG,JOSTND,DEBUG)
       IMPLICIT NONE
 C----------
 C AK $Id$
 C----------
-C   THIS SUBROUTINE COMPUTES THE HEIGHT INCREMENT GIVEN TREE-SPECIFIC
-C   INDEPENDENT VARIABLES SUCH AS DBH, DG AGE ...
-C   CALLED FROM **HTGF**
+C  THIS SUBROUTINE COMPUTES ONE OF THE FOLLOWING:
+C
+C  IF N .EQ. 0 THEN CALCULATE AGE USING HEIGHT AND SITE INDEX
+C  IF N .EQ. 1 THEN CALCULATE HEIGHT USING AGE AND SITE INDEX
+C  IF N .EQ. 2 CALCULATE HEIGHT INCREMENT USING AGE AND SITE INDEX
+C  HTMAX IS CALCULATED ON EVERY CALL TO HTCALC
+C  CALLED FROM: REGENT, ESSADV, ESSUBH, ESXCSH
 C----------
-C
+
+C----------
+C SPECIES LIST FOR ALASKA VARIANT.
+C Number  V  Code  Common Name         FIA  PLANTS Scientific Name
+C   1        SF   Pacific silver fir  011  ABAM   Abies amabilis
+C   2        AF   subalpine fir       019  ABLA   Abies lasiocarpa
+C   3        YC   Alaska cedar        042  CANO9  Callitropsis nootkatensis
+C   4        TA   tamarack            071  LALA   Larix laricina
+C   5     P  WS   white spruce        094  PIGL   Picea glauca
+C   6     P  LS   Lutz’s spruce            PILU   Picea lutzii
+C   7     P  BE   black spruce        095  PIMA   Picea mariana
+C   8        SS   Sitka spruce        098  PISI   Picea sitchensis
+C   9        LP   lodgepole pine      108  PICO   Pinus contorta
+C  10        RC   western redcedar    242  THPL   Thuja plicata
+C  11        WH   western hemlock     263  TSHE   Tsuga heterophylla
+C  12        MH   mountain hemlock    264  TSME   Tsuga mertensiana
+C  13     P  OS   other softwoods     298  2TE
+C  14        AD   alder species       350  ALNUS  Alnus species
+C  15        RA   red alder           351  ALRU2  Alnus rubra
+C  16     P  PB   paper birch         375  BEPA   Betula papyrifera
+C  17     P  AB   Alaska birch        376  BENE4  Betula neoalaskana
+C  18     P  BA   balsam poplar       741  POBA2  Populus balsamifera
+C  19     P  AS   quaking aspen       746  POTR5  Populus tremuloides
+C  20     P  CW   black cottonwood    747  POBAT  Populus trichocarpa
+C  21     P  WI   willow species      920  SALIX  Salix species
+C  22     P  SU   Scouler’s willow    928  SASC   Salix scouleriana
+C  23     P  OH   other hardwoods     998  2TD
+C----------
+
+C----------
 COMMONS
-C
+C----------
 C
       INCLUDE 'PRGPRM.F77'
 C
+      INCLUDE 'PLOT.F77'
 C
-      INCLUDE 'ARRAYS.F77'
-C
-C
-      INCLUDE 'CONTRL.F77'
-C
-COMMONS
-C
+      INCLUDE 'VARCOM.F77'
+
+C----------
+C  VARIABLE DEFINITIONS:
+C---------
+
+C  N     -- MODE FOR CALCULATION
+C  ISPC  -- SPECIES
+C  AGET  -- TREE AGE
+C  H     -- CURRENT TREE HEIGHT
+C  XSITE -- SITE INDEX FOR SPECIES
+C  *RETURN VARIABLES
+C  HTG  -- HEIGHT INCREMENT FOR CYCLE
+C  HTMAX -- MAXIMUM HEIGHT FOR SPECIES AT SITE SI
+C  AGET  -- TREE AGE RETURNED IF N <= 0
+
 C------------
 C  VARIABLE DECLARATIONS:
 C----------
-C
+
       LOGICAL DEBUG
+      INTEGER JOSTND,N,ISPC
+      REAL HTMAX,H,H1,H2,AGET,XSITE,HTG
+      REAL B1,B2,B3,B4,B5,C1,C2,C3
+      REAL HEGYI1(MAXSP),HEGYI2(MAXSP),HEGYI3(MAXSP)
+
+C----------
+C  DATA STATEMENTS
+C----------
+
+      DATA HEGYI1/1.1945, 1.3832, 1.1243, 1.1637, 1.2883,
+     &            1.2883, 1.1637, 1.0458, 1.0236, 1.1243,
+     &            1.1514, 1.1514, 1.2883, 1.1318, 1.0142,
+     &            1.1580, 1.1580, 1.1318, 1.2025, 1.1318,
+     &            1.1318, 1.1318, 1.1318/
+
+      DATA HEGYI2/-0.0236, -0.0155, -0.0263, -0.0215, -0.0181,
+     &            -0.0181, -0.0215, -0.0380, -0.0465, -0.0263,
+     &            -0.0237, -0.0237, -0.0181, -0.0226, -0.0421,
+     &            -0.0175, -0.0175, -0.0226, -0.0158, -0.0226,
+     &            -0.0226, -0.0226, -0.0226/
+
+      DATA HEGYI3/1.7918, 1.3597, 1.5662, 1.2243, 1.4177,
+     &            1.4177, 1.2243, 1.9804, 2.4269, 1.5662,
+     &            1.4365, 1.4365, 1.4177, 1.1233, 0.9422,
+     &            0.7687, 0.7687, 1.1233, 0.7994, 1.1233,
+     &            1.1233, 1.1233, 1.1233/
+
+C----------
+C NOTES ABOUT SITE INDEX EQUATIONS USED TO CALCULATE HEIGHT, AGE, AND
+C HEIGHT INCREMENT.
 C
-      INTEGER I,ISPC
+C ALL SPECIES EXCEPT SS, WH, AND MH:
+C USE SITE INDEX EQUATIONS FROM HEGYI 1981:SITE INDEX EQUATIONS
+C AND CURVES FOR THE MAJOR TREE SPECIES OF BRITISH COLUMBIA.
 C
-      REAL AG,B3,C0,C1,C2,C3,HB,HGUESS,PH,POTHTG,TERM1,XSITE
-C
-C-----------
-C  SEE IF WE NEED TO DO SOME DEBUG.
-C-----------
-      CALL DBCHK (DEBUG,'HTCALC',6,ICYC)
-      IF(DEBUG) WRITE(JOSTND,3)ICYC
-    3 FORMAT(' ENTERING SUBROUTINE HTCALC  CYCLE =',I5)
-C
-      POTHTG = 0.
-      HGUESS = 0.
-C
-      SELECT CASE(ISPC)
-C
+C SS, WH, WH:
+C USE SITE INDEX EQUATION FROM PAYANDEH 1974: NONLINEAR SITE INDEX EQUATIONS
+C FOR SEVERAL MAJOR CANADIAN TIMBER SPECIES.
 C----------
-C  WESTERN HEMLOCK
-C---------
-        CASE(5)
-          IF((HT(I) - 4.5) .LE. 0.0)GO TO 900
-          B3 = 3.316557 * XSITE**(-0.2930032)
-          C0 = (1.0 - EXP(-10.0*0.01046931)) * 6.421396**(1.0/B3)
-          C1 = 0.7642128 / B3
-          C2 = EXP(-10.0*0.01046931)
-          C3 = 1.0 / B3
-          HB = HT(I) - 4.5
-          PH = 4.5 + (C0*XSITE**C1 + C2*HB**C3)**(1.0/C3) - HB
-C----------
-C TERM1 IS BORROWED FROM SPRUCE LOGIC FOR NOW TO GET SOME
-C CROWN SENSITIVITY INTO THE HEMLOCK EQUATION.
-C----------
-          TERM1 = (1.0 - EXP( - 0.03563*ICR(I)) ** 0.907878)
-C----------
-C     NEW WH LOG-LINEAR HTG EQN FROM BILL FARR 10-22-87
-C----------
-          POTHTG = EXP(2.18643 + 0.2059*ALOG(DG(I)) - 7.84117E-5*(HT(I)
-     &    *HT(I)) + 9.6528E-3*XSITE + 0.54334*ALOG(DBH(I)) 
-     &    - 0.35425*ALOG(HT(I)))
-          POTHTG=POTHTG*TERM1
-          IF(POTHTG .GT. PH)POTHTG=PH
-          IF(DEBUG)WRITE(JOSTND,*)
-     &      ' IN HTCALC WH I,ICR,DG,HT,XSITE,DBH,PH= ',
-     &      ICR(I),DG(I),HT(I),XSITE,DBH(I),PH
-C
-C----------
-C  RED ALDER
-C----------
-        CASE(10)
-          HGUESS = XSITE
-     &           + (59.5864 + 0.7953*XSITE)*
-     &             (1.0-EXP((0.00194 - 0.0007403*XSITE)*AG))**0.9198
-     &           - (59.5864 + 0.7953*XSITE)*
-     &             (1.0-EXP((0.00194 - 0.0007403*XSITE)*20.0))**0.9198
-          IF(DEBUG)WRITE(JOSTND,*)' IN HTCALC RA XSITE,AG,HGUESS= ',
-     &    XSITE,AG,HGUESS     
-C
-C----------
-C  BLACK COTTONWOOD
-C---------
-        CASE(11)
-          HGUESS = (XSITE - 4.5) / ( 0.6192 - 5.3394/(XSITE - 4.5)
-     &           + 240.29*AG**(-1.4) + (3368.9/(XSITE-4.5))*AG**(-1.4))
-          HGUESS = HGUESS + 4.5
-C
-          IF(DEBUG)WRITE(JOSTND,*)' IN HTCALC BC XSITE,AG,HGUESS= ',
-     &    XSITE,AG,HGUESS     
-C----------
-C  ALL SPECIES OTHER THAN RED ALDER AND COTTONWOOD.
-C----------
-        CASE(1:4,6:9,12,13)
-          IF((HT(I) - 4.5) .LE. 0.0)GO TO 900
-C
-          IF(DEBUG)WRITE(JOSTND,9050)I,ISP(I),DBH(I),HT(I),ICR(I),
-     &    XSITE,DG(I)
- 9050     FORMAT('IN HTCALC 9050 I,ISP,DBH,HT,ICR,AVH,XSITE,DG=',
-     &    2I5,2F10.2,I5,5F8.3)
-C----------
-C SPRUCE HEIGHT EQUATION APPLIED TO ALL SPECIES EXCEPT WH, RA, AND BC.
-C----------
-          B3 = 2.744017 * XSITE**(-0.2095425)
-          C0 = (1.0 - EXP(-10.0 * 0.01630621)) * 3.380276**(1.0/B3)
-          C1 = 0.8683028 / B3
-          C2 = EXP(-10.0 * 0.01630621)
-          C3 = 1.0 / B3
-          HB = HT(I) - 4.5
-          PH = 4.5 + (C0*XSITE**C1 + C2*HB**C3)**(1.0/C3) - HB
-          TERM1 = (1.0 - EXP( - 0.03563*ICR(I)) ** 0.907878)
-C----------
-C     SPRUCE LOG-LINEAR HEIGHT EQUATION FROM FARR 10-22-87
-C----------
-          POTHTG = EXP(1.5163 + 0.1429*ALOG(DG(I)) - 6.04687E-5*(HT(I)
-     &    *HT(I)) + 0.0103*XSITE 
-     &    + 0.20358*ALOG(90.00 ) + 0.44146*ALOG(DBH(I))
-     &    - 0.36662*ALOG(HT(I)))
-          POTHTG=POTHTG*TERM1
-C----------
-C HT GROWTH CORRECTION FOR RC AND YC FROM BILL FARR (PNW JUNEAU)
-C JULY 9, 1987.  PUBLISHED BC STUFF INDICATES RC HEIGHT GROWTH SHOULD
-C BE ABOUT 75 PERCENT OF SS HEIGHT GROWTH.
-C----------
-          IF(ISP(I).EQ.2 .OR. ISP(I).EQ.6) THEN
-            POTHTG = POTHTG *
-     &      (0.84875-0.03039*DBH(I)+0.00076*DBH(I)*DBH(I)+0.00313*XSITE)
-          ENDIF
-C
-          IF(DEBUG)WRITE(JOSTND,110) B3,POTHTG
-  110     FORMAT('IN HTCALC 110 B3,POTHTG=',5F9.5)
-C
-          IF(POTHTG .GT. PH)POTHTG=PH
-C
-C----------
-C  SPACE FOR OTHER SPECIES
-C---------
+
+C  SET SITE INDEX FOR SPECIES
+      XSITE=SITEAR(ISPC)
+
+C  LOAD PAYANDEH COEFFICIENTS
+      B1 = 1.5469
+      B2 = 1.0018
+      B3 = -0.0114
+      B4 = 1.0883
+      B5 = 0.0072
+
+C  LOAD HEGYI COEFFICIENTS
+      C1 = HEGYI1(ISPC)
+      C2 = HEGYI2(ISPC)
+      C3 = HEGYI3(ISPC)
+
+C  CALCULATE HTMAX
+      SELECT CASE (ISPC)
+        CASE(8,11,12)
+          HTMAX =(B1*XSITE**B2)
         CASE DEFAULT
-          POTHTG = 0.
-          HGUESS = 0.
-C
+          HTMAX = (C1*XSITE)
       END SELECT
+
+C------
+C  IF DIFFERENCE BETWEEN MAX SITE INDEX HEIGHT AND H IS LE
+C  1 THEN BYPASS CALCULATIONS AND EXIT SUBROUTINE.
 C
+C  OTHERWISE DETERMINE TYPE OF CALCULATION TO BE MADE BASED ON N
+C------
+
+      IF(HTMAX-H.LE.1.) GOTO 900
+
+C------
+C  CHOICE 1
+C  N IS 0 AND AN AGE WILL BE CALCULATED FROM H AND XSITE
+C  CALL IS FROM REGENT
+C------
+      IF(N .EQ. 0) THEN
+
+C  PAYANDEH CALCULATION
+        SELECT CASE(ISPC)
+          CASE(8,11,12)
+            AGET = 1./B3*(ALOG(1-((H)/B1/XSITE**B2)**(1./B4/XSITE**B5)))
+            IF(DEBUG)WRITE(JOSTND,*)' IN HTCALC GETTING AGE (PAYANDEH)',
+     &      ' N=',N,' ISPC=',ISPC, ' HT=',H,' AGET=',AGET,
+     &      ' XSITE=',XSITE
+
+C  HEGYI CALCULATION
+          CASE DEFAULT
+            AGET = 1/C2*LOG(1-((H)/C1/XSITE)**(1/C3))
+            IF(DEBUG)WRITE(JOSTND,*)' IN HTCALC GETTING AGE (HEGYI)',
+     &      ' N=',N,' ISPC=',ISPC, ' HT=',H,' AGET=',AGET,
+     &      ' XSITE=',XSITE
+        END SELECT
+
+C------
+C  CHOICE 2
+C  N IS 1 AND HEIGHT IS BEING CALCULATED FROM AGET AND XSITE
+C  CALL IS FROM ESADVH, ESSUBH, ESXCSH
+C------
+      ELSE IF(N .EQ. 1) THEN
+
+C  PAYANDEH CALCULATION
+        SELECT CASE(ISPC)
+          CASE(8,11,12)
+            H = B1*XSITE**B2*(1-EXP(B3*AGET))**(B4*XSITE**B5)
+            IF(DEBUG)WRITE(JOSTND,*)' IN HTCALC GETTING HT (PAYANDEH)',
+     &      ' N=',N,' ISPC=',ISPC, ' HT=',H,' AGET=',AGET,
+     &      ' XSITE=',XSITE
+
+C  HEGYI CALCULATION
+          CASE DEFAULT
+            H = C1*XSITE*(1-EXP(C2*AGET))**C3
+
+C  DO DEBUG
+            IF(DEBUG)WRITE(JOSTND,*)' IN HTCALC GETTING HT (HEGYI)',
+     &     ' N=',N,' ISPC=',ISPC, ' HT=',H,' AGET=',AGET,
+     &     ' XSITE=',XSITE
+        END SELECT
+
+C------
+C  CHOICE 3
+C  MODE IS 2 AND HEIGHT INCREMENT IS BEING CALCULATED FROM AGET AND XSITE
+C  CALL IS FROM REGENT
+C------
+      ELSE
+
+C  PAYANDEH CALCULATION
+        SELECT CASE(ISPC)
+          CASE(8,11,12)
+            H1 = B1*XSITE**B2*(1-EXP(B3*AGET))**(B4*XSITE**B5)
+            H2 = B1*XSITE**B2*(1-EXP(B3*(AGET + 10.0)))**(B4*XSITE**B5)
+            HTG = H2 - H1
+
+C  DO DEBUG
+            IF(DEBUG)WRITE(JOSTND,*)' IN HTCALC GETTING HI (PAYANDEH)',
+     &      ' N=',N,' ISPC=',ISPC,' AGET=',AGET,' XSITE=',XSITE,
+     &      ' H1=',H1, ' H2=',H2, ' HTG=', HTG
+
+C  HEGYI CALCULATION
+          CASE DEFAULT
+            H1 = C1*XSITE*(1-EXP(C2*AGET))**C3
+            H2 = C1*XSITE*(1-EXP(C2*(AGET + 10.0)))**C3
+            HTG = H2 - H1
+
+C  DO DEBUG
+            IF(DEBUG)WRITE(JOSTND,*)' IN HTCALC GETTING HI (HEGYI)',
+     &      ' N=',N,' ISPC=',ISPC, ' AGET=',AGET,' XSITE=',XSITE,
+     &      ' H1=',H1, ' H2=',H2,' HTG=', HTG
+        END SELECT
+
+C  END OF CHOICES
+      ENDIF
+
   900 CONTINUE
-C
       RETURN
       END

@@ -18,9 +18,12 @@ Description: This change was only made to SQLite version and not ODBC version.
              -------------  -----------  -----------
              Establishment  RANNSEED     ESRanSD
 
-             Database       CALBSTAT     CalbStDB
+             Database       ATRTLIST     ATrtLiDB
+                            BURNREPT     BurnReDB
+                            CALBSTAT     CalbStDB
                             CARBRPTS     CarbReDB
                             CLIMREPT     ClimReDB
+                            COMPUTE      ComputDB
                             CUTLIST      CutLiDB
                             DWDCVOUT     DWDCvDB
                             DWDVLOUT     DWDVlDB
