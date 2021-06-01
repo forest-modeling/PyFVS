@@ -36,6 +36,9 @@ C
       INCLUDE 'PDEN.F77'
 C
 C
+      INCLUDE 'VARCOM.F77'
+C
+C
 COMMONS
 C
 C----------
@@ -137,6 +140,8 @@ C----------
       BAAA(IP)=0.0
       PCCF(IP)=0.0
       PTPA(IP)=0.0
+      PTPAA(IP)=0.0
+      PRDA(IP)=0.0
       DO 13 IS=1,MAXSP
       OVER(IS,IP)=0.0
    13 CONTINUE
@@ -207,6 +212,10 @@ C----------
       IF(D.LT.REGNBK) GO TO 10
       BAAA(IP)=BAAA(IP)+BATREE*PI/GROSPC
       OVER(ISPC,IP)=OVER(ISPC,IP)+BATREE*PI/GROSPC
+      PTPAA(IP)=PTPAA(IP)+P*PI/GROSPC
+      IF(XMAXPT(IP) .GT. 0.0) THEN
+        PRDA(IP)=PRDA(IP)+(P*(D/10.)**1.605*PI/GROSPC)/XMAXPT(IP)
+      ENDIF
    10 CONTINUE
 C----------
 C   CALCULATE RELATIVE DENSITY FOR THE STAND.
