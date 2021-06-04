@@ -144,7 +144,8 @@ C.... Dimension statements for local variables.
       REAL     ODBHKL(IRRTRE), ODBHU(IRRTRE), ONDTRE(7), ONLTRE(7),
      &         OPROBI(MAXSP), OPROBU(MAXSP), ORRKIL(MAXSP),
      &         PCTKL(IRRTRE),  PCTU(IRRTRE), PVECKL(IRRTRE),
-     &         PVECU(IRRTRE), TMPI, X1, X2, X3, X4
+     &         PVECU(IRRTRE), TMPI, X1, X2, X3, X4,
+     &         DDBHCLS(6), LDBHCLS(6)
 
       CHARACTER*1 CHTYPE(ITOTRR)
       
@@ -305,33 +306,54 @@ C....    Write out the indicators.
   802    CONTINUE
 
   801    CONTINUE 
+C
+C        LOAD DIAMETER CLASS ARRAYS FOR OUTPUT
+C
          IF (LMTRIC) THEN 
-            WRITE(IOUNIT,2110) IDRDOUT(2), JSP(KSP),
-     >           (ONDTRE(I)*INTOCM,I=1,6), X1/ACRtoHA,
-     >           (ONLTRE(I)*INTOCM,I=1,6),  X2/ACRtoHA, X3/ACRtoHA, X4
-C
-C           Call DBS for RD Detail output to database
-C
-            CALL DBSRD2 (JYR,NPLT,CHTYPE(IRRSP),PAREA(IRRSP)*ACRtoHA,
-     >        JSP(KSP), 
-     >        ONDTRE(1)*INTOCM, ONDTRE(2)*INTOCM, ONDTRE(3)*INTOCM,
-     >        ONDTRE(4)*INTOCM, ONDTRE(5)*INTOCM, ONDTRE(6)*INTOCM,
-     >        X1/ACRtoHA,
-     >        ONLTRE(1)*INTOCM, ONLTRE(2)*INTOCM, ONLTRE(3)*INTOCM, 
-     >        ONLTRE(4)*INTOCM, ONLTRE(5)*INTOCM, ONLTRE(6)*INTOCM, 
-     >        X2/ACRtoHA, X3/ACRtoHA, X4)
+            DO I=1,6
+              DDBHCLS(I) = ONDTRE(I)*INTOCM
+              LDBHCLS(I) = ONLTRE(I)*INTOCM
+            ENDDO
+            
+CX            WRITE(IOUNIT,2110) IDRDOUT(2), JSP(KSP),
+CX     >           (ONDTRE(I)*INTOCM,I=1,6), X1/ACRtoHA,
+CX     >           (ONLTRE(I)*INTOCM,I=1,6),  X2/ACRtoHA, X3/ACRtoHA, X4
+CXC
+CXC           Call DBS for RD Detail output to database
+CXC
+CX            CALL DBSRD2 (JYR,NPLT,CHTYPE(IRRSP),PAREA(IRRSP)*ACRtoHA,
+CX     >        JSP(KSP), 
+CX     >        ONDTRE(1)*INTOCM, ONDTRE(2)*INTOCM, ONDTRE(3)*INTOCM,
+CX     >        ONDTRE(4)*INTOCM, ONDTRE(5)*INTOCM, ONDTRE(6)*INTOCM,
+CX     >        X1/ACRtoHA,
+CX     >        ONLTRE(1)*INTOCM, ONLTRE(2)*INTOCM, ONLTRE(3)*INTOCM, 
+CX     >        ONLTRE(4)*INTOCM, ONLTRE(5)*INTOCM, ONLTRE(6)*INTOCM, 
+CX     >        X2/ACRtoHA, X3/ACRtoHA, X4)
 
          ELSE
-            WRITE(IOUNIT,2110) IDRDOUT(2), JSP(KSP),
-     >           (ONDTRE(I),I=1,6), X1,
-     >           (ONLTRE(I),I=1,6),  X2, X3, X4
-C
-C           Call DBS for RD Detail output to database
-C
-            CALL DBSRD2 (JYR,NPLT,CHTYPE(IRRSP),PAREA(IRRSP),
-     >           JSP(KSP),ONDTRE, X1, ONLTRE,  X2, X3, X4)
-
+            DO I=1,6
+              DDBHCLS(I) = ONDTRE(I)
+              LDBHCLS(I) = ONLTRE(I)
+            ENDDO
+            
+CX            WRITE(IOUNIT,2110) IDRDOUT(2), JSP(KSP),
+CX     >           (ONDTRE(I),I=1,6), X1,
+CX     >           (ONLTRE(I),I=1,6),  X2, X3, X4
+CXC
+CXC           Call DBS for RD Detail output to database
+CXC
+CX            CALL DBSRD2 (JYR,NPLT,CHTYPE(IRRSP),PAREA(IRRSP),
+CX     >           JSP(KSP),ONDTRE, X1, ONLTRE,  X2, X3, X4)
          ENDIF
+  
+         WRITE(IOUNIT,2110) IDRDOUT(2), JSP(KSP),
+     >        (DDBHCLS(I),I=1,6), X1,
+     >        (LDBHCLS(I),I=1,6),  X2, X3, X4
+C
+C        Call DBS for RD Detail output to database
+C
+         CALL DBSRD2 (JYR,NPLT,CHTYPE(IRRSP),PAREA(IRRSP),
+     >           JSP(KSP),DDBHCLS, X1, LDBHCLS,  X2, X3, X4)
 
 C        Zero out arrays.
 
@@ -347,6 +369,8 @@ C        Zero out arrays.
          DO 790 I=1,6
             ONDTRE(I) = 0.0
             ONLTRE(I) = 0.0
+            DDBHCLS(I) = 0.0
+            LDBHCLS(I) = 0.0
   790    CONTINUE
 
   800 CONTINUE
