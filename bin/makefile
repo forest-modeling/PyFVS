@@ -1,7 +1,7 @@
 #	$Id$	
 
 # Notes: If OS is defined, then then we are 64 bit windows, otherwise, we are Linix 
-# x86_64 or mac osx x86_64. These two are automatically picked.
+# x86_64 or mac osx x86_64. These two are automatically picked as OS is always defined on windows
 
 ifdef OS
  export WIN = -DWINDOWS
@@ -41,7 +41,7 @@ endif
 	
 # FC is the fortran compiler
 # FFLAGS are pasted to fortran
-# CC is the c compiler
+# CC is the c compiler and used for c++ code
 # CFLAGS are passed to C, of these CMPgcc is used by the fofem routines and WIN is used
 # by fvsSQL.c
 # LD is the linker
@@ -77,10 +77,10 @@ ifdef sourceFileList
  ifndef sourceList
   export sourceFileList
   export sourceList = $(shell cat $(sourceFileList))
-  export includes = $(notdir $(filter %.F77 %.INC %.h,$(sourceList))) $(dbstypedefs)
+  export includes = $(notdir $(filter %.F77 %.INC %.h,$(sourceList)))
   export mods = $(notdir $(filter %_mod.f, $(sourceList)))
   export mods_mods = $(addsuffix .mod,$(basename $(mods)))
-  export source = $(filter-out mkdbsTypeDefs.c, $(notdir $(filter %.c %.f, $(sourceList))))
+  export source = $(notdir $(filter %.c %.f %.cpp, $(sourceList)))
   export object = $(addsuffix .o,$(basename $(source)))
  endif
 endif
@@ -133,6 +133,9 @@ FVSne$(SLIBSUFX) FVSne$(PRGSUFX) : $(addsuffix _sourceList.txt,FVSne) $(shell ca
 
 FVSoc$(SLIBSUFX) FVSoc$(PRGSUFX) : $(addsuffix _sourceList.txt,FVSoc) $(shell cat $(addsuffix _sourceList.txt,FVSoc))
 	$(MAKE) --file=makefile FVSoc.setup
+
+#FVSon$(SLIBSUFX) FVSon$(PRGSUFX) : $(addsuffix _sourceList.txt,FVSon) $(shell cat $(addsuffix _sourceList.txt,FVSon))
+#	$(MAKE) --file=makefile FVSon.setup
 
 FVSop$(SLIBSUFX) FVSop$(PRGSUFX) : $(addsuffix _sourceList.txt,FVSop) $(shell cat $(addsuffix _sourceList.txt,FVSop))
 	$(MAKE) --file=makefile FVSop.setup
@@ -187,7 +190,8 @@ endif
 %.o : %.f $(includes) $(mods_mods)
 	$(FCprf)$(FC) $(FFLAGS) -c -o $@ $<
 
-%.o : %.c $(includes) 
+%.o : %.c  
 	$(CCprf)$(CC) $(CFLAGS) -c -o $@ $<
 	
-	
+%.o : %.cpp  
+	$(CCprf)$(CC) $(CFLAGS) -c -o $@ $<
