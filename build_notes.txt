@@ -1,0 +1,39 @@
+# Keep trunk and trunk-ci current with SVN
+
+# (Re)Create a CI branch, e.g. FMSCdev-ci
+# Checkout a non-target branch
+git checkout main
+# Force delete of local branch
+git branch -D FMSCdev-ci
+# Delete remote branch
+git push origin --delete FMSCdev-ci
+# Create the local branch from the mirror
+git checkout -b FMSCdev-ci FMSCdev
+# Copy CI files from another branch
+git checkout trunk-ci appveyor.yml
+git checkout trunk-ci CMakeLists.txt
+git checkout trunk-ci CMakeLists.txt.in
+git checkout trunk-ci bin/CMakeLists.txt
+git checkout trunk-ci readme.md
+git checkout trunk-ci .gitignore
+
+# Update trunk with SVN commits
+git checkout trunk
+git pull origin
+git svn rebase
+git push
+
+# Rebase trunk-ci with trunk commits
+git checkout trunk-ci
+git pull
+git rebase trunk
+# NOTE: pull again to integrate with origin, otherwise the rebase gets rejected
+git pull
+git push origin
+
+
+# Build
+conda create -c conda-forge -n=pyfvs38 python=3.8 cmake ninja m2w64-gcc-fortran
+cal activate pyfvs38
+cmake -S . -B build -G "Ninja" -DFVS_VARIANTS=wc -DCMAKE_RELEASE_TYPE=Release
+cmake --build build
