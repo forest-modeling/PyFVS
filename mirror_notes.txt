@@ -1,0 +1,32 @@
+Open FVS Mirror
+
+Fix-Up a Broken SVN Branch
+
+Sometimes a branch is not rebase-able. This seems to happen with FMSCrelease.
+The reason is not entirely clear. I think the SVN branch is simply deleted 
+and re-copied. Presumably it is copied from trunk, however there may be other
+changes to prepare the release. In any case the branch history is broken and 
+Git-SVN is unable to reconcile the commits.
+
+The only solution appears to be to delete and re-fetch the broken branch.
+Delete the branch locally and push the delete to the remote repository.
+> git branch -d FMSCrelease
+> git push origin --delete FMSCrelease
+
+Fetch all the SVN commits for the configured branches.
+A shallow fetch will complete quicker, but compromise some history.
+Network errors cause this to fail on long fetches. The batch file 
+`svn_fetch.bat` will call this repeatedly until it finishes completely.
+
+> git svn fetch -r2500:HEAD
+
+Now recreate the branch locally and push it to the remote.
+
+> git checkout -b FMSCrelease
+> git reset --hard remotes/open-fvs/FMSCrelease
+> git push --set-upstream origin FMSCrelease
+
+Now it should be ready again for integration
+
+> git svn rebase
+
