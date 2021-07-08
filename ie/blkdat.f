@@ -161,7 +161,7 @@ C    11 = MOUNTAIN HEMLOCK (MH)          TSUGA MERTENSIANA (OT FR0M NI)
 C    12 = WHITEBARK PINE (WB)            PINUS ALBICAULIS (WL FR0M NI)
 C    13 = LIMBER PINE (LM)               PINUS FLEXILIS (FR0M TT)
 C    14 = SUBALPINE LARCH (LL)           LARIX LYALLII (AF FR0M NI)
-C    15 = PINYON PINE (PI)               PINUS EDULIS (FR0M UT)
+C    15 = SINGLELEAF PINYON (PM)         PINUS MONOPHYLLA (FR0M UT)
 C    16 = ROCKY MOUNTAIN JUNIPER (RM)    JUNIPERUS SCOPULORUM (FR0M UT)
 C    17 = PACIFIC YEW (PY)               TAXUS BREVIFOLIA (LM FR0M TT)
 C    18 = QUAKING ASPEN (AS)             POPULUS TREMULOIDES (FR0M UT)
@@ -174,20 +174,20 @@ C----------
       DATA JSP /
      & 'WP ',   'WL ',   'DF ',   'GF ',   'WH ',   'RC ',   'LP ',
      & 'ES ',   'AF ',   'PP ',   'MH ',   'WB ',   'LM ',   'LL ',
-     & 'PI ',   'RM ',   'PY ',   'AS ',   'CO ',   'MM ',   'PB ',
+     & 'PM ',   'RM ',   'PY ',   'AS ',   'CO ',   'MM ',   'PB ',
      & 'OH ',   'OS '/
 C
       DATA FIAJSP /
      & '119',   '073',   '202',   '017',   '263',   '242',   '108',
      & '093',   '019',   '122',   '264',   '101',   '113',   '072',
-     & '106',   '066',   '231',   '746',   '740',   '321',   '375',
-     & '998',   '298'/
+     & '133',   '066',   '231',   '746',   '740',   '321',   '375',
+     & '998',   '299'/
 C
       DATA PLNJSP /
      & 'PIMO3 ','LAOC  ','PSME  ','ABGR  ','TSHE  ','THPL  ','PICO  ',
      & 'PIEN  ','ABLA  ','PIPO  ','TSME  ','PIAL  ','PIFL2 ','LALY  ',
-     & 'PIED  ','JUSC2 ','TABR2 ','POTR5 ','POPUL ','ACGL  ','BEPA  ',
-     & '2TD   ','2TE   '/
+     & 'PIMO  ','JUSC2 ','TABR2 ','POTR5 ','POPUL ','ACGL  ','BEPA  ',
+     & '2TB   ','2TN   '/
 C
       DATA JTYPE / 10,100,110,130,140,160,170,180,190,200,
      &            210,220,230,250,260,280,290,310,320,330,
@@ -201,13 +201,13 @@ C
      &            925,930,940,950,999,27*0 /
 C
       DATA NSP /'WP1','WL1','DF1','GF1','WH1','RC1','LP1','ES1','AF1',
-     >          'PP1','MH1','WB1','LM1','LL1','PI1','RM1','PY1','AS1',
+     >          'PP1','MH1','WB1','LM1','LL1','PM1','RM1','PY1','AS1',
      >          'CO1','MM1','PB1','OH1','OS1',
      >          'WP2','WL2','DF2','GF2','WH2','RC2','LP2','ES2','AF2',
-     >          'PP2','MH2','WB2','LM2','LL2','PI2','RM2','PY2','AS2',
+     >          'PP2','MH2','WB2','LM2','LL2','PM2','RM2','PY2','AS2',
      >          'CO2','MM2','PB2','OH2','OS2',
      >          'WP3','WL3','DF3','GF3','WH3','RC3','LP3','ES3','AF3',
-     >          'PP3','MH3','WB3','LM3','LL3','PI3','RM3','PY3','AS3',
+     >          'PP3','MH3','WB3','LM3','LL3','PM3','RM3','PY3','AS3',
      >          'CO3','MM3','PB3','OH3','OS3'/
 C----------
 C   COMMON STATEMENT FOR COEFFS VARIABLES

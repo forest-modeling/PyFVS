@@ -121,7 +121,7 @@ C     2 = SUGAR PINE (SP)                PINUS LAMBERTIANA
 C     3 = DOUGLAS-FIR (DF)               PSEUDOTSUGA MENZIESII
 C     4 = WHITE FIR (WF)                 ABIES CONCOLOR
 C     5 = MADRONE (MA)                   ARBUTUS MENZIESII
-C     6 = INCENSE CEDAR (IC)             LIBOCEDRUS DECURRENS
+C     6 = INCENSE CEDAR (IC)             CALOCEDRUS DECURRENS
 C     7 = CALIFORNIA BLACK OAK (BO)      QUERQUS KELLOGGII
 C     8 = TANOAK (TO)                    LITHOCARPUS DENSIFLORUS
 C     9 = RED FIR (RF)                   ABIES MAGNIFICA
@@ -133,12 +133,12 @@ C----------
      & 'TO ',   'RF ',   'PP ',   'OH '/
 C
       DATA FIAJSP /
-     & '298',   '117',   '202',   '015',   '361',   '081',   '818',
+     & '299',   '117',   '202',   '015',   '361',   '081',   '818',
      & '631',   '020',   '122',   '998'/
 C
       DATA PLNJSP /
-     & '2TE   ','PILA  ','PSME  ','ABCO  ','ARME  ','CADE27','QUKE  ',
-     & 'LIDE3 ','ABMA  ','PIPO  ','2TD   '/
+     & '2TN   ','PILA  ','PSME  ','ABCO  ','ARME  ','CADE27','QUKE  ',
+     & 'LIDE3 ','ABMA  ','PIPO  ','2TB   '/
 C
       DATA JTYPE /130,170,250,260,280,290,310,320,330,420,
      &            470,510,520,530,540,550,570,610,620,640,

@@ -85,11 +85,11 @@ C    16 = UTAH JUNIPER                 UJ  JUNIPERUS OSTEOSPERMA
 C    17 = GREAT BASIN BRISTLECONE PINE GB  PINUS LONGAEVA
 C    18 = NARROWLEAF COTTONWOOD        NC  POPULUS ANGUSTIFOLIA
 C    19 = FREMONT COTTONWOOD           FC  POPULUS FREMONTII
-C    20 = CURL-LEAF MOUNTAIN-MAHOGANY  MC  CERCOCARPUS LEDIFOLIUS
+C    20 = CURL-LEAF MOUNTAIN MAHOGANY  MC  CERCOCARPUS LEDIFOLIUS
 C    21 = BIGTOOTH MAPLE               BI  ACER GRANDIDENTATUM
 C    22 = BOXELDER                     BE  ACER NEGUNDO
-C    23 = OTHER SOFTWOODS              OS
-C    24 = OTHER HARDWOODS              OH
+C    23 = OTHER SOFTWOOD               OS
+C    24 = OTHER HARDWOOD               OH
 C
 C----------
 C TYPE DECLARATIONS AND COMMON STATEMENT FOR CONTROL VARIABLES.
@@ -147,13 +147,13 @@ C
      & '101',   '113',   '202',   '015',   '096',   '746',   '108',
      & '093',   '019',   '122',   '106',   '064',   '814',   '133',
      & '066',   '065',   '142',   '749',   '748',   '475',   '322',
-     & '313',   '298',   '998'/
+     & '313',   '299',   '998'/
 C
       DATA PLNJSP /
      & 'PIAL  ','PIFL2 ','PSME  ','ABCO  ','PIPU  ','POTR5 ','PICO  ',
      & 'PIEN  ','ABLA  ','PIPO  ','PIED  ','JUOC  ','QUGA  ','PIMO  ',
      & 'JUSC2 ','JUOS  ','PILO  ','POAN3 ','POFR2 ','CELE3 ','ACGR3 ',
-     & 'ACNE2 ','2TE   ','2TD   '/
+     & 'ACNE2 ','2TN   ','2TB   '/
 C
       DATA NSP /'WB1','LM1','DF1','WF1','BS1','AS1','LP1','ES1','AF1',
      >          'PP1','PI1','WJ1','GO1','PM1','RM1','UJ1','GB1','NC1',
