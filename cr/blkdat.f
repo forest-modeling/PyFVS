@@ -76,7 +76,7 @@ C----------
 C    AL COMMON                  FIA SCIENTIFIC                         
 C  # CD NAME                    CD  NAME                               
 C -- -- ---------------------   --- -----------------------------------
-C  1 AF SUBALPINE FIR           019 ABIES LASIOCARPA var. LASIOCARPA
+C  1 AF SUBALPINE FIR           019 ABIES LASIOCARPA 
 C  2 CB CORKBARK FIR            018 ABIES LASIOCARPA var. ARIZONICA
 C  3 DF DOUGLAS-FIR             202 PSEUDOTSUGA MENZIESII
 C  4 GF GRAND FIR               017 ABIES GRANDIS
