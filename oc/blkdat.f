@@ -98,8 +98,8 @@ C     1 = PORT ORFORD CEDAR (PC)          CHAMAECYPARIS LAWSONIANA
 C     2 = INCENSE CEDAR (IC)              LIBOCEDRUS DECURRENS
 C     3 = WESTERN REDCEDAR (RC)           THUJA PLICATA
 C     4 = GRAND FIR (GF) / WHITE FIR      ABIES GRANDIS
-C     5 = CALIFORNIA RED FIR (RF)         ABIES MAGNIFICA (MAGNIFICA)
-C     6 = SHASTA RED FIR (SH)             ABIES MAGNIFICA (SHASTENSIS)
+C     5 = CALIFORNIA RED FIR (RF)         ABIES MAGNIFICA 
+C     6 = SHASTA RED FIR (SH)             ABIES xSHASTENSIS
 C     7 = DOUGLAS-FIR (DF)                PSEUDOTSUGA MENZIESII
 C     8 = WESTERN HEMLOCK (WH)            TSUGA HETEROPHYLLA
 C     9 = MOUNTAIN HEMLOCK (MH)           TSUGA MERTENSIANA
@@ -107,25 +107,25 @@ C    10 = WHITEBARK PINE (WB)             PINUS ALBICAULIS
 C    11 = KNOBCONE PINE (KP)              PINUS ATTENUATA
 C    12 = LODGEPOLE PINE (LP)             PINUS CONTORTA
 C    13 = COULTER PINE (CP)               PINUS COULTERI
-C    14 = LIMBER PINE (LM)                PINUS FLEXILIS (FLEXILIS)
+C    14 = LIMBER PINE (LM)                PINUS FLEXILIS
 C    15 = JEFFREY PINE (JP)               PINUS JEFFREYI
 C    16 = SUGAR PINE (SP)                 PINUS LAMBERTIANA
 C    17 = WESTERN WHITE PINE (WP)         PINUS MONTICOLA
 C    18 = PONDEROSA PINE (PP)             PINUS PONDEROSA
 C    19 = MONTEREY PINE (MP)              PINUS RADIATA
-C    20 = GRAY PINE (GP)                  PINUS SABINIANA
+C    20 = CALIFORNIA FOOTHILL PINE (GP)   PINUS SABINIANA
 C    21 = WESTERN JUNIPER (WJ)            JUNIPERUS OCCIDENTALIS
 C    22 = BREWER SPRUCE (BR)              PICEA BREWERIANA
 C    23 = GIANT SEQUOIA (GS)              SEQUOIADENDRON GIGANTEUM
 C    24 = PACIFIC YEW (PY)                TAXUS BREVIFOLIA
-C    25 = OTHER SOFTWOODS (OS)
+C    25 = OTHER SOFTWOOD (OS)
 C    26 = COAST LIVE OAK (LO)             QUERCUS AGRIFOLIA
 C    27 = CANYON LIVE OAK (CY)            QUERCUS CHRYSOLEPSIS
 C    28 = BLUE OAK (BL)                   QUERCUS DOUGLASII
 C    29 = ENGELMANN OAK (EO)              QUERCUS ENGELMANNI
 C    30 = OREGON WHITE OAK (WO)           QUERCUS GARRYANA
 C    31 = CALIFORNIA BLACK OAK (BO)       QUERCUS KELLOGGII
-C    32 = VALLEY WHITE OAK (VO)           QUERCUS LOBATA
+C    32 = VALLEY OAK (VO)                 QUERCUS LOBATA
 C    33 = INTERIOR LIVE OAK (IO)          QUERCUS WISLIZENII
 C    34 = BIGLEAF MAPLE (BM)              ACER MACROPHYLLUM
 C    35 = CALIFORNIA BUCKEYE (BU)         AESCULUS CALIFORNICA
@@ -134,15 +134,15 @@ C    37 = PACIFIC MADRONE (MA)            ARBUTUS MENZIESII
 C    38 = GIANT CHINQUAPIN (GC)           CHRYSOLEPIS CHRYSOPHYLLA
 C    39 = PACIFIC DOGWOOD (DG)            CORNUS NUTTALLII
 C    40 = OREGON ASH (FL)                 FRAXINUS LATIFOLIA
-C    41 = WALNUT (WN)                     JUGLANS sp.
+C    41 = WALNUT (WN)                     JUGLANS
 C    42 = TANOAK (TO)                     LITHOCARPUS DENSIFLORUS
 C    43 = CALIFORNIA SYCAMORE (SY)        PLATANUS RACEMOSA
 C    44 = QUAKING ASPEN (AS)              POPULUS TREMULOIDES
 C    45 = BLACK COTTONWOOD (CW)           POPULUS TRICHOCARPA
-C    46 = WILLOW (WI)                     SALIX sp.
+C    46 = WILLOW (WI)                     SALIX 
 C    47 = CALIFORNIA NUTMEG (CN)          TORREYA CALIFORNICA
 C    48 = CALIFORNIA LAUREL (CL)          UMBELLULARIA CALIFORNICA
-C    49 = OTHER HARDWOODS (OH)
+C    49 = OTHER HARDWOOD (OH)
 C----------
       DATA JSP /
      & 'PC ',   'IC ',   'RC ',   'GF ',   'RF ',   'SH ',   'DF ',
@@ -157,7 +157,7 @@ C
      & '041',   '081',   '242',   '017',   '020',   '021',   '202',
      & '263',   '264',   '101',   '103',   '108',   '109',   '113',
      & '116',   '117',   '119',   '122',   '124',   '127',   '064',
-     & '092',   '212',   '231',   '298',   '801',   '805',   '807',
+     & '092',   '212',   '231',   '299',   '801',   '805',   '807',
      & '811',   '815',   '818',   '821',   '839',   '312',   '333',
      & '351',   '361',   '431',   '492',   '542',   '600',   '631',
      & '730',   '746',   '747',   '920',   '251',   '981',   '998'/
@@ -166,10 +166,10 @@ C
      & 'CHLA  ','CADE27','THPL  ','ABGR  ','ABMA  ','ABSH  ','PSME  ',
      & 'TSHE  ','TSME  ','PIAL  ','PIAT  ','PICO  ','PICO3 ','PIFL2 ',
      & 'PIJE  ','PILA  ','PIMO3 ','PIPO  ','PIRA2 ','PISA2 ','JUOC  ',
-     & 'PIBR  ','SEGI2 ','TABR2 ','2TE   ','QUAG  ','QUCH2 ','QUDO  ',
+     & 'PIBR  ','SEGI2 ','TABR2 ','2TN   ','QUAG  ','QUCH2 ','QUDO  ',
      & 'QUEN  ','QUGA4 ','QUKE  ','QULO  ','QUWI2 ','ACMA3 ','AECA  ',
      & 'ALRU2 ','ARME  ','CHCHC4','CONU4 ','FRLA  ','JUGLA ','LIDE3 ',
-     & 'PLRA  ','POTR5 ','POBAT ','SALIX ','TOCA  ','UMCA  ','2TD   '/
+     & 'PLRA  ','POTR5 ','POBAT ','SALIX ','TOCA  ','UMCA  ','2TB   '/
 C
       DATA JTYPE /130,170,250,260,280,290,310,320,330,420,
      &            470,510,520,530,540,550,570,610,620,640,

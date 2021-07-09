@@ -77,15 +77,17 @@ C  20 = BIGLEAF MAPLE           (BM)    ACER MACROPHYLLUM
 C  21 = VINE MAPLE              (VN)    ACER CIRCINATUM
 C  22 = RED ALDER               (RA)    ALNUS RUBRA
 C  23 = PAPER BIRCH             (PB)    BETULA PAPYRIFERA
-C  24 = GIANT CHINQUAPIN        (GC)    CHRYSOLEPIS CHRYSOPHYLLA
+C  24 = GIANT CHINQUAPIN        (GC)    CHRYSOLEPIS CHRYSOPHYLLA var.
+C                                       CHRYSOPHYLLA
 C  25 = PACIFIC DOGWOOD         (DG)    CORNUS NUTTALLII
 C  26 = QUAKING ASPEN           (AS)    POPULUS TREMULOIDES
-C  27 = BLACK COTTONWOOD        (CW)    POPULUS BALSAMIFERA var. TRICHOCARPA
+C  27 = BLACK COTTONWOOD        (CW)    POPULUS BALSAMIFERA var. 
+C                                       TRICHOCARPA
 C  28 = OREGON WHITE OAK        (WO)    QUERCUS GARRYANA
-C  29 = CHERRY AND PLUM SPECIES (PL)    PRUNUS sp.
-C  30 = WILLOW SPECIES          (WI)    SALIX sp.
-C  31 = OTHER SOFTWOODS         (OS)
-C  32 = OTHER HARDWOODS         (OH)
+C  29 = PLUM                    (PL)    PRUNUS
+C  30 = WILLOW                  (WI)    SALIX
+C  31 = OTHER SOFTWOOD          (OS)
+C  32 = OTHER HARDWOOD          (OH)
 C
 C  SURROGATE EQUATION ASSIGNMENT:
 C
@@ -208,7 +210,7 @@ C
      & '015',   '072',   '042',   '064',   '312',
      & '324',   '351',   '375',   '431',   '492',
      & '746',   '747',   '815',   '760',   '920',
-     & '298',   '998'/
+     & '299',   '998'/
 C
       DATA PLNJSP /
      & 'PIMO3 ','LAOC  ','PSME  ','ABAM  ','THPL  ',
@@ -217,7 +219,7 @@ C
      & 'ABCO  ','LALY  ','CANO9 ','JUOC  ','ACMA3 ',
      & 'ACCI  ','ALRU2 ','BEPA  ','CHCHC4','CONU4 ',
      & 'POTR5 ','POBAT ','QUGA4 ','PRUNU ','SALIX ',
-     & '2TE   ','2TD   '/
+     & '2TN   ','2TB   '/
 C
       DATA JTYPE /130,170,250,260,280,290,310,320,330,420,
      &            470,510,520,530,540,550,570,610,620,640,

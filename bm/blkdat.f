@@ -116,19 +116,26 @@ C     2 = WESTERN LARCH        073 WL  LAOC   LARIX OCCIDENTALIS
 C     3 = DOUGLAS-FIR          202 DF  PSME   PSEUDOTSUGA MENZIESII
 C     4 = GRAND FIR            017 GF  ABGR   ABIES GRANDIS
 C     5 = MOUNTAIN HEMLOCK     264 MH  TSME   TSUGA MERTENSIANA
-C     6 = WESTERN JUNIPER      064 WJ  JUOC   JUNIPERUS OCCIDENTALIS (WJ FROM UT)
+C     6 = WESTERN JUNIPER      064 WJ  JUOC   JUNIPERUS OCCIDENTALIS 
+C                                             (WJ FROM UT)
 C     7 = LODGEPOLE PINE       108 LP  PICO   PINUS CONTORTA
 C     8 = ENGLEMANN SPRUCE     093 ES  PIEN   PICEA ENGELMANNII
 C     9 = SUBALPINE FIR        019 AF  ABLA   ABIES LASIOCARPA
 C    10 = PONDEROSA PINE       122 PP  PIPO   PINUS PONDEROSA
-C    11 = WHITEBARK PINE       101 WB  PIAL   PINUS ALBICAULIS (WB FROM TT)
-C    12 = LIMBER PINE          113 LM  PIFL2  PINUS FLEXILIS (LM FROM UT)
-C    13 = PACIFIC YEW          231 PY  TABR2  TAXUS BREVIFOLIA (PY FROM WC)
-C    14 = ALASKA YELLOW CEDAR  042 YC  CANO9  CALLITROPSIS NOOTKATENSIS (YC FROM WC)
-C    15 = QUAKING ASPEN        746 AS  POTR5  POPULUS TREMULOIDES (AS FROM UT)
-C    16 = BLACK COTTONWOOD     747 CW  POBAT  POPULUS BALSAMIFERA (CW FROM WC)
-C    17 = OTHER SOFTWOODS      298 OS  2TE    (PP FROM BM)
-C    18 = OTHER HARDWOODS      998 OH  2TD    (OT FROM WC)
+C    11 = WHITEBARK PINE       101 WB  PIAL   PINUS ALBICAULIS 
+C                                             (WB FROM TT)
+C    12 = LIMBER PINE          113 LM  PIFL2  PINUS FLEXILIS 
+C                                             (LM FROM UT)
+C    13 = PACIFIC YEW          231 PY  TABR2  TAXUS BREVIFOLIA 
+C                                             (PY FROM WC)
+C    14 = ALASKA CEDAR         042 YC  CANO9  CALLITROPSIS NOOTKATENSIS 
+C                                             (YC FROM WC)
+C    15 = QUAKING ASPEN        746 AS  POTR5  POPULUS TREMULOIDES 
+C                                             (AS FROM UT)
+C    16 = BLACK COTTONWOOD     747 CW  POBAT  POPULUS BALSAMIFERA var. 
+C                                             TRICHOCARPA (CW FROM WC)
+C    17 = OTHER SOFTWOOD       299 OS  2TE    (PP FROM BM)
+C    18 = OTHER HARDWOOD       998 OH  2TD    (OT FROM WC)
 C----------
       DATA JSP /
      & 'WP ',   'WL ',   'DF ',   'GF ',   'MH ',   'WJ ',   'LP ',
@@ -138,12 +145,12 @@ C
       DATA FIAJSP /
      & '119',   '073',   '202',   '017',   '264',   '064',   '108',
      & '093',   '019',   '122',   '101',   '113',   '231',   '042',
-     & '746',   '747',   '298',   '998'/
+     & '746',   '747',   '299',   '998'/
 C
       DATA PLNJSP /
      & 'PIMO3 ','LAOC  ','PSME  ','ABGR  ','TSME  ','JUOC  ','PICO  ',
      & 'PIEN  ','ABLA  ','PIPO  ','PIAL  ','PIFL2 ','TABR2 ','CANO9 ',
-     & 'POTR5 ','POBAT ','2TE   ','2TD   '/
+     & 'POTR5 ','POBAT ','2TN   ','2TB   '/
 C
       DATA JTYPE /130,170,250,260,280,290,310,320,330,420,
      &            470,510,520,530,540,550,570,610,620,640,
