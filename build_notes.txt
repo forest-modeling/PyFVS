@@ -18,10 +18,10 @@ git checkout trunk-ci readme.md
 git checkout trunk-ci .gitignore
 
 # Edit branch name, etc. in imported files
-# git add <new files>
-# git commit -m"Rebuild FMSCdev-ci"
+git add <new files>
+git commit -m"Rebuild FMSCdev-ci"
 # Push the "new" branch
-# git push -u origin FMSCdev-ci
+git push -u origin FMSCdev-ci
 
 # Update trunk with SVN commits
 git checkout trunk
