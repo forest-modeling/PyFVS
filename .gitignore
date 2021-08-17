@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/_skbuild
+/.ninja*
+/build.ninja
+/cmake_install.cmake
+/CMakeCache.txt
+/CMakeFiles/*
+cmake_install.cmake

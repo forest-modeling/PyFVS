@@ -1,0 +1,161 @@
+## @header_message@
+
+project(@target_name@
+	LANGUAGES Fortran C CXX
+	)
+
+find_package(PythonExtensions REQUIRED)
+# find_package(F2PY REQUIRED)
+# find_package(NUMPY REQUIRED)
+
+set(variant_name @target_name@)
+set(varName @variant@)
+#string(TOLOWER "_py${variant_name}" ext_name)
+string(TOLOWER "${variant_name}" ext_name)
+
+message(STATUS "FVSvariant = ${variant_name}")
+
+set (CMAKE_Fortran_Format FIXED)
+set (CMAKE_VERBOSE_MAKEFILE ON)
+set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+## TODO: May need to include flags for VS/Intel compilers
+# if (CMAKE_GENERATOR MATCHES "Visual Studio 10")
+  # set (CMAKE_C_FLAGS   "/D_WINDOWS /W3 /Zm100" CACHE STRING "VS10 mod A" FORCE)
+  # set (CMAKE_CXX_FLAGS "/D_WINDOWS /W3 /Zm100" CACHE STRING "VS10 mod B" FORCE)
+  # message(STATUS "Building FVS variant with VS10/Intel")
+
+add_definitions(-DANSI)
+
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+	add_definitions(-DWINDOWS -D_WINDLL -DMS_WIN64)
+endif ()
+
+message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "CXX compiler: ${CMAKE_CXX_COMPILER_ID}")
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # using Clang
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  # using GCC
+  add_definitions(-DCMPgcc)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+  # using Intel C++
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  # using Visual Studio C++
+endif()
+
+set(CMAKE_C_FLAGS "-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION ${CMAKE_C_FLAGS}")
+set(CMAKE_Fortran_FLAGS_Debug "-g -Wall -Wno-integer-division -ffpe-trap=invalid,zero,underflow,overflow,denormal -fbacktrace  ${CMAKE_Fortran_FLAGS_Debug}")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols ${CMAKE_SHARED_LINKER_FLAGS}")
+
+set (include_dirs)
+set (fvs_src)
+set (main_src)
+
+file(STRINGS sourcelist.txt source_files)
+
+set(src_exts ".c;.cpp;.f")
+set(incl_exts ".h;.F77")
+set(f2py_names "fvs.f")
+set(f2py_src_files)
+
+foreach (fn ${source_files})
+	get_filename_component (fname   ${fn} NAME CACHE)
+	get_filename_component (pname   ${fn} PATH CACHE)
+	get_filename_component (extname ${fn} EXT  CACHE)
+
+	if (extname IN_LIST incl_exts)
+		list (APPEND include_dirs  ${pname})
+		
+	elseif(extname IN_LIST src_exts)
+		if (fname STREQUAL "main.f")
+			list (APPEND main_src ${fn})
+		else()
+			list (APPEND fvs_src ${fn})
+		endif()
+	
+	endif()
+
+	if (fname IN_LIST f2py_names)
+		list (APPEND f2py_src_files  ${fn})
+	endif()
+
+	unset (fname   CACHE)
+	unset (pname   CACHE)
+	unset (extname CACHE)
+  
+endforeach(fn)
+
+list (REMOVE_DUPLICATES include_dirs)
+# Append the build folder so the .mod files can be located
+list (APPEND include_dirs ${CMAKE_CURRENT_BINARY_DIR})
+
+include_directories(BEFORE ${include_dirs})
+include_directories(BEFORE ${NumPy_INCLUDE_DIRS})
+
+# Compile sources, stage in an object library
+add_library(OBJS_${variant_name} OBJECT ${fvs_src})
+
+add_library(lib${variant_name} SHARED $<TARGET_OBJECTS:OBJS_${variant_name}>)
+add_library(lib${variant_name}_static STATIC $<TARGET_OBJECTS:OBJS_${variant_name}>)
+
+add_executable (${variant_name} ${main_src} $<TARGET_OBJECTS:OBJS_${variant_name}>)
+# target_link_libraries(${variant_name} lib${variant_name}_static)
+# target_link_libraries(${variant_name} lib${variant_name})
+
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set (flags "-static")
+endif ()
+
+# FIXME: Make sure this doesn't clobber file names on Linux
+string(TOLOWER ${variant_name} out_name)
+set_target_properties(${variant_name} PROPERTIES
+	LINKER_LANGUAGE Fortran
+	OUTPUT_NAME ${out_name}
+	LINK_FLAGS ${flags})
+	
+set_target_properties(lib${variant_name} PROPERTIES
+	LINKER_LANGUAGE Fortran
+	OUTPUT_NAME ${out_name}
+	LINK_FLAGS ${flags})
+
+set_target_properties(lib${variant_name}_static PROPERTIES
+	LINKER_LANGUAGE Fortran
+	OUTPUT_NAME ${out_name}
+	LINK_FLAGS ${flags})
+
+
+#### Python Extension
+
+find_package(F2PY REQUIRED)
+find_package(PythonLibs REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS NumPy)
+
+## Generate the F2PY wrapper source files
+set(f2py_module_name "${ext_name}")
+
+add_f2py_target(${f2py_module_name} ${f2py_src_files})
+
+# set(generated_module_file ${CMAKE_CURRENT_BINARY_DIR}/${f2py_module_name}module.c)
+
+# add_custom_target(${f2py_module_name} ALL
+#   DEPENDS ${generated_module_file}
+#   )
+
+# add_custom_command(
+#   OUTPUT ${generated_module_file}
+#   COMMAND ${F2PY_EXECUTABLE}
+#     -m ${f2py_module_name}
+#     ${f2py_src_files}
+#   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#   )
+
+# install(FILES ${generated_module_file} DESTINATION pyfvs)
+
+add_library(${f2py_module_name} MODULE $<TARGET_OBJECTS:OBJS_${variant_name}>) # ${generated_module_file})
+python_extension_module(${f2py_module_name})
+include_directories(${PYTHON_INCLUDE_DIRS})
+include_directories(${_Python3_NumPy_INCLUDE_DIR})
+target_link_libraries(${f2py_module_name} ${PYTHON_LIBRARIES})
+install(TARGETS ${f2py_module_name} LIBRARY DESTINATION pyfvs)
