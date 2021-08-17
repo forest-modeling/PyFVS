@@ -60,6 +60,10 @@ Cx      INTEGER MYACT(1)                                            !Remove thes
 Cx      REAL PRM(1)                                                 !Remove these
 Cx      DATA MYACT/100/                                             !Remove these
       INTEGER IRSTRTCD,ISTOPDONE,IRTNCD,lenCl
+
+C-- F2PY signature hints
+Cf2py intent(out) irtncd
+
 C
 C     ******************     EXECUTION BEGINS     ******************
 C
