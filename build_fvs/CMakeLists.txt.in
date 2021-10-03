@@ -1,0 +1,252 @@
+## @header_message@
+
+project(@target_name@
+	LANGUAGES Fortran C CXX
+	)
+
+find_package(PythonExtensions REQUIRED)
+# find_package(F2PY REQUIRED)
+# find_package(NUMPY REQUIRED)
+
+set(target_name @target_name@)
+set(fvs_variant @variant@)
+string(TOLOWER "${target_name}" ext_name)
+# string(TOLOWER "${target_name}" ext_name)
+
+message(STATUS "FVS Variant: ${fvs_variant}")
+message(STATUS "Target Name: ${target_name}")
+message(STATUS "BINARY DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+message(STATUS "SOURCE DIR: ${CMAKE_SOURCE_DIR}")
+
+
+set (CMAKE_Fortran_Format FIXED)
+set (CMAKE_VERBOSE_MAKEFILE ON)
+set (CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+## TODO: May need to include flags for VS/Intel compilers
+# if (CMAKE_GENERATOR MATCHES "Visual Studio 10")
+  # set (CMAKE_C_FLAGS   "/D_WINDOWS /W3 /Zm100" CACHE STRING "VS10 mod A" FORCE)
+  # set (CMAKE_CXX_FLAGS "/D_WINDOWS /W3 /Zm100" CACHE STRING "VS10 mod B" FORCE)
+  # message(STATUS "Building FVS variant with VS10/Intel")
+
+# add_definitions(-DANSI)
+add_definitions(-DMS_WIN64)
+# add_definitions(-DANSI -DWINDOWS -DCMPgcc)
+
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+	add_definitions(-DWINDOWS -D_WINDLL -DMS_WIN64)
+endif ()
+
+message(STATUS "System name: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "CXX compiler: ${CMAKE_CXX_COMPILER_ID}")
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # using Clang
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  # using GCC
+  add_definitions(-DCMPgcc)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+  # using Intel C++
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  # using Visual Studio C++
+endif()
+
+set(CMAKE_C_FLAGS "-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION ${CMAKE_C_FLAGS}")
+set(CMAKE_Fortran_FLAGS_Debug "-g -Wall -Wno-integer-division -ffpe-trap=invalid,zero,underflow,overflow,denormal -fbacktrace  ${CMAKE_Fortran_FLAGS_Debug}")
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols ${CMAKE_SHARED_LINKER_FLAGS}")
+
+set (include_dirs)
+set (fvs_src)
+set (main_src)
+
+file(STRINGS sourcelist.txt source_files)
+
+set(src_exts ".c;.cpp;.f")
+set(incl_exts ".h;.F77")
+
+# List of F77 include files to translate to F90
+set(f77_incl)
+
+set(api_names "fvs.f")
+set(api_wrap_src)
+
+foreach (fn ${source_files})
+	get_filename_component (fname   ${fn} NAME CACHE)
+	get_filename_component (pname   ${fn} PATH CACHE)
+	get_filename_component (extname ${fn} EXT  CACHE)
+
+	# F77 files that will get translated
+	if (extname STREQUAL ".F77")
+		list(APPEND f77_incl ${fn})
+	endif ()
+
+	# Folders with include source files
+	if (extname IN_LIST incl_exts)
+		list (APPEND include_dirs  ${pname})
+		
+	elseif(extname IN_LIST src_exts)
+		if (fname STREQUAL "main.f")
+			list (APPEND main_src ${fn})
+		else()
+			list (APPEND fvs_src ${fn})
+		endif()
+	
+	endif()
+
+	# Enumerate source files to wrap with F2PY
+	if (fname IN_LIST api_names)
+		list (APPEND api_wrap_src  ${fn})
+	endif()
+
+	unset (fname   CACHE)
+	unset (pname   CACHE)
+	unset (extname CACHE)
+  
+endforeach(fn)
+
+# Process the F77 include files into F90
+set(f90_gen_dir "${CMAKE_SOURCE_DIR}/api/${fvs_variant}/f90_include")
+foreach (fn ${f77_incl})
+	get_filename_component (fname ${fn} NAME_WLE)
+	file(MAKE_DIRECTORY "${f90_gen_dir}")
+	set(pth "${f90_gen_dir}/${fname}.F90")
+	# message(STATUS ${pth})
+	file(READ ${fn} flines)
+
+	# Normalize line endings
+	string(REGEX REPLACE "\r\n" "\n" flines ${flines})
+	
+	# Replace F77 comments with F90
+	string(REGEX REPLACE "^C" "!" flines ${flines})
+	string(REGEX REPLACE "\nC" "\n!" flines ${flines})
+	string(REGEX REPLACE "\n\\*" "\n!" flines ${flines})
+
+	# Replace F77 line continuation
+	string(REGEX REPLACE "\n(     )&" " &\n      " flines ${flines})
+
+	# Write the new include file
+	file(WRITE ${pth} "${flines}")
+endforeach (fn)
+
+list (APPEND include_dirs  "${f90_gen_dir}")
+
+## Add API source files
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/fvs_step.f90")
+# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/tree_data.f90")
+# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/snag_data.f90")
+# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
+
+# list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/base/cmdline.f") ## FIXME: BLOCK DATA
+
+## Wrap BLOCK DATA files
+## NOTE: Simply recasting BLOCK DATA units to SUBROUTINE causes the common blocks to initialize
+## TODO: Automate the BLOCK DATA->SUBROUTINE step
+## TODO: Scan all files for BLOCK DATA and add them to the api
+list (APPEND api_wrap_src "${fvs_root}/base/keywds.f")
+list (APPEND api_wrap_src "${fvs_root}/estb/esblkd.f")
+list (APPEND api_wrap_src "${fvs_root}/${fvs_variant}/blkdat.f")
+
+# list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/${fvs_variant}/cubrds.f") ## FIXME: BLOCK DATA
+# list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/fire/${fvs_variant}/fmcblk.f") ## FIXME: BLOCK DATA
+# list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/base/svblkd.f") ## FIXME: BLOCK DATA
+# list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/dbsqlite/dbsblkd.f") ## FIXME: BLOCK DATA
+# list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/dfb/dfblkd.f") ## FIXME: ALL BLOCK DATA in DFB
+
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/common.f90")
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/foo.f90")
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/test.f90")
+
+# Additional API files to compile
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/common.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/fvs_step.f90")
+# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/tree_data.f90")
+# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/snag_data.f90")
+# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/foo.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/test.f90")
+
+# Cleanup the lists
+list (REMOVE_DUPLICATES api_wrap_src)
+list (REMOVE_DUPLICATES include_dirs)
+
+# Append the build folder so the .mod files can be located
+list (APPEND include_dirs ${CMAKE_CURRENT_BINARY_DIR})
+
+include_directories(BEFORE ${include_dirs})
+
+# Compile sources, stage in an object library
+add_library(OBJS_${target_name} OBJECT ${fvs_src})
+
+# Use the objects in libraries
+add_library(lib${target_name} SHARED $<TARGET_OBJECTS:OBJS_${target_name}>)
+add_library(lib${target_name}_static STATIC $<TARGET_OBJECTS:OBJS_${target_name}>)
+
+add_executable (${target_name} ${main_src} $<TARGET_OBJECTS:OBJS_${target_name}>)
+# target_link_libraries(${target_name} lib${target_name}_static)
+# target_link_libraries(${target_name} lib${target_name})
+
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set (flags "-static")
+	add_definitions(-DMS_WIN64 -DANSI -DWINDOWS -DCMPgcc)
+endif ()
+
+# FIXME: Make sure this doesn't clobber file names on Linux
+string(TOLOWER ${target_name} out_name)
+set_target_properties(${target_name} PROPERTIES
+	LINKER_LANGUAGE Fortran
+	OUTPUT_NAME ${out_name}
+	LINK_FLAGS ${flags})
+	
+set_target_properties(lib${target_name} PROPERTIES
+	LINKER_LANGUAGE Fortran
+	OUTPUT_NAME ${out_name}
+	LINK_FLAGS ${flags})
+
+set_target_properties(lib${target_name}_static PROPERTIES
+	LINKER_LANGUAGE Fortran
+	OUTPUT_NAME ${out_name}
+	LINK_FLAGS ${flags})
+
+
+#### Python Extension
+## Generate the F2PY wrapper source files
+set(api_name "${ext_name}")
+
+set(api_ext_file ${api_name}${PYTHON_EXTENSION_MODULE_SUFFIX})
+message(STATUS "Python extension: ${api_ext_file}")
+
+# message(STATUS ${include_dirs})
+list(JOIN include_dirs ";" f2py_incl)
+# message(STATUS "*** ${f2py_incl}")
+
+# List the f90wrap generated wrappers to expect
+set(api_pyf "${CMAKE_CURRENT_BINARY_DIR}/${api_name}.pyf")
+
+# Compile with F2PY
+add_custom_command(
+	OUTPUT ${api_pyf} ${api_ext_file}
+
+	# Generate the signature file
+	COMMAND ${F2PY_EXECUTABLE}
+		-h ${api_name}.pyf
+		-m ${api_name}
+		--lower
+		--overwrite-signature
+		--include-paths "${f2py_incl}"
+		${api_wrap_src}
+		# only: ${f2py_only} :
+
+	# Compile the modules and link with the FVS library
+	COMMAND ${F2PY_EXECUTABLE}
+		-c --fcompiler=gnu95
+		${api_name}.pyf
+		-I"${CMAKE_CURRENT_BINARY_DIR}"
+		# NOTE: Too many object files, generated batch file fails
+		# $<TARGET_OBJECTS:OBJS_${target_name}>
+		# Link the the static library
+		$<TARGET_FILE:lib${target_name}_static>
+
+	DEPENDS "${api_wrap_src}" "lib${target_name}_static"
+)
+add_custom_target(${target_name}_ext ALL DEPENDS "${api_ext_file}" "lib${target_name}_static")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${api_ext_file} DESTINATION pyfvs)

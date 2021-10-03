@@ -117,7 +117,7 @@ setup(
             }
     # , include_package_data=True # package the files listed in MANIFEST.in
     , entry_points={
-            'console_scripts': ['pyfvs=pyfvs.__main__:main']
+            'console_scripts': ['pyfvs=pyfvs.__main__:cli']
         }
     , classifiers=[
             'Development Status :: 3 - Alpha'
