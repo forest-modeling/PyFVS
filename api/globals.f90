@@ -1,4 +1,4 @@
-module common
+module globals
     implicit none
     INCLUDE 'PRGPRM.F90'
     INCLUDE 'COEFFS.F90'
@@ -21,8 +21,13 @@ module common
     INCLUDE 'FMPARM.F90'
     INCLUDE 'FMCOM.F90'
 
+    ! FVS functionality controls
+    logical :: calc_forest_type=.true.
+    logical :: fast_age_search=.false.
+    logical :: use_fvs_morts=.false.
+
     save
 
     contains
 
-end module common
+end module globals

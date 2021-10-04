@@ -21,7 +21,7 @@ module fvs_step
 
     !TODO: Strip out the restart and cmdline logic from the step API routines
 
-    use common, only: &
+    use globals, only: &
         ! PRGPRM
         maxcyc,maxcy1,maxtp1, &
         ! CONTRL
@@ -33,12 +33,10 @@ module fvs_step
         !WORKCM
         iwork1, &
         !OUTCOM
-        ititle,ocvcur,obfcur,omccur &
+        ititle,ocvcur,obfcur,omccur
 
-        , jostnd
-
-        !FIXME:
-!     use tree_data, only: init_tree_data
+    !FIXME:
+    use tree_data, only: init_tree_data
 !     use blkdat_mod, only: blkdat
 !     use esblkd_mod, only: esblkd
 !     use cubrds_mod, only: cubrds
@@ -73,7 +71,7 @@ module fvs_step
         ! call cubrds()
         ! call keywds()
 
-        print *, 'JOSTD: ', jostnd
+        ! print *, 'JOSTD: ', jostnd
 
     end subroutine init_blkdata
 
@@ -124,7 +122,7 @@ module fvs_step
 
         ! Zero the API report arrays
         !! FIXME:
-        ! call init_tree_data()
+        call init_tree_data()
 
         ! Initialize the command line argument
         ! TODO: Accept keywords as a buffer rather than a file name
@@ -424,9 +422,9 @@ module fvs_step
         endif
 !#endif /* FVSDEBUG */
 
-        CALL TREGRO
+        ! CALL TREGRO
         !! FIXME: 
-        ! call step_tregro()
+        call step_tregro()
 
 !#ifdef FVSSTARTSTOP
         CALL fvsGetRtnCode(IRTNCD)
@@ -503,16 +501,16 @@ module fvs_step
         !Finalize an FVS run.  Extracted from fvs.f
         
         !!FIXME
-        ! use tree_data, only: &
-        !         save_tree_data,copy_tree_data &
-        !         ,copy_cuts_data,copy_mort_data
+        use tree_data, only: &
+                save_tree_data,copy_tree_data &
+                ,copy_cuts_data,copy_mort_data
 
         ! use contrl_mod
         ! use arrays_mod
         ! use plot_mod
         ! use workcm_mod
         ! use outcom_mod
-        use common
+        use globals
         implicit none
 
 #ifdef _WINDLL
@@ -565,10 +563,10 @@ module fvs_step
 
         ! Copy tree attributes for the final of the period
         !!FIXME
-        ! if (save_tree_data) then
-        !     call copy_tree_data()
-        !     ! call copy_mort_data()
-        ! endif
+        if (save_tree_data) then
+            call copy_tree_data()
+            ! call copy_mort_data()
+        endif
 
         CALL DISPLY
         CALL fvsGetRtnCode(IRTNCD)

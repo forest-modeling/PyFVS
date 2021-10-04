@@ -189,7 +189,7 @@ class FVS(object):
         Return the list of FVS species codes used in this variant.
         """
         if self._spp_codes is None:
-            self._spp_codes = [s.decode().strip() for s in self.fvslib.plot_mod.jsp]
+            self._spp_codes = [s.decode().strip() for s in self.fvslib.globals.jsp]
 
         return self._spp_codes
 
@@ -199,7 +199,7 @@ class FVS(object):
         Return a dictionary mapping of species translations {fvs abbv: fvs seq,...}
         """
         if self._spp_seq is None:
-            maxspp = self.prgprm_mod.maxsp
+            maxspp = self.globals.maxsp
             seq = {self.spp_codes[x]:x + 1 for x in range(maxspp)}
             self._spp_seq = seq
 
@@ -211,7 +211,7 @@ class FVS(object):
         Return a dictionary mapping of species translations {fvs abbv: fia code,...}
         """
         if self._spp_fia_codes is None:
-            fiajsp = [int(c.replace(b'    ', b'0')) for c in self.fvslib.plot_mod.fiajsp]
+            fiajsp = [int(c.replace(b'    ', b'0')) for c in self.fvslib.globals.fiajsp]
             self._spp_fia_codes = dict(zip(self.spp_codes,fiajsp))
 
         return self._spp_fia_codes
@@ -222,7 +222,7 @@ class FVS(object):
         Return a dictionary mapping of species translations {fvs abbv: plants code,...}
         """
         if self._spp_plant_codes is None:
-            jsp = [s.strip().decode('utf-8') for s in self.fvslib.plot_mod.plnjsp]
+            jsp = [s.strip().decode('utf-8') for s in self.fvslib.globals.plnjsp]
             self._spp_plants_codes = dict(zip(self.spp_codes,jsp))
 
         return self._spp_plants_codes
@@ -626,15 +626,15 @@ class FVS(object):
 
     @property
     def current_cycle(self):
-        return int(self.contrl_mod.icyc)
+        return int(self.globals.icyc)
 
     @property
     def year(self):
-        return int(self.contrl_mod.iy[self.current_cycle])
+        return int(self.globals.iy[self.current_cycle])
 
     @property
     def num_cycles(self):
-        return int(self.contrl_mod.ncyc)
+        return int(self.globals.ncyc)
     
     # @property
     # def treelist(self):
@@ -662,7 +662,7 @@ class FVS(object):
                 trees[c][m:m+n] = getattr(self.tree_data, c)[:n,i]
             
             trees['cycle'][m:m+n] = i
-            trees['year'][m:m+n] = self.contrl_mod.iy[i]
+            trees['year'][m:m+n] = self.globals.iy[i]
             
             m += n
             
@@ -681,7 +681,7 @@ class FVS(object):
                 ,'sam_wgt','for_type','size','stock']
         
         df = pd.DataFrame.from_records(
-            self.fvslib.outcom_mod.iosum[:, :self.num_cycles + 1].T
+            self.fvslib.globals.iosum[:, :self.num_cycles + 1].T
             , columns=cols)
         
         return df
@@ -734,7 +734,7 @@ class FVS(object):
             raise
 
         # Return the summary values for the cycles in the run
-        return(self.fvslib.outcom_mod.iosum[i, :self.num_cycles + 1])
+        return(self.fvslib.commmon.iosum[i, :self.num_cycles + 1])
 
 error_codes = {
     1: 'Invalid keyword specified.',
@@ -766,44 +766,44 @@ class FVSTrees(object):
 
     @property
     def num_recs(self):
-        return self.parent.contrl_mod.itrn
+        return self.parent.globals.itrn
 
     @property
     def plot_id(self):
-        return self.parent.arrays_mod.itre[:self.num_recs + 1]
+        return self.parent.globals.itre[:self.num_recs + 1]
 
     @property
     def tree_id(self):
-        return self.parent.arrays_mod.idtree[:self.num_recs + 1]
+        return self.parent.globals.idtree[:self.num_recs + 1]
 
     @property
     def species(self):
-        return self.parent.arrays_mod.isp[:self.num_recs + 1]
+        return self.parent.globals.isp[:self.num_recs + 1]
 
     @property
     def tpa(self):
-        return self.parent.arrays_mod.prob[:self.num_recs + 1]
+        return self.parent.globals.prob[:self.num_recs + 1]
 
     @property
     def dbh(self):
         """Diameter at breast height"""
-        return self.parent.arrays_mod.dbh[:self.num_recs + 1]
+        return self.parent.globals.dbh[:self.num_recs + 1]
 
     @property
     def height(self):
-        return self.parent.arrays_mod.ht[:self.num_recs + 1]
+        return self.parent.globals.ht[:self.num_recs + 1]
 
     @property
     def age(self):
         """Tree age"""
-        return self.parent.arrays_mod.age[:self.num_recs + 1]
+        return self.parent.globals.age[:self.num_recs + 1]
 
     @property
     def cfv(self):
         """Total cubic foot volume per tree"""
-        return self.parent.arrays_mod.cfv[:self.num_recs + 1]
+        return self.parent.globals.cfv[:self.num_recs + 1]
 
     @property
     def bfv(self):
         """Total scribner board foot volume per tree"""
-        return self.parent.arrays_mod.bfv[:self.num_recs + 1]
+        return self.parent.globals.bfv[:self.num_recs + 1]

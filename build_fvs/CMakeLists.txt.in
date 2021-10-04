@@ -67,7 +67,7 @@ set(incl_exts ".h;.F77")
 # List of F77 include files to translate to F90
 set(f77_incl)
 
-set(api_names "fvs.f")
+set(api_names "fvs.f;htcalc.f")
 set(api_wrap_src)
 
 foreach (fn ${source_files})
@@ -105,7 +105,7 @@ foreach (fn ${source_files})
 endforeach(fn)
 
 # Process the F77 include files into F90
-set(f90_gen_dir "${CMAKE_SOURCE_DIR}/api/${fvs_variant}/f90_include")
+set(f90_gen_dir "${CMAKE_SOURCE_DIR}/api/gen/${fvs_variant}/include")
 foreach (fn ${f77_incl})
 	get_filename_component (fname ${fn} NAME_WLE)
 	file(MAKE_DIRECTORY "${f90_gen_dir}")
@@ -131,10 +131,13 @@ endforeach (fn)
 list (APPEND include_dirs  "${f90_gen_dir}")
 
 ## Add API source files
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/globals.f90")
+# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/foo.f90")
+# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/test.f90")
 list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/fvs_step.f90")
-# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/tree_data.f90")
-# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/snag_data.f90")
-# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/tree_data.f90")
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/snag_data.f90")
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
 
 # list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/base/cmdline.f") ## FIXME: BLOCK DATA
 
@@ -152,18 +155,40 @@ list (APPEND api_wrap_src "${fvs_root}/${fvs_variant}/blkdat.f")
 # list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/dbsqlite/dbsblkd.f") ## FIXME: BLOCK DATA
 # list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/dfb/dfblkd.f") ## FIXME: ALL BLOCK DATA in DFB
 
-list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/common.f90")
-list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/foo.f90")
-list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/test.f90")
-
 # Additional API files to compile
-list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/common.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/globals.f90")
 list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/fvs_step.f90")
-# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/tree_data.f90")
-# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/snag_data.f90")
-# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
-list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/foo.f90")
-list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/test.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/tree_data.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/snag_data.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
+# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/foo.f90")
+# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/test.f90")
+
+# Handle the alternate mortality subroutines in PN,WC
+set(_vars "pn" "wc")
+list (FIND _vars "${fvs_variant}" _idx)
+if (${_idx} GREATER -1)
+	foreach (fn in ${fvs_src})
+		# rename the morts subroutine
+		if(fn MATCHES ".*morts.f")
+			# get_filename_component (pname   ${fn} PATH)
+			# get_filename_component (fname ${fn} NAME_WLE)
+			file(READ ${fn} flines)
+			string(REGEX REPLACE "SUBROUTINE MORTS\\s*(\r?\n)" "SUBROUTINE MORTS_DEFAULT\\1" flines ${flines})
+			string(REGEX REPLACE "ENTRY MORCON\\s*(\r?\n)" "ENTRY MORCON_DEFAULT\\1" flines ${flines})
+			file(WRITE ${fn} "${flines}")
+
+			# Cleanup the file lists
+			list(APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/morts_wc_fvs.f")
+			list(APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/morts_wrap.f90")
+			list(APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/morts_wrap.f90")
+
+		endif ()
+		
+	endforeach ()
+endif ()
+
+####################
 
 # Cleanup the lists
 list (REMOVE_DUPLICATES api_wrap_src)
@@ -173,6 +198,8 @@ list (REMOVE_DUPLICATES include_dirs)
 list (APPEND include_dirs ${CMAKE_CURRENT_BINARY_DIR})
 
 include_directories(BEFORE ${include_dirs})
+
+###################
 
 # Compile sources, stage in an object library
 add_library(OBJS_${target_name} OBJECT ${fvs_src})
