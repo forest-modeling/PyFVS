@@ -19,6 +19,7 @@ module snag_data
     contains
 
     subroutine copy_snag_data()
+        ! Called from tregro after the call to grincr
         ! Copy snag data to the module data arrays for the current cycle
         ! Called from fvs_step.tree_grow prior to updating the growth and
         ! mortality increments to capture the prior end of cycle snag list.

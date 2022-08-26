@@ -3,4 +3,4 @@
 
 __version__ = '0.2.0.dev0'
 __git_describe__ = ''
-__git_commit__ = '1528b97e'
+__git_commit__ = '6f731ecd-dirty'

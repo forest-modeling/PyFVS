@@ -1,3 +1,12 @@
+# Custom Open-FVS build process
+# CMakeLists.txt.in is a template for FVS variant builds
+#   - Adds API files to the build
+#   -
+#
+# A new subdirectory will be created for each requested FVS variant
+#   where a configured template will be written before the
+#   variant subdirectory is added to the CMake build
+
 cmake_minimum_required (VERSION 3.12 FATAL_ERROR)
 
 project(open-fvs
@@ -5,7 +14,7 @@ project(open-fvs
 	)
 
 # Default variable values which can be set on the command line
-set(FVS_VARIANTS "all" CACHE STRING "FVS variants to configure, eg. pnc,wcc,oc,op")
+set(FVS_VARIANTS "all" CACHE STRING "FVS variants to configure, eg. pn,wc,oc,op")
 string(TOLOWER ${FVS_VARIANTS} FVS_VARIANTS)
 
 # Get the list of variants to configure
@@ -23,15 +32,15 @@ else ()
 	# Verify the user supplied variants to configure
 	string(REPLACE "," ";" FVS_VARIANTS "${FVS_VARIANTS}")
 	string(REPLACE " " ";" FVS_VARIANTS "${FVS_VARIANTS}")
-	
+
 	foreach (var ${FVS_VARIANTS})
 		set(pth "${fvs_root}/bin/FVS${var}_sourceList.txt")
 		if (NOT EXISTS ${pth})
 			list(REMOVE_ITEM FVS_VARIANTS ${var})
-			message(WARNING "*** Variant ${var} source list does not exist: ${pth}") 
+			message(WARNING "*** SKIPPING variant ${var}, source list does not exist: ${pth}")
 		endif ()
 	endforeach ()
-	
+
 endif ()
 
 message(STATUS "Variants to configure: ${FVS_VARIANTS}")
@@ -55,14 +64,14 @@ foreach (variant ${FVS_VARIANTS})
 
 	# Read the source file list
 	file(STRINGS "${slfn}"  source_files  NEWLINE_CONSUME)
-	
+
 	string(REPLACE "../" "${fvs_root}/" source_files ${source_files})
 
 	# Setup the variant target subdirectory
 	set(target_folder "${PROJECT_BINARY_DIR}/${target_name}")
 	file(MAKE_DIRECTORY ${target_folder})
 	file(WRITE ${target_folder}/sourcelist.txt ${source_files})
-	
+
 	# Perform variable substitution on the variant CMakeLists.txt
 	set(header_message "**** DO NOT EDIT - This is an auto-generated file")
 	configure_file(
@@ -70,14 +79,14 @@ foreach (variant ${FVS_VARIANTS})
 		${target_folder}/CMakeLists.txt
 		@ONLY # replace strings with the form @VAR@, but not ${VAR}
 		)
-	
+
 	message(STATUS "Configure subdirectory: ${target_folder}")
 	add_subdirectory(${target_folder} "${PROJECT_BINARY_DIR}/${target_name}/bin")
-	
+
 	# Custom target for all components of the variant
 	set(variant_targets ${target_name} lib${target_name} lib${target_name}_static)
 	add_custom_target(${variant} ALL DEPENDS ${variant_targets})
-	
+
 	# Add the variant components to the global target list
 	list(APPEND all_targets ${variant_targets})
 

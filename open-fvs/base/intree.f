@@ -1,4 +1,5 @@
       SUBROUTINE INTREE (RECORD,IRDPLV,ISDSP,SDLO,SDHI,LKECHO)
+      use inventory_trees
       IMPLICIT NONE
 C----------
 C BASE $Id$
@@ -50,6 +51,10 @@ C
       DIMENSION IPVARS(5),IDAMCD(6)
       COMMON / INTREECOM / CSPI
       DATA IDCMP1/10000000/
+
+      ! inventory_trees record pointer
+      row_idx = 0
+
 C-----------
 C  SEE IF WE NEED TO DO SOME DEBUG.
 C-----------
@@ -61,7 +66,7 @@ C
      &        ' DATA SET REFERENCE NUMBER =',I2,/
      &        ' TREE DATA FORMAT:',/30X,A80/30X,A80,/,
      &        ' MORDAT: ',L2,'; IRDPLV=',I3)
-    8 CONTINUE      
+    8 CONTINUE
 C---------
 C     SET INITIAL VALUES FOR SPECIES TRANSLATION.
 C---------
@@ -143,6 +148,52 @@ C----------
 C  READ STAND DATA FILE            **********
 C----------
    31 CONTINUE
+
+      ! Preferentially load trees from the inventory_trees module
+      if (allocated(plot_id) .and. row_idx<size(plot_id)) then
+            row_idx = row_idx + 1
+
+            ! ITREI,IDTREE(I),PROB(I),ITH,CSPI,
+            ! DBH(I),DG(I),HT(I),THT,HTG(I),ICR(I),(IDAMCD(J),J=1,6),
+            ! IMC1,KUTKOD(I),IPVARS(1),IPVARS(2),IPVARS(3),IPVARS(4),
+            ! IPVARS(5),ABIRTH(I)
+!             print *, 'Reading tree', row_idx, species(row_idx)
+!      &           , diameter(row_idx)
+
+            ITREI = plot_id(row_idx)
+            IDTREE(I) = tree_id(row_idx)
+            PROB(I) = trees(row_idx)
+            ITH = history(row_idx)
+            CSPI = species(row_idx)
+            CSPI = CSPI(:INDEX(CSPI,ACHAR(0))-1)
+            DBH(I) = diameter(row_idx)
+            DG(I) = diameter_growth(row_idx)
+            HT(I) = height(row_idx)
+            THT = total_height(row_idx)
+            HTG(I) = height_growth(row_idx)
+            ICR(I) = crown_ratio(row_idx)
+            ! IMC1 = IMC1(row_idx)
+            ! KUTKOD(I) = plot_id(row_idx)
+
+            IDAMCD(1) = damage_codes(1,row_idx)
+            IDAMCD(2) = damage_codes(2,row_idx)
+            IDAMCD(3) = damage_codes(3,row_idx)
+            IDAMCD(4) = damage_codes(4,row_idx)
+            IDAMCD(5) = damage_codes(5,row_idx)
+            IDAMCD(6) = damage_codes(6,row_idx)
+
+            ! IPVARS
+
+            ABIRTH(I) = tree_age(row_idx)
+
+            IF(ABIRTH(I).LE.0) THEN
+                  ABIRTH(I) = 0
+                  LBIRTH(I) =.FALSE.
+            ELSE
+                  LBIRTH(I) =.TRUE.
+            END IF
+
+      else
 C----------
 C  DETERMINE IF DATA IS COMING FROM DATABASE OR FILE
 C----------
@@ -188,6 +239,9 @@ C----------
       ELSEIF(DBSKODE.EQ.-1) THEN
         GOTO 900
       ENDIF
+
+      end if ! inventory_trees
+
       IF(NPNVRS.EQ.1)THEN
         DO IK=1,5
         IPVARS(IK)=0

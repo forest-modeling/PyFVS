@@ -1,4 +1,4 @@
-subroutine morts
+subroutine morts_wrap
 ! Replaces the base morts routine to switch between the original FVS
 ! mortality routines and the ported ORGANON routines.
 
@@ -9,12 +9,12 @@ subroutine morts
         call morts_fvs
     else
         ! Call the default morts subroutine
-        call morts_default
+        call morts
     end if
     
-end subroutine morts
+end subroutine morts_wrap
 
-subroutine morcon
+subroutine morcon_wrap
     use globals, only: use_fvs_morts
     implicit none
 
@@ -22,6 +22,6 @@ subroutine morcon
         call morcon_fvs
     else
         ! Call the default morcon entry
-        call morcon_default
+        call morcon
     end if
-end subroutine morcon
+end subroutine morcon_wrap

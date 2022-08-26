@@ -1,4 +1,4 @@
-      BLOCK DATA DFBLKD
+      SUBROUTINE DFBLKD
       IMPLICIT NONE
 C----------
 C DFB $Id$
@@ -73,4 +73,4 @@ C.... Set the variables for random number generator
 
       DATA S0 / 55329D0 /, SS / 55329.0 / 
 
-      END
+      END SUBROUTINE

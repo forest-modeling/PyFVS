@@ -11,13 +11,14 @@ find_package(PythonExtensions REQUIRED)
 set(target_name @target_name@)
 set(fvs_variant @variant@)
 string(TOLOWER "${target_name}" ext_name)
-# string(TOLOWER "${target_name}" ext_name)
 
 message(STATUS "FVS Variant: ${fvs_variant}")
 message(STATUS "Target Name: ${target_name}")
 message(STATUS "BINARY DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "SOURCE DIR: ${CMAKE_SOURCE_DIR}")
 
+# Pre-Processor definitions to implement API features
+add_definitions(-DFVS_DATA_API)
 
 set (CMAKE_Fortran_Format FIXED)
 set (CMAKE_VERBOSE_MAKEFILE ON)
@@ -65,9 +66,10 @@ set(src_exts ".c;.cpp;.f")
 set(incl_exts ".h;.F77")
 
 # List of F77 include files to translate to F90
-set(f77_incl)
+set(f77_includes)
 
-set(api_names "fvs.f;htcalc.f")
+set(api_names "fvs.f;htcalc.f;cmdline.f;forkod.f;revise.f")
+
 set(api_wrap_src)
 
 foreach (fn ${source_files})
@@ -77,20 +79,20 @@ foreach (fn ${source_files})
 
 	# F77 files that will get translated
 	if (extname STREQUAL ".F77")
-		list(APPEND f77_incl ${fn})
+		list(APPEND f77_includes ${fn})
 	endif ()
 
 	# Folders with include source files
 	if (extname IN_LIST incl_exts)
 		list (APPEND include_dirs  ${pname})
-		
+
 	elseif(extname IN_LIST src_exts)
 		if (fname STREQUAL "main.f")
 			list (APPEND main_src ${fn})
 		else()
 			list (APPEND fvs_src ${fn})
 		endif()
-	
+
 	endif()
 
 	# Enumerate source files to wrap with F2PY
@@ -101,12 +103,19 @@ foreach (fn ${source_files})
 	unset (fname   CACHE)
 	unset (pname   CACHE)
 	unset (extname CACHE)
-  
+
 endforeach(fn)
 
+# Convert common blocks to module data
+#
+# FVS is written in the style of Fortran 77 and uses common blocks for sharing data.
+#   Common blocks are made available to all subroutines by using F77 include files.
+#   For use with Fortran 90 code the inlude files are converted to F90, free form.
+#   The F90 include files and common blocks are then made available as a module.
+#
 # Process the F77 include files into F90
 set(f90_gen_dir "${CMAKE_SOURCE_DIR}/api/gen/${fvs_variant}/include")
-foreach (fn ${f77_incl})
+foreach (fn ${f77_includes})
 	get_filename_component (fname ${fn} NAME_WLE)
 	file(MAKE_DIRECTORY "${f90_gen_dir}")
 	set(pth "${f90_gen_dir}/${fname}.F90")
@@ -115,7 +124,7 @@ foreach (fn ${f77_incl})
 
 	# Normalize line endings
 	string(REGEX REPLACE "\r\n" "\n" flines ${flines})
-	
+
 	# Replace F77 comments with F90
 	string(REGEX REPLACE "^C" "!" flines ${flines})
 	string(REGEX REPLACE "\nC" "\n!" flines ${flines})
@@ -134,10 +143,14 @@ list (APPEND include_dirs  "${f90_gen_dir}")
 list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/globals.f90")
 # list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/foo.f90")
 # list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/test.f90")
+# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/initialize.f90")
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/inventory_trees.f90")
 list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/fvs_step.f90")
 list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/tree_data.f90")
 list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/snag_data.f90")
-list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/carbon_data.f90")
+list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/downwood_data.f90")
+# list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
 
 # list (APPEND api_wrap_src "C:/workspace/forest-modeling/PyFVS/open-fvs/base/cmdline.f") ## FIXME: BLOCK DATA
 
@@ -145,6 +158,7 @@ list (APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
 ## NOTE: Simply recasting BLOCK DATA units to SUBROUTINE causes the common blocks to initialize
 ## TODO: Automate the BLOCK DATA->SUBROUTINE step
 ## TODO: Scan all files for BLOCK DATA and add them to the api
+## FIXME: F2PY is supposed to handle block data, but I couldn't make it work
 list (APPEND api_wrap_src "${fvs_root}/base/keywds.f")
 list (APPEND api_wrap_src "${fvs_root}/estb/esblkd.f")
 list (APPEND api_wrap_src "${fvs_root}/${fvs_variant}/blkdat.f")
@@ -157,35 +171,87 @@ list (APPEND api_wrap_src "${fvs_root}/${fvs_variant}/blkdat.f")
 
 # Additional API files to compile
 list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/globals.f90")
+# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/initialize.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/inventory_trees.f90")
 list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/fvs_step.f90")
 list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/tree_data.f90")
 list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/snag_data.f90")
-list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/carbon_data.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/downwood_data.f90")
+# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/step_tregro.f90")
+list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/prtrls_wrap.f90")
+# list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/stop_wrap.f90")
 # list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/foo.f90")
 # list (APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/test.f90")
+
+# Convert BLOCK DATA to subroutine
+# foreach (fn in ${fvs_src})
+# 	# restate call morts to call morts_wrap
+# 	if(fn MATCHES ".*.f")
+# 		get_filename_component (pname   ${fn} PATH)
+# 		get_filename_component (fname ${fn} NAME_WLE)
+# 		file(READ ${fn} flines)
+# 		string(REGEX REPLACE "(\\s*)BLOCK DATA\\s*(\r?\n)" "\\1SUBROUTINE\\2" flines ${flines})
+# 		set(outpth "${pname}/${fname}.f")
+# 		file(WRITE ${outpth} "${flines}")
+# 	endif ()
+
+# endforeach ()
 
 # Handle the alternate mortality subroutines in PN,WC
 set(_vars "pn" "wc")
 list (FIND _vars "${fvs_variant}" _idx)
 if (${_idx} GREATER -1)
-	foreach (fn in ${fvs_src})
-		# rename the morts subroutine
-		if(fn MATCHES ".*morts.f")
-			# get_filename_component (pname   ${fn} PATH)
-			# get_filename_component (fname ${fn} NAME_WLE)
-			file(READ ${fn} flines)
-			string(REGEX REPLACE "SUBROUTINE MORTS\\s*(\r?\n)" "SUBROUTINE MORTS_DEFAULT\\1" flines ${flines})
-			string(REGEX REPLACE "ENTRY MORCON\\s*(\r?\n)" "ENTRY MORCON_DEFAULT\\1" flines ${flines})
-			file(WRITE ${fn} "${flines}")
 
-			# Cleanup the file lists
-			list(APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/morts_wc_fvs.f")
-			list(APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/morts_wrap.f90")
-			list(APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/morts_wrap.f90")
+	add_definitions(-DFVS_MORTS_WRAP)
 
-		endif ()
-		
-	endforeach ()
+	# Cleanup the file lists
+	list(APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/variant/${fvs_variant}/morts_fvs.f")
+	list(APPEND fvs_src "${CMAKE_SOURCE_DIR}/api/morts_wrap.f90")
+	list(APPEND api_wrap_src "${CMAKE_SOURCE_DIR}/api/morts_wrap.f90")
+
+	# foreach (fn in ${fvs_src})
+		# # restate subroutine fvsstopoint to subroutine fvsstoppoint_base
+		# if(fn MATCHES ".*cmdline.f")
+		# 	get_filename_component (pname   ${fn} PATH)
+		# 	get_filename_component (fname ${fn} NAME_WLE)
+		# 	file(READ ${fn} flines)
+		# 	string(REGEX REPLACE "(\\s*)subroutine fvsStopPoint([^_].*\r?\n)" "\\1subroutine fvsStopPoint_base\\2" flines ${flines})
+		# 	set(outpth "${pname}/${fname}.f")
+		# 	list(REMOVE_ITEM fvs_src ${fn})
+		# 	list(APPEND fvs_src ${outpth})
+		# 	file(WRITE ${outpth} "${flines}")
+
+		# endif ()
+
+		# # restate call morts to call morts_wrap
+		# if(fn MATCHES ".*grincr.f")
+		# 	get_filename_component (pname   ${fn} PATH)
+		# 	get_filename_component (fname ${fn} NAME_WLE)
+		# 	file(READ ${fn} flines)
+		# 	string(REGEX REPLACE "(\\s*)CALL MORTS\\s*(\r?\n)" "\\1CALL MORTS_WRAP\\2" flines ${flines})
+		# 	# file(WRITE ${fn} "${flines}")
+		# 	set(outpth "${pname}/${fname}_${fvs_variant}.f")
+		# 	# message(STATUS "**** ${outpth} ****")
+		# 	list(REMOVE_ITEM fvs_src ${fn})
+		# 	list(APPEND fvs_src ${outpth})
+		# 	file(WRITE ${outpth} "${flines}")
+
+		# endif ()
+
+		# # restate call morcon to call morcon_wrap
+		# if(fn MATCHES ".*rcon.f")
+		# 	get_filename_component (pname   ${fn} PATH)
+		# 	get_filename_component (fname ${fn} NAME_WLE)
+		# 	file(READ ${fn} flines)
+		# 	string(REGEX REPLACE "(\\s*)CALL MORCON\\s*(\r?\n)" "\\1CALL MORCON_WRAP\\2" flines ${flines})
+		# 	set(outpth "${pname}/${fname}_${fvs_variant}.f")
+		# 	list(REMOVE_ITEM fvs_src ${fn})
+		# 	list(APPEND fvs_src ${outpth})
+		# 	file(WRITE ${outpth} "${flines}")
+		# endif ()
+
+	# endforeach ()
 endif ()
 
 ####################
@@ -223,7 +289,7 @@ set_target_properties(${target_name} PROPERTIES
 	LINKER_LANGUAGE Fortran
 	OUTPUT_NAME ${out_name}
 	LINK_FLAGS ${flags})
-	
+
 set_target_properties(lib${target_name} PROPERTIES
 	LINKER_LANGUAGE Fortran
 	OUTPUT_NAME ${out_name}
@@ -245,10 +311,12 @@ message(STATUS "Python extension: ${api_ext_file}")
 # message(STATUS ${include_dirs})
 list(JOIN include_dirs ";" f2py_incl)
 # message(STATUS "*** ${f2py_incl}")
+set(f2py_skip)
 
 # List the f90wrap generated wrappers to expect
 set(api_pyf "${CMAKE_CURRENT_BINARY_DIR}/${api_name}.pyf")
 
+# message(STATUS, "********* ${api_wrap_src}")
 # Compile with F2PY
 add_custom_command(
 	OUTPUT ${api_pyf} ${api_ext_file}
@@ -262,6 +330,7 @@ add_custom_command(
 		--include-paths "${f2py_incl}"
 		${api_wrap_src}
 		# only: ${f2py_only} :
+		skip: fvssetcmdlinec :
 
 	# Compile the modules and link with the FVS library
 	COMMAND ${F2PY_EXECUTABLE}

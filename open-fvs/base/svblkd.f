@@ -1,4 +1,4 @@
-      BLOCK DATA SVBLKD
+      SUBROUTINE SVBLKD
       IMPLICIT NONE
 C----------
 C BASE $Id$
@@ -21,4 +21,4 @@ C
 COMMONS
 C
       DATA NIMAGE/0/
-      END
+      END SUBROUTINE

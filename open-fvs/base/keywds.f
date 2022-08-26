@@ -1,4 +1,5 @@
-      BLOCK DATA KEYWDS
+      SUBROUTINE KEYWDS
+CF2PY
       IMPLICIT NONE
 C----------
 C BASE $Id$
@@ -55,4 +56,4 @@ C
      >     'THINRDSL','MORTMSB','SETSITE','CLIMATE','SDICALC',
      >     'THINQFA','PTGROUP ','ORGANON','SPLEAVE','CCADJ',
      >     'PRMFROST','        ','        ','        ','        '/
-      END
+      END SUBROUTINE

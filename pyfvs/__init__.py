@@ -14,6 +14,8 @@ import logging
 import logging.config
 import importlib.machinery as imp
 
+import confuse
+
 # # Bring standard modules into the package namespace
 # from .keywords.keywords import *
 # from .keywords.eventmonitor import *
@@ -23,37 +25,55 @@ import importlib.machinery as imp
 # If the __version__ file is present, use it.
 from ._version import __version__, __git_commit__, __git_describe__
 
-# TODO: Look in local path as well as user home path
-# TODO: Use YAML for the config file
-# Use a config file written as a Python dictionary.
-# The config file is used to initialize logging and FVS library paths.
-config_path = os.path.join(os.path.split(__file__)[0], 'pyfvs.cfg')
+# Configuration is stored in a YAML file
+# Package defaults will be in ./config_default.yaml
+# NOTE: Confuse uses the concept of "views" where the contents of the configuration
+#     files are not resolved until the ".get()" method is called, e.g. config['logging'].get()
+config = confuse.LazyConfig('PyFVS', __name__)
+
+# print(config['workspace'].get())
+
+# print(config['treelist_format'].get()['template'])
 
 def version():
     """Return the current PyFVS API version number."""
     return __version__
 
-treelist_format = {
-    'template':(
-        '{plot_id:04d}{tree_id:04d}{prob:>7.1f}{tree_history:1d}{species:2s}'
-        '{dbh:>5.1f}{dg_incr:>3.1f}{live_ht:>3.0f}{trunc_ht:>3.0f}{htg_incr:>2.1f}'
-        '{crown_ratio:>2d}'
-        '{damage1:>2d}{severity1:>2d}'
-        '{damage2:>2d}{severity2:>2d}'
-        '{damage3:>2d}{severity3:>2d}'
-        '{age:>15d}')
-    , 'fvs_format':(
-        'I4,T1,I8,F7.1,I1,A2,F5.1,F3.1,F3.0,F3.0,F2.1'
-        ',I2,6I2,2I1,I2,2I3,2I1,F3.0'
-        )
-    }
+# Default FVS Treelist format
+# template is the Python string format
+# fvs_format is the FVS keyword fields to read the formatted string
+tmplt = config['treelist_format']['template'].get(str)
+tmplt = ''.join(x.strip() for x in tmplt.split())
+fmt = config['treelist_format']['fvs_format'].get(str)
+if tmplt and fmt:
+    if len(fmt)>78:
+        f = fmt.split(',')
+
+
+    treelist_format = {'template':tmplt, 'fvs_format': fmt}
+
+else:
+    treelist_format = {
+        'template':(
+            '{plot_id:04d}{tree_id:04d}{prob:>9.3f}{tree_history:1d}{species:2s}'
+            '{dbh:>5.1f}{dg_incr:>3.1f}{live_ht:>3.0f}{trunc_ht:>3.0f}{htg_incr:>2.1f}'
+            '{crown_ratio:>2d}'
+            '{damage1:>2d}{severity1:>2d}'
+            '{damage2:>2d}{severity2:>2d}'
+            '{damage3:>2d}{severity3:>2d}'
+            '{age:>15d}')
+        , 'fvs_format':(
+            'I4,T1,I8,F9.3,I1,A2,F5.1,F3.1,F3.0,F3.0,F2.1'
+            ',I2,6I2,2I1,I2,2I3,2I1,F3.0'
+            )
+        }
 
 # Map treelist dataframe columns to a FVS formatted treelist file
 treelist_fields = (
     #(column name, python format, fortran format, required)
     ('plot_id',':04d','I4',True),
     ('tree_id',':04d','T1,I8',True),
-    ('prob',':>7.1f','F7.1',True),
+    ('prob',':>9.3f','F9.3',True),
     ('tree_history',':1d','I1',False),
     ('species',':>5s','A5',True),
     ('dbh',':>5.1f','F5.1',True),
@@ -77,31 +97,31 @@ treelist_fields = (
     ('plot_siteprep',':1d','I1',False),
     ('tree_age',':>3d','F3.0',False),
     )
-    
-def get_config():
-    """
-    Return the configuration dict.
-    """
-    try:
-        with open(config_path) as foo:
-            cfg = eval(foo.read())
 
-    except:
-        cfg = {
-            'logging':{
-                'version':1
-                , 'disable_existing_loggers':True
-                , 'incremental':False
-                }
-            }
+# def get_config():
+#     """
+#     Return the configuration dict.
+#     """
+#     try:
+#         with open(config_path) as foo:
+#             cfg = eval(foo.read())
 
-    return cfg
+#     except:
+#         cfg = {
+#             'logging':{
+#                 'version':1
+#                 , 'disable_existing_loggers':True
+#                 , 'incremental':False
+#                 }
+#             }
+
+#     return cfg
 
 def init_logging():
     """
     Initialize package wide logging from the configuration file.
     """
-    logging.config.dictConfig(get_config()['logging'])
+    logging.config.dictConfig(config['logging'].get())
 
 def list_variants():
     """
@@ -109,7 +129,7 @@ def list_variants():
     """
     import glob
     import importlib
-    
+
     root = os.path.dirname(__file__)
     _vars = set()
     for sfx in imp.EXTENSION_SUFFIXES:
@@ -120,7 +140,7 @@ def list_variants():
         libname = os.path.splitext(os.path.basename(var))[0]
         if not (libname.startswith('fvs') or libname.startswith('_fvs')):
             continue
-        
+
         modname = libname.split('.')[0].lower()
         varname = modname[3:].upper()
         lib = 'pyfvs.{}'.format(modname)
@@ -131,7 +151,7 @@ def list_variants():
         except:
             raise
             status = 'Failed'
-            
+
         vars[varname] = {'lib':lib, 'status':status}
 
     return vars

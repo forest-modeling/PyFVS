@@ -34,12 +34,12 @@ def cli(ctx, version=False):
 @click.option('-p', '--prompt', is_flag=True, help='Prompt the user for I/O files.')
 @click.option('--fvs-mort', is_flag=True, help='Use the former FVS mortality functions for PN & WC variants.')
 @click.option('--forest-type', is_flag=True, help='Calculate FVS forest type.')
-def run(ctx, 
+def run(ctx,
     variant, keywords=None, bootstrap=False, debug=False, stochastic=False, prompt=False
     , fvs_mort=False, forest_type=False
     ):
     """
-    Run the FVS <varian> using the PyFVS command line
+    Run the FVS <variant> using the PyFVS command line
 
     \b
     Basic Usage:
@@ -57,7 +57,8 @@ def run(ctx,
     if debug:
         log.setLevel(logging.DEBUG)
 
-    if keywords is None or prompt:
+    # Run using the base FVS subroutine which will prompt for input files
+    if prompt:
         # Run FVS in prompt mode
         r = FVS(variant).fvs()
         sys.exit(r)
@@ -85,12 +86,12 @@ def run(ctx,
 
     except:
         sys.exit(1)
-    
-    # 
+
+    #
     fvs.globals.use_fvs_morts = fvs_mort
     fvs.globals.fast_age_search = False
     fvs.globals.calc_forest_type = forest_type
-     
+
     try:
         fvs.execute_projection(keywords)
     except:
@@ -111,7 +112,7 @@ def list_variants():
     msg = 'Supported FVS variants:\n'
     for v,s in vars.items():
         msg += '  {} - ({}) - {}\n'.format(v,s['lib'],s['status'])
-        
+
     print(msg)
     sys.exit(0)
 
@@ -119,7 +120,12 @@ def list_variants():
 @click.pass_context
 def run_tests(ctx):
     'Run tests against the supported variants'
-    print('run-tests not implemented')
+    # print('run-tests not implemented')
+    import subprocess
+    p = os.path.join(os.path.dirname(__file__), 'test')
+    os.chdir(p)
+    subprocess.call('pytest')
+    sys.exit()
 
 if __name__ == '__main__':
     cli()

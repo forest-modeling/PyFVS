@@ -533,7 +533,15 @@ C     CALL **MORTS** TO COMPUTE TREE MORTALITY.
 C
       IF (DEBUG) WRITE(JOSTND,160) ICYC
   160 FORMAT(' CALLING MORTS, CYCLE=',I2)
+
+#ifdef FVS_MORTS_WRAP
+C     MORTS_WRAP provides the option to use the original FVS
+C     mortality subroutines in the PN and WC variants
+      CALL MORTS_WRAP
+#else
       CALL MORTS
+#endif /* FVS_MORTS_WRAP */
+
 C
 C     NOW TRIPLE RECORDS AND REALLIGN POINTERS IF TRIPLING OPTION IS
 C     SET.

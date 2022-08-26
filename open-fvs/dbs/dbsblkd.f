@@ -1,4 +1,4 @@
-      BLOCK DATA DBSBLKD
+      SUBROUTINE DBSBLKD
 C
 C DBS $Id$
 C
@@ -19,4 +19,4 @@ C
       DATA ConnHndlIn/-1/
       DATA EnvHndlIn/-1/
 
-      END
+      END SUBROUTINE

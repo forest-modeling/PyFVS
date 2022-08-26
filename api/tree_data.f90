@@ -17,7 +17,7 @@ module tree_data
         !WORKCM
         work1, &
         !ARRAYS
-        wk2,wk3
+        wk2,wk3,wk4
 
     implicit none
 
@@ -71,18 +71,21 @@ module tree_data
         integer :: i,x
 
         ! Increment the array position so that period zero is in the first slot
-        i = icyc
+        i = icyc+1
 
-!        write(*,*) 'Save tree list for cycle ',i,' TPA: ', sum(prob(:itrn)/grospc)
+        ! write(*,*) 'tree_data.f90: Save tree list for cycle ',i,' TPA: ', sum(prob(:itrn)/grospc)
 
         !copy tree data to the tree_data module
         num_recs(i) = itrn
+        ! write (*,*) num_recs
         tree_seq(:itrn,i) = (/(x, x=1,itrn, 1)/)
         tree_id(:itrn,i) = idtree(:itrn)
         plot_seq(:itrn,i) = itre(:itrn)
         spp_seq(:itrn,i) = isp(:itrn)
         age(:itrn,i) = int(abirth(:itrn))
         live_tpa(:itrn,i) = prob(:itrn)/grospc
+
+        ! write(*,*) '    TPA:', itrn, prob(:itrn), grospc, live_tpa(:itrn,i)
 
 !        ! Mortality records are tripled before the grow routine returns
 !        if (icyc>0) mort_tpa(:itrn,i) = wk2(:itrn)/grospc
@@ -113,7 +116,7 @@ module tree_data
     end subroutine copy_tree_data
 
     subroutine copy_mort_data()
-        
+
         ! Mortality estimates copied after the call to `morts` in grincr.f
         mort_tpa(:itrn,icyc+1) = wk2(:itrn)/grospc
 
@@ -121,9 +124,15 @@ module tree_data
 
     subroutine copy_cuts_data()
         ! Copy the cut trees
-        ! Call from GRINCR right after the call to CUTS
-        
-        cut_tpa(:itrn,icyc) = wk3(:itrn)/grospc
+        ! Cut TPA is copied to WK4 grincr.f right after
+        !  the call to the CUTS routine, for use in the
+        !  second call to EVMON
+        !  NOTE: itrn has been updated for depleted trees already
+
+        ! cut_tpa(:,icyc) = wk4(:)/grospc
+
+        ! Called from prtrls after cuts routine
+        cut_tpa(:,icyc) = wk3(:)/grospc
 
     end subroutine copy_cuts_data
 

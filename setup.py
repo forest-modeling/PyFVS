@@ -107,15 +107,23 @@ setup(
     , download_url='https://github.com/forest-modeling/PyFVS/archive/main.zip'
     , author="Tod Haren"
     , author_email="tod.haren@gmail.com"
-    , setup_requires=['cython', 'numpy']
+    , setup_requires=['numpy', 'cython'] #, 'skbuild', 'ninja', 'cmake', 'm2w64-gcc-fortran']
     , tests_require=['pytest',]
     , install_requires=['numpy',]
     , packages=['pyfvs', 'pyfvs.keywords']
     , package_data={
             # '.':['*.pyd', '*.cfg', '*.so', 'README.*']
-            'pyfvs':['docs/*', 'examples/*', 'test/*.py']
+            'pyfvs':[
+                '*.yaml'
+                , 'docs/*'
+                , 'examples/*'
+                , 'test/*.py'
+                , 'test/*.db'
+                , 'test/rmrs/*.key'
+                , 'test/rmrs/*.save'
+                ]
             }
-    # , include_package_data=True # package the files listed in MANIFEST.in
+    , include_package_data=True # package the files listed in MANIFEST.in
     , entry_points={
             'console_scripts': ['pyfvs=pyfvs.__main__:cli']
         }
@@ -131,4 +139,5 @@ setup(
             ]
     , keywords=''
     , cmdclass={"version": Version, }
+    , cmake_args=['-DFVS_VARIANTS=wc,pn,op,oc,so,ca',] #,ec',] 
     )

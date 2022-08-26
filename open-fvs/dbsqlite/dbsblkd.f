@@ -1,4 +1,4 @@
-      BLOCK DATA DBSBLKD
+      SUBROUTINE DBSBLKD
 C
 C DBSQLITE $Id$
 C
@@ -17,4 +17,4 @@ C
       DATA IoutDBref/-1/
       DATA IinDBref /-1/
 
-      END
+      END SUBROUTINE

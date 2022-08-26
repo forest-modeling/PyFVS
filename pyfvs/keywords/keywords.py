@@ -2,7 +2,7 @@
 Define FVS keywords as Python classes
 
 Keywords are subclasses of KeywordBase. KeywordBase enforces field ordering
-default field valeus, data type casting, field width, etc. 
+default field valeus, data type casting, field width, etc.
 
 """
 
@@ -72,16 +72,16 @@ class KeywordMetaClass(type):
 class KeywordBase(with_metaclass(KeywordMetaClass, object)):
     """
     Base class of an FVS keyword represented as a list of 7 fields
-    
-    Fields are defined on subclasses using one of the Field classes.  Field 
-        order is enforced as the order of definition during class creation.  
-        
-    During instantiation, fields defined by subclasses are copied to the 
-        instance dictionary, self.__dict__, to avoid namespace pollution.  
-        
+
+    Fields are defined on subclasses using one of the Field classes.  Field
+        order is enforced as the order of definition during class creation.
+
+    During instantiation, fields defined by subclasses are copied to the
+        instance dictionary, self.__dict__, to avoid namespace pollution.
+
     To designate fields as supplemental records put their attribute name in the
         __supplemental__ class attribute.
-    
+
     :param mnemonic: FVS shortname for the keyword
     :param name: Long name for the keyword
     :param children: Nested keywords for multipart keywords
@@ -93,7 +93,9 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
             3 - Block keyword with children keywords and END statement
             4 - PARMS keyword format, fields can be expressions, constants, or values
             5 - Single line with children (supplemental records, etc.)
+    :param end_block: Signal that the keyword requires an end statement
     :param comment: single line comment string
+    :param end_statement: Statement signaling the end of a block (format=3)
     """
 
     # TODO: Refine keyword formatting options
@@ -122,7 +124,7 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
         return new_inst
 
     def __init__(self, mnemonic, name='', children=[], rank=1, format=0
-            , add_vals=[], end_block=False, comment=''
+            , add_vals=[], end_block=False, comment='', end_statement='END'
             , **kargs):
         self.mnemonic = mnemonic
         self.name = name
@@ -131,6 +133,7 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
         self.format = format
         self.end_block = end_block
         self.comment = comment
+        self.end_statement = end_statement
 
 #        for f in self.__fields__:
 #            print 'Field init', self.__dict__[f].name
@@ -157,7 +160,7 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
 
     def __setattr__(self, attr, value):
         """
-        Override to handle setting "Field" values 
+        Override to handle setting "Field" values
         """
         if attr in object.__getattribute__(self, '__fields__'):
             fld = super(KeywordBase, self).__getattribute__(attr)
@@ -170,7 +173,7 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
     def __iadd__(self, child):
         """
         Support ' += ' inplace addition operator to append child keywords
-        
+
         @param child: Keyword container, Iterator, or keyword string
         """
         self.append(child)
@@ -179,8 +182,8 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
     def append(self, child):
         """
         Append a child keyword item or container
-        
-        @param child: Keyword container, Iterator, or keyword string 
+
+        @param child: Keyword container, Iterator, or keyword string
         """
 
         if child is None:
@@ -309,6 +312,9 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
             for f in self.add_vals:
                 s += '%s\n' % str(getattr(self, f))
 
+            if self.end_block:
+                s += f'{self.end_statement}\n'
+
         #---Format 3
         elif self.format == 3:
             # Keyword Block format
@@ -334,7 +340,7 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
             for c in self.children:
                 s += '%s\n' % (str(c).strip(),)
 
-            s += 'END\n'
+            s += f'{self.end_statement}\n'
             s += '! End %s\n' % self.mnemonic
 
         #---Format 4
@@ -348,14 +354,14 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
                 s += '%s' % str(getattr(self, self.add_vals[0]))
                 vals = ', %s' % (', '.join([str(getattr(self, f)).strip()
                                   for f in self.add_vals[1:]]))
-                s += '   PARMS(%s)\n' % vals
+                s += '   PARMS(%s)' % vals
 
             else:
                 s += '%s' % object.__getattribute__(self, self.__fields__[0])
                 vals = ', '.join([str(object.__getattribute__(self, f)).strip()
                                   for f in self.__fields__[1:]])
 
-                s += '   PARMS(%s)\n' % vals
+                s += '   PARMS(%s)' % vals
 
             # PARMS can be split between two lines
             # #TODO: double check PARMS line continuation
@@ -418,18 +424,23 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
 
 class AddHocKeyword(KeywordBase):
     def __init__(self, mnemonic, field_vals=(), format=0, supplemental=()
-                 , name='', comment='', **kargs):
+                 , name='', comment='', end_block=False, end_statement='END'
+                 , **kargs):
         """
         A generic class KeywordBase class for keywords defined at run-time
-        
+
         :param mnemonic:  FVS keyword identifier
         :param field_vals:  Iterator of field values
         :param format:  Keyword formatting code (see KeywordBase)
-        :param name:  Descriptive identifier  
-        :param comment:  Description of the keyword's purpose 
+        :param name:  Descriptive identifier
+        :param comment:  Description of the keyword's purpose
+        :param end_block: Signal that the keyword requires an end statement
+        :param end_statement: Statement signaling the end of a block (format=3)
         """
         KeywordBase.__init__(self, mnemonic, name=name, comment=comment
-                             , format=format, **kargs)
+                             , format=format
+                             , end_block=end_block, end_statement=end_statement
+                             , **kargs)
         self.mnemonic = mnemonic
         self.field_vals = field_vals
 
@@ -482,15 +493,15 @@ class KeywordSet(object):
             cn = self.find('STANDCN')
             if ident:
                 self._title = ident[0].stand_id
-            
+
             elif cn:
                 self._title = cn[0].stand_cn
-            
+
             else:
                 self._title = 'pyfvs-' + ''.join(random.choices(CHARS, k=5))
-        
+
         return self._title
-    
+
     @title.setter
     def title(self, title):
         self._title = title
@@ -545,7 +556,7 @@ class KeywordSet(object):
         s = ''
 
         if self.title:
-            s += '\n\n! Begin: %s\n' % self.title.strip()
+            s += '\n! Begin: %s\n' % self.title.strip()
 
         if self.comment:
             lines = self.comment.strip().split('\n')
@@ -573,8 +584,8 @@ class KeywordSet(object):
     def _sort(self, k1, k2):
         """
         Sort the keywords to ensure FVS reads them in the proper order
-        
-        #FIXME: Test and fully implement for implemented keywords 
+
+        #FIXME: Test and fully implement for implemented keywords
         """
         try:
             if k1.rank < k2.rank: return -1
@@ -665,7 +676,7 @@ class DB_DSNIN(KeywordBase):
         """
         Input database DSN
 
-        @param dsn:  ODBC DSN;uid;pwd or file name (.mdb,.xls) 
+        @param dsn:  ODBC DSN;uid;pwd or file name (.mdb,.xls)
         """
         KeywordBase.__init__(self, 'DSNIN'
                              , 'Input database DSN', format=1, **kargs)
@@ -687,16 +698,17 @@ class DB_STANDSQL(KeywordBase):
 
 class DB_TREESQL(KeywordBase):
     sql = TextField('Tree Init SQL')
-    end = TextField('End Tag')
 
     def __init__(self, sql, **kargs):
         """
         """
         KeywordBase.__init__(self, 'TREESQL'
-                             , 'Tree Init SQL', format=2, **kargs)
+                             , 'Tree Init SQL', format=2
+                             , end_block=True
+                             , end_statement='EndSQL'
+                             , **kargs)
 
         self.sql = sql
-        self.end = 'EndSQL'
 
 class DB_DSNOUT(KeywordBase):
     dsn = TextField('Output DSN')
@@ -705,7 +717,7 @@ class DB_DSNOUT(KeywordBase):
         """
         Output database DSN
 
-        @param dsn:  ODBC DSN or file name (.mdb,.xls) 
+        @param dsn:  ODBC DSN or file name (.mdb,.xls)
         """
         KeywordBase.__init__(self, 'DSNOUT'
                              , 'Output database DSN', format=1, **kargs)
@@ -720,7 +732,7 @@ class DB_SUMMARY(KeywordBase):
         KeywordBase.__init__(self, 'SUMMARY'
                              , 'Send stand summary to database', **kargs)
 
-class DB_TREELIST(KeywordBase):
+class DB_TREELIDB(KeywordBase):
     output_dest = IntegerField('Output Destination Code')
     spp_fmt = IntegerField('Species Format')
 
@@ -731,20 +743,20 @@ class DB_TREELIST(KeywordBase):
         @param output_dest:
                 1: send to DB and file
                 2: send treelist to DB only
-        
+
         @param spp_fmt:  Species code format
                     0: format of last input tree record
                     1: FVS alpha code format
                     2: FIA code format
                     3: USDA plants symbol format
         """
-        KeywordBase.__init__(self, 'TREELIST'
+        KeywordBase.__init__(self, 'TREELIDB'
                          , 'Send treelist to database', **kargs)
 
         self.output_dest = output_dest
         self.spp_fmt = spp_fmt
 
-class DB_CUTLIST(KeywordBase):
+class DB_CUTLIDB(KeywordBase):
     output_dest = IntegerField('Output Destination Code')
     spp_fmt = IntegerField('Species Format')
 
@@ -760,13 +772,13 @@ class DB_CUTLIST(KeywordBase):
                     3: USDA plants symbol format
         """
 
-        KeywordBase.__init__(self, 'CUTLIST'
+        KeywordBase.__init__(self, 'CUTLIDB'
                              , 'Send cutlist to database', **kargs)
 
         self.output_dest = output_dest
         self.spp_fmt = spp_fmt
 
-class DB_ATRTLIST(KeywordBase):
+class DB_ATRTLIDB(KeywordBase):
     output_dest = IntegerField('Output Destination Code')
     spp_fmt = IntegerField('Species Format')
 
@@ -781,14 +793,14 @@ class DB_ATRTLIST(KeywordBase):
                     2: FIA code format
                     3: USDA plants symbol format
         """
-        KeywordBase.__init__(self, 'ATRTLIST'
+        KeywordBase.__init__(self, 'ATRTLIDB'
                              , 'Send after treament treelist to database'
                              , **kargs)
 
         self.output_dest = output_dest
         self.spp_fmt = spp_fmt
 
-class DB_COMPUTE(KeywordBase):
+class DB_COMPUTDB(KeywordBase):
     append_new = IntegerField('Append New')
     output_pvt = IntegerField('Ignore Private')
 
@@ -799,7 +811,7 @@ class DB_COMPUTE(KeywordBase):
         @param append_new:
         @param output_pvt:
         """
-        KeywordBase.__init__(self, 'COMPUTE'
+        KeywordBase.__init__(self, 'COMPUTDB'
                          , 'Output user defined variables', **kargs)
 
         self.append_new = not append_new  # 0 has the effect of adding fields, the opposite of True/False in Python
@@ -821,7 +833,7 @@ class DB_FUELSOUT(KeywordBase):
 
         self.output_dest = output_dest
 
-class DB_DWDCVOUT(KeywordBase):
+class DB_DWDCVDB(KeywordBase):
     output_dest = IntegerField('Output Destination Code')
 
     def __init__(self, output_dest=0, **kargs):
@@ -833,13 +845,13 @@ class DB_DWDCVOUT(KeywordBase):
                 1: send to the DB and file
         """
         KeywordBase.__init__(self
-                , 'DWDCVOUT'
+                , 'DWDCVDB'
                 , 'Write the downwood cover table to database'
                 , **kargs)
 
         self.output_dest = output_dest
 
-class DB_DWDVLOUT(KeywordBase):
+class DB_DWDVLDB(KeywordBase):
     output_dest = IntegerField('Output Destination Code')
 
     def __init__(self, output_dest=0, **kargs):
@@ -851,13 +863,13 @@ class DB_DWDVLOUT(KeywordBase):
                 1: send to the DB and file
         """
         KeywordBase.__init__(self
-                , 'DWDVLOUT'
+                , 'DWDVLDB'
                 , 'Write the downwood volume table to database'
                 , **kargs)
 
         self.output_dest = output_dest
 
-class DB_STRCLASS(KeywordBase):
+class DB_STRCLSDB(KeywordBase):
     output_dest = IntegerField('Output Destination Code')
 
     def __init__(self, output_dest=0, **kargs):
@@ -869,13 +881,13 @@ class DB_STRCLASS(KeywordBase):
                 1: send to the DB and file
         """
         KeywordBase.__init__(self
-                , 'STRCLASS'
+                , 'STRCLSDB'
                 , 'Write the structure statistics table to database'
                 , **kargs)
 
         self.output_dest = output_dest
 
-class DB_SNAGSUM(KeywordBase):
+class DB_SNAGSUDB(KeywordBase):
     output_dest = IntegerField('Output Destination Code')
 
     def __init__(self, output_dest=0, **kargs):
@@ -886,12 +898,12 @@ class DB_SNAGSUM(KeywordBase):
                 2: send snag summary table to DB only
                 1: send to DB and file
         """
-        KeywordBase.__init__(self, 'SNAGSUM'
+        KeywordBase.__init__(self, 'SNAGSUDB'
                          , 'Send snag summary table to database', **kargs)
 
         self.output_dest = output_dest
 
-class DB_SNAGOUT(KeywordBase):
+class DB_SNAGOUDB(KeywordBase):
     output_dest = IntegerField('Output Destination Code')
     spp_fmt = IntegerField('Species Format')
 
@@ -902,7 +914,7 @@ class DB_SNAGOUT(KeywordBase):
         @param output_dest:  Output Destination Code
                 2 - send snag detail table to DB only
                 1 - send to DB and file
-        
+
         @param spp_fmt:  Species code format
                     0 - format of last input tree record
                     1 - FVS alpha code format
@@ -910,28 +922,37 @@ class DB_SNAGOUT(KeywordBase):
                     3 - USDA plants symbol format
 
         """
-        KeywordBase.__init__(self, 'SNAGOUT'
+        KeywordBase.__init__(self, 'SNAGOUDB'
                              , 'Send the snag detail table to database'
                              , **kargs)
 
         self.output_dest = output_dest
         self.spp_fmt = spp_fmt
 
-class DB_CARBRPTS(KeywordBase):
+class DB_CARBREDB(KeywordBase):
     output_dest = IntegerField('Output Destination')
 
     def __init__(self, output_dest=0, **kargs):
         """
         Output the carbon reports to the database
 
-        @param output_dest:  Output Destination Code 
+        @param output_dest:  Output Destination Code
                             2 - send carbon reports to DB only
                             1 - send to DB and file
         """
-        KeywordBase.__init__(self, 'CARBRPTS'
+        KeywordBase.__init__(self, 'CARBREDB'
                              , 'Send carbon reports to database', **kargs)
 
         self.output_dest = output_dest
+
+class DB_CALBSTDB(KeywordBase):
+    def __init__(self, **kargs):
+        """
+        Output the calibration statistics report to the database
+        """
+        KeywordBase.__init__(self, 'CALBSTDB'
+                             , 'Send calibration statistics to database'
+                             , **kargs)
 
 class RESETAGE(KeywordBase):
     cycle = IntegerField('Cycle')
@@ -989,7 +1010,7 @@ class PLANT(KeywordBase):
         @param shade:  Shade code
                     0 - Seedlings occurance is uniform throughout the stand
                     1 - Occurance is more frequent with overstory
-                    2 - Occurance is less frequent with overstory 
+                    2 - Occurance is less frequent with overstory
         """
         KeywordBase.__init__(self, 'PLANT', 'Planted Seedlings', **kargs)
 
@@ -1039,7 +1060,7 @@ class TALLY(KeywordBase):
     def __init__(self, cycle=0, disturbance=0, **kargs):
         """
         Schedule a regeneration tally and disturbance
-        
+
         cycle - Year/Cycle to schedule the tally
         disturbance - Year/Cycle of the disturbance
         """
@@ -1161,7 +1182,7 @@ class TREELIST(KeywordBase):
         @param cycleZero:  Control output of cycle zero tree data
                                 0=all; 1=one only; 2=zero only
         @param liveDead:  Request dead tree record report, not just current cycle mortality
-        
+
         @param dbhIncrement:  Include diamter growth estimates
         """
         self.first_cycle = first_cycle
@@ -1186,7 +1207,7 @@ class TREEDATA(KeywordBase):
             , spp_exclude='', **kargs):
         """
         Read and Filter Tree Data
-        
+
         @param file_num: File unit number
         @param plot_site: Read plot specific site descriptors
         @param min_dbh: Minimum tree DBH to retain
@@ -1414,18 +1435,18 @@ class FFE_FUELINIT(KeywordBase):
             , **kargs):
         """
         Set the initial hard (sound) dead fuel loadings (tons/acre)
-        
+
         @param fuel_0_1:  Hard Fuel 0-1 inches
         @param fuel_1_3:  Hard Fuel 1-3 inches
         @param fuel_3_6:  Hard Fuel 3-6 inches
         @param fuel_6_12:  Hard Fuel 6-12 inches
-        @param fuel_12_20:  Hard Fuel 12-20 inches 
+        @param fuel_12_20:  Hard Fuel 12-20 inches
         @param fuel_litter:  Hard Fuel litter
         @param fuel_duff:  Hard Fuel duff
         @param fuel_0_25:  Hard Fuel 0.0-0.25 inches
         @param fuel_25_1:  Hard Fuel 0.25-1.0 inches
         @param fuel_20_35:  Hard Fuel 20-35 inches
-        @param fuel_35_50:  Hard Fuel 35-50 inches 
+        @param fuel_35_50:  Hard Fuel 35-50 inches
         @param fuel_gt_50:  Hard Fuel >= 50 inches
         """
         KeywordBase.__init__(self, 'FUELINIT', 'Hard Dead Fuel Loadings'
@@ -1450,7 +1471,7 @@ class FFE_FUELFOTO(KeywordBase):
 
     def __init__(self, series_ref, photo_num, **kargs):
         """
-        
+
         @param series_ref: Photo series reference number
         @param photo_num: Photo refernce code
         """
@@ -1479,7 +1500,7 @@ class FFE_FUELSOFT(KeywordBase):
             , fuel_gt_50=0.0, **kargs):
         """
         Set the initial soft (rotten) dead fuel loadings (tons/acre)
-        
+
         @param fuel_0_25:  Soft Fuel 0.0-0.25 inches
         @param fuel_25_1:  Soft Fuel 0.25-1.0 inches
         @param fuel_1_3:  Soft Fuel 1-3 inches
@@ -1530,7 +1551,7 @@ class FFE_SNAGSUM(KeywordBase):
     def __init__(self, suppress=0, **kargs):
         """
         Produce the FFE snag summary report
-        
+
         @param suppress:  If not zero, output is suppressed
         """
         KeywordBase.__init__(self, 'SNAGSUM', 'Snag Summary Report'
@@ -1557,9 +1578,9 @@ class MANAGED(KeywordBase):
     def __init__(self, year=0, managed=True, **kargs):
         """
         Indicates the stand is managed (eg. a plantation).
-        
+
         @param year:  Year or cycle after which the stand is considered managed
-        @param managed:  Flag indicating the stand is managed 
+        @param managed:  Flag indicating the stand is managed
         """
         KeywordBase.__init__(self, 'MANAGED', 'Managed Stand Flag', **kargs)
 
@@ -1654,7 +1675,7 @@ class STANDCN(KeywordBase):
         """
         Stand Control Number - Veg database primary key
 
-        @param stand_cn: Stand control number, a primary key into the 
+        @param stand_cn: Stand control number, a primary key into the
                             vegetation database
         """
         KeywordBase.__init__(self, 'STANDCN', 'Stand Control Number'
@@ -1683,8 +1704,8 @@ class STDINFO(KeywordBase):
             ):
         """
         Stand Information Keyword
-        
-        ***Note: PV reference code is field 7 even though the documentation says latitude 
+
+        ***Note: PV reference code is field 7 even though the documentation says latitude
 
         @param location:  FVS variant specific administrative location
         @param pot_veg_code:  Potential Vegetation code
@@ -1799,7 +1820,7 @@ class SDICALC(KeywordBase):
             , method='reinke', **kargs):
         """
         Select the method used to calculate Stand Density Index.
-        
+
         @param mindbh_reinke: Min. DBH used in the calculating Reinke SDI.
         @param mindbh_zeide: Min. DBH used in the calculating Zeide SDI.
         @param method: Method used to calculate SDI, 'reinke' or 'zeide'.
@@ -1824,7 +1845,7 @@ class SDIMAX(KeywordBase):
             , **kargs):
         """
         Set the maximum stand density index, affecting density related mortality
-        
+
         @param spp:  Species this SDI applies to
         @param max_sdi:  Maximum stand density index
         @param mort_dens:  Percent of max sdi where density related mortality occurs
@@ -1852,7 +1873,7 @@ class MORTMULT(KeywordBase):
             , min_dbh=0.0, max_dbh=999.9, **kargs
             ):
         """
-        Adjust the predicted background mortality rate. 
+        Adjust the predicted background mortality rate.
 
         @param cycle:  First cycle the mortality multiplier applies to
         @param spp:  Species this mortality multiplier applies to
@@ -1869,11 +1890,39 @@ class MORTMULT(KeywordBase):
         self.min_dbh = min_dbh
         self.max_dbh = max_dbh
 
+class FIXDG(KeywordBase):
+    cycle = IntegerField('First Cycle')
+    spp = CharacterField('Species')
+    multiplier = DecimalField('Multiplier', precision=4)
+    min_dbh = DecimalField('Min DBH')
+    max_dbh = DecimalField('Max DBH')
+
+    def __init__(self, cycle=1, spp='ALL', multiplier=1.0
+            , min_dbh=0.0, max_dbh=999.9, **kargs
+            ):
+        """
+        Scale the predicted diameter growth, proportional to squared diameter change
+
+        @param cycle:  First cycle the multiplier applies to
+        @param spp:  Species this multiplier applies to
+        @param multiplier:  multiplier
+        @param min_dbh:  Minimum DBH the multiplier applies to
+        @param max_dbh:  Maximum DBH the multiplier applies to
+        """
+        KeywordBase.__init__(self, 'FIXDG', 'Diameter Growth Multiplier'
+                         , format=4, **kargs)
+
+        self.cycle = cycle
+        self.spp = spp
+        self.multiplier = multiplier
+        self.min_dbh = min_dbh
+        self.max_dbh = max_dbh
+
 class STATS(KeywordBase):
     significance = DecimalField('Significance Level', precision=3)
     def __init__(self, significance=0.05, **kargs):
         """
-        Sends stand inventory statistics report to the standard output file 
+        Sends stand inventory statistics report to the standard output file
 
         @param significance:  Significance level for computing confidence intervals
         """
@@ -1899,17 +1948,17 @@ class GROWTH(KeywordBase):
                  ):
         """
         Define the growth measurement methods
-        
+
         @param dbh_method:  Diameter growth measurement method:
                                 0 - Direct inside bark, increment core
-                                1 - Remeasurement outside bark, DBH is at the 
-                                    end of the growth period, DG is DBH at the 
+                                1 - Remeasurement outside bark, DBH is at the
+                                    end of the growth period, DG is DBH at the
                                     beginning of the growth period.
                                 2 - Direct inside bark, increment core,
-                                    ouside bark DBH is at the beginning of the 
+                                    ouside bark DBH is at the beginning of the
                                     growth period
-                                3 - Remeasurement outside bark, DBH is at the 
-                                    beginning of the growth period, DG is DBH at 
+                                3 - Remeasurement outside bark, DBH is at the
+                                    beginning of the growth period, DG is DBH at
                                     the end of the growth period
         @param dbh_period:  Years represented by the dbh increment
         @param ht_method:  Height growth measurement method
@@ -1956,7 +2005,7 @@ class ECHOSUM(KeywordBase):
     def __init__(self, file_num=4, **kargs):
         """
         Output the summary table to a separate file
-        
+
         @param file_num:  File number to write the summary table to
         """
         KeywordBase.__init__(self, 'ECHOSUM', 'Output Summary Table to a File'
@@ -1970,7 +2019,7 @@ class RANNSEED(KeywordBase):
     def __init__(self, seed=55329, **kargs):
         """
         Reseed the random number generator
-        
+
         @param seed:  Replacement pseudorandom number seed
         """
         KeywordBase.__init__(self, 'RANNSEED', 'Random Number Seed'
@@ -1984,7 +2033,7 @@ class NOHTDREG(KeywordBase):
     def __init__(self, species='ALL', suppress=0, **kargs):
         """
         Suppress or enable height regression
-        
+
         @param species:  Species affected
         @param suppress: 0-suppress; 1-enable
         """
@@ -2000,7 +2049,7 @@ class NOCALIB(KeywordBase):
     def __init__(self, species='ALL', **kargs):
         """
         Suppress calculation of growth calibration
-        
+
         @param species:  Species to suppress calibration for
         """
         KeywordBase.__init__(self, 'NOCALIB', 'Suppress Calibration Statistics'
@@ -2033,10 +2082,10 @@ class CALBSTAT(KeywordSet):
                  , dbh_recs=5, ht_recs=5, **kargs):
         """
         Output the calibration statistics table to a file.
-        
+
         Combines and CALBSTAT keyword with OPEN to enforce a known file path
-        
-        @param file_path:  Output file path  
+
+        @param file_path:  Output file path
         @param file_num:  Output file reference number
         @param dbh_recs:  Minimum number of DBH increment records required for calibration
         @param ht_recs:  Minimum number of height increment records required for calibration
@@ -2107,7 +2156,7 @@ class SPGROUP(KeywordBase):
         Species Group
 
         @param group_name:  Moniker given to the species group
-        @param spp_list:  Python iterable of FVS Species codes 
+        @param spp_list:  Python iterable of FVS Species codes
         """
         # init the Keyword parent
         KeywordBase.__init__(self, 'SPGROUP', 'Species Group'
@@ -2127,7 +2176,7 @@ class BFFDLN(KeywordBase):
     def __init__(self, species='ALL', intercept=0.0, slope=1.0, **kargs):
         """
         Board Foot Volume Defect Log Linear Equation
-        
+
         @param species:  Affected single species or species group
         @param intercept:  Log linear equation intercept
         @param slope:  Log linear equation slope
@@ -2144,11 +2193,11 @@ class VOLEQNUM(KeywordBase):
     species = CharacterField('Species')
     cuft_eq = CharacterField('Cubic Foot Equation')
     bdft_eq = CharacterField('Board Foot Equation')
-    
+
     def __init__(self, species='ALL', cuft_eq='', bdft_eq='', **kargs):
         """
         Sets the volume equation number used to calculate volume.
-        
+
         @param species:  Species code for these equation numbers
         @param cuft_eq:  Cubic Foot NVEL equation number.
         @param bdft_eq:  Board Foot NVEL equation number
@@ -2160,7 +2209,7 @@ class VOLEQNUM(KeywordBase):
         self.species = species
         self.cuft_eq = cuft_eq
         self.bdft_eq = bdft_eq
-        
+
 class BFVOLEQU(KeywordBase):
     species = CharacterField('Species')
     transition_code = IntegerField('Transition Code')
@@ -2171,7 +2220,7 @@ class BFVOLEQU(KeywordBase):
             , coefficients_1=[], coefficients_2=[], **kargs):
         """
         Board Foot Volume Defect Log Linear Equation
-        
+
         @param species:  Affected single species or species group
         @param transition_code:  Tree size coefficient transition code
         @param slope:  Tree size coefficient transition DBH.
@@ -2202,7 +2251,7 @@ class CFVOLEQU(KeywordBase):
             , coefficients_1=[], coefficients_2=[], **kargs):
         """
         Cubic Foot Volume Defect Log Linear Equation
-        
+
         @param species:  Affected single species or species group
         @param transition_code:  Tree size coefficient transition code
         @param slope:  Tree size coefficient transition DBH.
@@ -2231,7 +2280,7 @@ class MCFDLN(KeywordBase):
     def __init__(self, species='ALL', intercept=0.0, slope=1.0, **kargs):
         """
         Merchantable Cubic Foot Volume Defect Log Linear Equation
-        
+
         @param species:  Affected single species or species group
         @param intercept:  Log linear equation intercept
         @param slope:  Log linear equation slope
@@ -2306,7 +2355,7 @@ class FIXMORT(KeywordBase):
                  , effect=0, distribution=0, **kargs):
         """
         Apply a fixed mortality proportion to species tpa records.
-        
+
         @param period:  Period affected by the mortality proportion.
         @param species:  Affected species.
         @param proportion:  Fraction of tree killed during the affected periods.
@@ -2345,7 +2394,7 @@ class STRCLASS(KeywordBase):
             , **kargs):
         """
         Compute and report structure classification statistics.
-        
+
         @param output: If True the summary report is generated.
         @param gap_size: Percentage of tree height used to define a gap.
         @param sapling_max_dbh: DBH separating sapling from pole sized trees.
@@ -2379,10 +2428,10 @@ class COMPRESS(KeywordBase):
     def __init__(self, period=1, records=675, diff_pct=50, debug_out=0, **kargs):
         """
         Compress the treelist to reduce data overhead
-        
+
         @param period:  Year or cycle to compress the treelist.
         @param records:  Number of records to compress the treelist into.
-        @param diff_pct:  Percentage of new records that will use the largest 
+        @param diff_pct:  Percentage of new records that will use the largest
                             difference between trees.
         @param debug: Output debug messages.
         """
@@ -2404,7 +2453,7 @@ class BAIMULT(KeywordBase):
     def __init__(self, period=0, species='ALL', multiplier=1.0, **kargs):
         """
         Adjust the large tree basa area increment prediction by a percentage
-        
+
         @param period:  Period affected by the mortality proportion.
         @param species:  Affected species.
         @param multiplier:  Basal area growth prediction percent adjustment
@@ -2421,7 +2470,7 @@ class READCORD(KeywordBase):
     """
     def __init__(self, spp_cor={}, spp_seq=None, **kargs):
         """
-        @param spp_cor:  Species diameter increment correction factors 
+        @param spp_cor:  Species diameter increment correction factors
         """
         if not spp_seq:
             raise ValueError("spp_seq requires a list of species codes in FVS sequence order.")\
@@ -2493,7 +2542,7 @@ class DEBUG(KeywordBase):
 
 class MINHARV(KeywordBase):
     """
-    Specify a minimum harvest volume to implement a thinning 
+    Specify a minimum harvest volume to implement a thinning
     """
     cycle = IntegerField('Cycle')
     min_mcuft = IntegerField('Minimum Merch. CuFt VPA')
@@ -2507,10 +2556,10 @@ class MINHARV(KeywordBase):
             , **kargs):
         """
         MINHARV - Minimum Acceptable Harvest Volume
-        
+
         @param cycle: First year/cycle the minimum harvest applies.
         @param min_mcuft: Minimum merch. cubic foot volume per acre.
-        @param min_bdft: Minimum board foot volume per acre. 
+        @param min_bdft: Minimum board foot volume per acre.
         @param min_baa: Minimum basal area per acre.
         @param min_tcuft: Minimum total cubic foot volume per acre.
         """
@@ -2534,7 +2583,7 @@ class CUTEFF(KeywordBase):
     def __init__(self, efficiency=1.0, **kargs):
         """
         CUTEFF - Global cutting efficiency default
-        
+
         @param efficiency:
         """
         KeywordBase.__init__(self, 'CUTEFF', 'Global cutting efficiency'
@@ -2561,7 +2610,7 @@ class THINBBA(KeywordBase):
                  , **kargs):
         """
         THINBBA - Thin From Below to a BA Target
-        
+
         @param cycle:
         @param target_ba:
         @param cut_eff:
@@ -2600,11 +2649,11 @@ class THINSDI(KeywordBase):
                  , **kargs):
         """
         THINSDI - Thin to a Target SDI
-        
+
         @param cycle:
         @param target:
         @param cut_eff:
-        @param species: 
+        @param species:
         @param min_dbh:
         @param max_dbh:
         @param cut_control:
@@ -2639,7 +2688,7 @@ class THINBTA(KeywordBase):
                  , **kargs):
         """
         THINBBA - Thin From Below to a TPA Target
-        
+
         @param cycle:
         @param target_tpa:
         @param cut_eff:

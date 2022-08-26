@@ -96,6 +96,9 @@ c       open the scratch file (should be removed sometime)
         return
   102   continue
         print *,"File open error on: ",trim(cname)
+        print *, 'OUTPUT: ', JOLIST, '  ', cname
+        print *, '    KWDFIL: ', KWDFIL
+
         call fvsSetRtnCode(1)
         return
       endif

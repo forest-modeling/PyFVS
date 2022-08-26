@@ -1,4 +1,4 @@
-      BLOCK DATA CUBRDS
+      SUBROUTINE CUBRDS
       IMPLICIT NONE
 C----------
 C EC $Id$
@@ -201,4 +201,4 @@ C----------
      &      0.0,      0.0,     0.0,     0.0,     0.0,
      &      0.0,      0.0,     0.0,     0.0,     0.0,
      &     20.5,      0.0/
-      END
+      END SUBROUTINE

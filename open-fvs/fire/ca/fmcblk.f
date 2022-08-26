@@ -1,4 +1,4 @@
-      BLOCK DATA FMCBLK
+      SUBROUTINE FMCBLK
       IMPLICIT NONE
 C----------
 C FIRE-CA $Id$
@@ -312,4 +312,4 @@ C     Sw/Hw index N = 2 (1=Soft;  2=Hard)
      & 0.4006,0.4007,0.4008,0.4008,0.4009,0.4009,0.4010,0.4010,0.4010,
      & 0.4011,0.4011/
 
-      END
+      END SUBROUTINE

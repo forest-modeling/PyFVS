@@ -1,5 +1,7 @@
       SUBROUTINE REVISE (VAR,REV)
       IMPLICIT NONE
+cf2py intent(in) var
+cf2py intent(out) rev
 C----------
 C VBASE $Id$
 C----------

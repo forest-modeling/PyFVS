@@ -1,0 +1,52 @@
+prefix: pyfvs
+workspace: '%TEMP%'
+treelist_format:
+  # Python string template with keywords
+  # Must print as a single fixed format line.
+  # newlines and spaces will be stripped
+  template: >
+    {plot_id:04d}{tree_num:04d}{tree_count:>9.3f}{tree_history:1d}{species:>4s}
+    {diam:>5.1f}{dg_incr:>3.1f}{live_ht:>3.0f}{trunc_ht:>3.0f}{htg_incr:>2.1f}
+    {crown_ratio:>2d}
+    {damage1:>2d}{severity1:>2d}
+    {damage2:>2d}{severity2:>2d}
+    {damage3:>2d}{severity3:>2d}
+    {tree_val:1d}{tree_rx:1d}
+    {plot_slope:>2d}{plot_aspect:<3d}{plot_habitat:<3d}
+    {plot_topo_pos:>2d}{plot_site_prep:1d}
+    {tree_age:>3.0f}
+  
+  # This is the FVS TREEFMT keyword format string
+  # If the format string exceeds 80 characters it will be split on a comma
+  # The widths and precision must match the Python template
+  fvs_format:
+    'I4,T1,I8,F9.3,I1,A4,F5.1,F3.1,F3.0,F3.0,F2.1,I2,6I2,2I1,I2,2I3,2I1,F3.0'
+
+logging:
+  version: 1
+  disable_existing_loggers: true
+  incremental: false
+
+  formatters: 
+      file:
+        format: '%(asctime)s %(levelname)-8s %(name)-15s %(message)s'
+        datefmt: '%Y-%m-%d %H:%M:%S'
+        
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: NOTSET
+      stream: ext://sys.stdout
+
+    file:
+      class: logging.FileHandler
+      filename: ./pyfvs.log
+      mode: w
+      level: NOTSET
+      formatter: file
+  
+  loggers:
+    pyfvs: 
+      level: INFO
+      handlers: [console, file]
+      propagate: no

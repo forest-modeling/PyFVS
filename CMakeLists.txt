@@ -18,6 +18,8 @@ enable_language(Fortran)
 # Required CMake Packages
 # Base Python requirements
 find_package(Python3 REQUIRED COMPONENTS NumPy Interpreter Development.Module)
+
+# Bail if the there are missing Python components
 if (NOT ${Python3_FOUND})
     message(STATUS "Python Interpreter: ${Python3_EXECUTABLE}")
     message(STATUS "Python Libraries: ${Python3_LIBRARIES}")
@@ -41,12 +43,13 @@ message(STATUS "Python Includes: ${PYTHON_INCLUDE_DIRS}")
 message(STATUS "Numpy Includes: ${_Python3_NumPy_INCLUDE_DIR}")
 message(STATUS "Python Libs: ${PYTHON_LIBRARIES}")
 
-# read the PyFVS version number from a file
+# Read in the PyFVS version number
 file(STRINGS "pyfvs/_version.py" PACKAGE_VERSION REGEX "[0-9]+\\.[0-9]+\\.[0-9]+")
 message(STATUS "Package version: ${PACKAGE_VERSION}")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
 
+# Add the custom Open-FVS CMakelists.txt subdirectory
 set(fvs_root "${CMAKE_SOURCE_DIR}/open-fvs")
 add_subdirectory(build_fvs)

@@ -20,7 +20,8 @@ module fvs_step
     !Date: 10/2013
 
     !TODO: Strip out the restart and cmdline logic from the step API routines
-
+    
+    use tree_data, only: save_tree_data,copy_tree_data,copy_mort_data,copy_cuts_data
     use globals, only: &
         ! PRGPRM
         maxcyc,maxcy1,maxtp1, &
@@ -33,26 +34,11 @@ module fvs_step
         !WORKCM
         iwork1, &
         !OUTCOM
-        ititle,ocvcur,obfcur,omccur
+        ititle,ocvcur,obfcur,omccur, &
+        !FMFCOM
+        jsnout
 
-    !FIXME:
     use tree_data, only: init_tree_data
-!     use blkdat_mod, only: blkdat
-!     use esblkd_mod, only: esblkd
-!     use cubrds_mod, only: cubrds
-!     use keywds_mod, only: keywds
-
-!     external blkdat
-!     external keywds !block data in keywds.f
-
-    !f2py integer, intent(aux) :: maxcyc,maxcy1,maxtp1
-    !f2py integer, intent(aux) :: icl1,icl6,icyc,irec2,itable,itrn,iy,jostnd,lflag,lstart,ncyc
-    !f2py real, intent(aux) :: bfv,cfv,ind,prob,wk1,wk3
-    !f2py real, intent(aux) :: ind
-    !f2py integer, intent(aux) :: mgmid,nplt,sdiac,sdiac2
-    !f2py integer, intent(aux) :: iwork1
-    !f2py integer, intent(aux) :: ititle
-    !f2py real, intent(aux) :: ocvcur,obfcur,omccur
 
     integer :: sim_status=0
 
@@ -66,10 +52,15 @@ module fvs_step
 #ifdef _WINDLL
         !GCC$ ATTRIBUTES STDCALL,DLLEXPORT :: init_blkdata
 #endif
-        ! call blkdat()
-        ! call esblkd()
-        ! call cubrds()
-        ! call keywds()
+        call blkdat()
+        call esblkd()
+        call cubrds()
+        call keywds()
+        call svblkd()
+        call dbsblkd()
+        ! call fmcblk() ! TODO:Broken
+        ! call dfblkd() ! TODO: Add preprocessing ifdef to enable DFB and MPB sub models
+        ! call mpblkd()
 
         ! print *, 'JOSTD: ', jostnd
 
@@ -119,6 +110,14 @@ module fvs_step
         ! Initialize parameters and arrays
         ! TODO: This should probably be elevated to a toplevel call
         call init_blkdata()
+        
+        ! Perform Cleanup tasks to perform between runs
+
+        ! Ensure IO files are closed
+        call filclose()
+
+        ! Close the snag output file explicitly
+        close(unit=jsnout)
 
         ! Zero the API report arrays
         !! FIXME:
@@ -335,7 +334,7 @@ module fvs_step
         CALL MISPRT
 !#endif /*FVSREPORTS*/
 
-        CALL PRTRLS (1)
+        CALL PRTRLS_WRAP (1)
 
 !#ifdef FVSREPORTS
         !CREATE THE INITIAL STAND VISULIZATION.
@@ -377,7 +376,7 @@ module fvs_step
 
     subroutine fvs_grow(irtncd)
         !Execute a FVS grow cycle.  Adapted from fvs.f
-        
+        use tree_data, only: save_tree_data,copy_tree_data,copy_mort_data,copy_cuts_data
         implicit none
 
 #ifdef _WINDLL
@@ -422,9 +421,9 @@ module fvs_step
         endif
 !#endif /* FVSDEBUG */
 
-        ! CALL TREGRO
+        CALL TREGRO
         !! FIXME: 
-        call step_tregro()
+        !! call step_tregro()
 
 !#ifdef FVSSTARTSTOP
         CALL fvsGetRtnCode(IRTNCD)
@@ -469,7 +468,8 @@ module fvs_step
 !#endif /* FVSEXTENSIONS */
 
         !IF TREE LIST OUTPUT IS REQUESTED...CALL TREE LIST PRINTER.
-        CALL PRTRLS (1)
+        CALL PRTRLS_WRAP (1)
+        ! call copy_tree_data()
 
 !#ifdef FVSREPORTS
         !IF RUNNING FVSSTAND POST-PROCESSOR, CALL FILE PRINTER.
@@ -561,12 +561,13 @@ module fvs_step
         SDIAC=SDIBC
         SDIAC2=SDIBC2
 
-        ! Copy tree attributes for the final of the period
-        !!FIXME
-        if (save_tree_data) then
+        ! ! Copy tree attributes for the final of the period
+        ! !!FIXME
+        ! if (save_tree_data) then
+        ! !     write(*,*) 'Save tree list for cycle ',i,' TPA: ', sum(prob(:itrn)/grospc)
             call copy_tree_data()
-            ! call copy_mort_data()
-        endif
+        !     ! call copy_mort_data()
+        ! endif
 
         CALL DISPLY
         CALL fvsGetRtnCode(IRTNCD)

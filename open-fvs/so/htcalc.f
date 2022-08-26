@@ -1,5 +1,10 @@
       SUBROUTINE HTCALC(JFOR,SINDX,ISPC,AG,HGUESS,JOSTND,DEBUG)
       IMPLICIT NONE
+
+!f2py intent(in) :: jfor,sindx,ispc,ag
+!f2py intent(hide) :: jostnd,debug
+!f2py intent(out) :: hguess
+      
 C----------
 C SO $Id$
 C----------
