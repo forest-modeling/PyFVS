@@ -59,22 +59,24 @@ rx_trees['total_height'] = 0.0
 
 # Map the trees data column names to FVS tree array names
 field_map = dict(
-  plot_id='plot_id'
+  plot_id='plot'
   , tree_id = 'tree'
-  , history = 'statuscd'
+  , history = 'status'
   , species='spcd'
-  , prob='tpa_unadj'
-  , diameter = 'dia'
+  , prob='tpa'
+  , diameter = 'diam'
   , diameter_growth = 'diameter_growth'
   , height = 'ht'
   , total_height = 'total_height'
   , height_growth = 'height_growth'
-  , crown = 'cr'
-  , age = 'totage'
+  , crown = 'cr_code'
+  , age = 'age'
 )
 
 fm = {v:k for k,v in field_map.items()}
 rx_trees.rename(columns=fm, inplace=True)
+
+# print(rx_trees.columns)
 
 # Pass the trees dataframe to the FVS instance
 sim.inventory_trees = rx_trees

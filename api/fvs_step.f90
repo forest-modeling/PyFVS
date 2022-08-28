@@ -20,7 +20,7 @@ module fvs_step
     !Date: 10/2013
 
     !TODO: Strip out the restart and cmdline logic from the step API routines
-    
+
     use tree_data, only: save_tree_data,copy_tree_data,copy_mort_data,copy_cuts_data
     use globals, only: &
         ! PRGPRM
@@ -72,7 +72,7 @@ module fvs_step
         !
         ! Modifications include preprocessor directives to optionally exclude
         ! extranious FVS routines.
-        
+
 !#define xFVSREPORTS
 !#define xFVSEXTENSIONS
 !#define xFVSSTARTSTOP
@@ -88,7 +88,7 @@ module fvs_step
         !Python F2PY Interface Directives
         !f2py character(len=*),intent(in) :: keywords_file
         !f2py integer,intent(out) :: irtncd
-        
+
         character(len=*), intent(in) :: keywords_file
         integer, intent(out) :: irtncd
 
@@ -110,7 +110,7 @@ module fvs_step
         ! Initialize parameters and arrays
         ! TODO: This should probably be elevated to a toplevel call
         call init_blkdata()
-        
+
         ! Perform Cleanup tasks to perform between runs
 
         ! Ensure IO files are closed
@@ -344,7 +344,7 @@ module fvs_step
         CALL FVSSTD (1)
 
         !IF NAT CRUISE OUTPUT IS REQUESTED ... CALL NATCRZ PRINTER.
-        CALL NATCRZ (1)
+        ! CALL NATCRZ (1)
 !#endif /*FVSREPORTS*/
 
         !DONE WITH DEAD TREES THAT WERE PRESENT IN THE INVENTORY. PURGE
@@ -385,7 +385,7 @@ module fvs_step
 
         !Python F2PY Interface Directives
         !f2py integer,intent(out) :: irtncd
-        
+
         integer, intent(out) :: irtncd
 
         INTEGER I,IA,N,K,NTODO,ITODO,IACTK,IDAT,NP
@@ -399,7 +399,7 @@ module fvs_step
         INTEGER IRSTRTCD,ISTOPDONE,lenCl
 
         character(len=100) :: fmt
-        
+
         ! Ensure the simulation is initialized or running
         if (sim_status < 1) then
             irtncd = -1
@@ -422,7 +422,7 @@ module fvs_step
 !#endif /* FVSDEBUG */
 
         CALL TREGRO
-        !! FIXME: 
+        !! FIXME:
         !! call step_tregro()
 
 !#ifdef FVSSTARTSTOP
@@ -476,7 +476,7 @@ module fvs_step
         CALL FVSSTD (1)
 
         !IF NAT CRUISE OUTPUT IS REQUESTED ... CALL NATCRZ PRINTER.
-        CALL NATCRZ (1)
+        ! CALL NATCRZ (1)
 !#endif /* FVSREPORTS */
 
         !FIND AND RUN ANY SCHEDULED SYSTEM CALLS.
@@ -491,7 +491,7 @@ module fvs_step
                 ENDIF
             ENDDO
         ENDIF
-        
+
         ! Flag simulation as running
         sim_status = 2
         return
@@ -499,7 +499,7 @@ module fvs_step
 
     subroutine fvs_end(irtncd)
         !Finalize an FVS run.  Extracted from fvs.f
-        
+
         !!FIXME
         use tree_data, only: &
                 save_tree_data,copy_tree_data &
@@ -521,7 +521,7 @@ module fvs_step
         !f2py integer,intent(out) :: irtncd
 
         integer, intent(out) :: irtncd
-        
+
         INTEGER I,IA,N,K,NTODO,ITODO,IACTK,IDAT,NP
         REAL STAGEA,STAGEB
         LOGICAL DEBUG,LCVGO
