@@ -115,6 +115,7 @@ endforeach(fn)
 #
 # Process the F77 include files into F90
 set(f90_gen_dir "${CMAKE_SOURCE_DIR}/api/gen/${fvs_variant}/include")
+message(STATUS "*** F90 Include Files: ${f90_gen_dir}")
 foreach (fn ${f77_includes})
 	get_filename_component (fname ${fn} NAME_WLE)
 	file(MAKE_DIRECTORY "${f90_gen_dir}")

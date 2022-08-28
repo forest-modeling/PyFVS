@@ -51,5 +51,5 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # Add the custom Open-FVS CMakelists.txt subdirectory
-set(fvs_root "${CMAKE_SOURCE_DIR}/open-fvs")
+set(fvs_root "${CMAKE_SOURCE_DIR}/fvs")
 add_subdirectory(build_fvs)

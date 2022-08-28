@@ -1,0 +1,4 @@
+[submodule "fvs"]
+	path = fvs
+	url = https://github.com/forest-modeling/ForestVegetationSimulator.git
+	branch = pyfvs-features
