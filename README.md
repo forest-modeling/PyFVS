@@ -52,7 +52,7 @@ f.init_projection(kwds)
 
 # Iterate through the simulation cycles
 for cycle in f:
-    print(cycle.year)
+    print(f.year)
     # Do something interesting
 
 # Closeout the simulation
