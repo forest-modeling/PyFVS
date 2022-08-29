@@ -335,7 +335,10 @@ add_custom_command(
 
 	# Compile the modules and link with the FVS library
 	COMMAND ${F2PY_EXECUTABLE}
-		-c --fcompiler=gnu95
+		-c --fcompiler=gnu95 --compiler=mingw32
+        --opt="-O3"
+        --f90flags="-Wall -fno-second-underscore -funroll-loops"
+        --f77flags="-Wall -ffixed-form -fno-second-underscore -funroll-loops"
 		${api_name}.pyf
 		-I"${CMAKE_CURRENT_BINARY_DIR}"
 		# NOTE: Too many object files, generated batch file fails

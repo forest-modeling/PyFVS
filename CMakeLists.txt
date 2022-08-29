@@ -43,9 +43,12 @@ message(STATUS "Python Includes: ${PYTHON_INCLUDE_DIRS}")
 message(STATUS "Numpy Includes: ${_Python3_NumPy_INCLUDE_DIR}")
 message(STATUS "Python Libs: ${PYTHON_LIBRARIES}")
 
-# Read in the PyFVS version number
-file(STRINGS "pyfvs/_version.py" PACKAGE_VERSION REGEX "[0-9]+\\.[0-9]+\\.[0-9]+")
-message(STATUS "Package version: ${PACKAGE_VERSION}")
+## FIXME: version now comes from the Git
+# # Read in the PyFVS version number
+# file(STRINGS "pyfvs/_version.py" PACKAGE_VERSION REGEX "[0-9]+\\.[0-9]+\\.[0-9]+")
+# message(STATUS "Package version: ${PACKAGE_VERSION}")
+
+# set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/src")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")

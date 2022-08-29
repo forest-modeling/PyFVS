@@ -6,8 +6,6 @@ Modules and objects for executing and interacting with FVS variants.
 @author: Tod Haren, tod.haren at gmail
 """
 
-__author__ = 'Tod Haren, tod.haren at gmail'
-
 import os
 import sys
 import logging
@@ -16,14 +14,21 @@ import importlib.machinery as imp
 
 import confuse
 
-# # Bring standard modules into the package namespace
-# from .keywords.keywords import *
-# from .keywords.eventmonitor import *
-# from .fvs import FVS, FVSTrees
-# from . import fvs
+if sys.version_info[:2] >= (3, 8):
+    # TODO: Import directly (no need for conditional) when `python_requires = >= 3.8`
+    from importlib.metadata import PackageNotFoundError, version  # pragma: no cover
+else:
+    from importlib_metadata import PackageNotFoundError, version  # pragma: no cover
 
-# If the __version__ file is present, use it.
-from ._version import __version__, __git_commit__, __git_describe__
+try:
+    # Change here if project is renamed and does not equal the package name
+    dist_name = "PyFVS"
+    __version__ = version(dist_name)
+except PackageNotFoundError:  # pragma: no cover
+    __version__ = "unknown"
+finally:
+    del version, PackageNotFoundError
+
 
 # Configuration is stored in a YAML file
 # Package defaults will be in ./config_default.yaml
@@ -34,10 +39,6 @@ config = confuse.LazyConfig('PyFVS', __name__)
 # print(config['workspace'].get())
 
 # print(config['treelist_format'].get()['template'])
-
-def version():
-    """Return the current PyFVS API version number."""
-    return __version__
 
 # Default FVS Treelist format
 # template is the Python string format
