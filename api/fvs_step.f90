@@ -93,17 +93,13 @@ module fvs_step
         integer, intent(out) :: irtncd
 
         character(len=256) :: keywords
-        INTEGER I,IA,N,K,NTODO,ITODO,IACTK,IDAT,NP
+        character(len=100) :: fmt
+
+        INTEGER I,IA,N,K
         REAL STAGEA,STAGEB
         LOGICAL DEBUG,LCVGO
         INTEGER IBA
-        CHARACTER*150 SYSCMD
-        INTEGER MYACT(1)
-        REAL PRM(1)
-        DATA MYACT/100/
-        INTEGER IRSTRTCD,ISTOPDONE,lenCl
-
-        character(len=100) :: fmt
+        INTEGER IRSTRTCD,ISTOPDONE,ISTOPRES,lenCl
 
         sim_status = 0
 
@@ -152,78 +148,90 @@ module fvs_step
         endif
         if (IRTNCD.ne.0) return
         if (IRSTRTCD.lt.0) return
-        if (IRSTRTCD.ge.1) return !in fvs.f this code skips over the initialization routines and the time increment
-!#endif /* FVSSTARTSTOP */
+        ! if (IRSTRTCD.eq.7) goto 19
+        if (IRSTRTCD.ne.7) then
 
-        ICL1=0
-        LSTART = .TRUE.
-        LFLAG = .TRUE.
-        ICYC=0
+                if (IRSTRTCD.ge.1) return !in fvs.f this code skips over the initialization routines and the time increment
+        !#endif /* FVSSTARTSTOP */
 
-        !INITIATE THE PROGNOSIS
-        CALL INITRE
-        CALL fvsGetRtnCode(IRTNCD)
-        IF (IRTNCD.NE.0) RETURN
+                ICL1=0
+                LSTART = .TRUE.
+                LFLAG = .TRUE.
+                ICYC=0
 
-!#ifdef FVSREPORTS
-        !SEE IF WE NEED TO DO SOME DEBUG.
-        CALL DBCHK (DEBUG,'MAIN',4,0)
-!#endif /* FVSREPORTS */
+                !INITIATE THE PROGNOSIS
+                CALL INITRE
+                CALL fvsGetRtnCode(IRTNCD)
+                IF (IRTNCD.NE.0) RETURN
 
-        !PROCESS ARRAY IY
-        IF (NCYC.LE.0)  NCYC=1
-        IF (NCYC.GT.MAXCYC) NCYC=MAXCYC
-        DO I = 2, MAXCY1
-            IF (IY(I).EQ.-1) IY(I)=10
-            IY(I) = IY(I-1) + IY(I)
-        ENDDO
+        !#ifdef FVSREPORTS
+                !SEE IF WE NEED TO DO SOME DEBUG.
+                CALL DBCHK (DEBUG,'MAIN',4,0)
+        !#endif /* FVSREPORTS */
 
-        !ADD IN CYCLES FOR REQUESTED YEARS...BUT DON'T EXTEND THE END
-        !OR CHANGE THE BEGINNING OF THE SIMULATION.
-        IF (IWORK1(1).GT.0) THEN
-            DO IA=2,IWORK1(1)+1
-                IF (IWORK1(IA).LE.IY(1).OR.IWORK1(IA).GE.IY(NCYC+1)) THEN
-                    CYCLE
-                ELSE
-                    N=NCYC
-                    DO I=1,N
-                        IF (IWORK1(IA).GT.IY(I).AND.IWORK1(IA).LT.IY(I+1)) THEN
-                            NCYC=NCYC+1
-                            IF (NCYC.GT.MAXCYC) NCYC=MAXCYC
-                            DO K=NCYC+1,I+2,-1
-                                IY(K)=IY(K-1)
-                            ENDDO
-                            IY(I+1)=IWORK1(IA)
-                            EXIT
+                !PROCESS ARRAY IY
+                IF (NCYC.LE.0)  NCYC=1
+                IF (NCYC.GT.MAXCYC) NCYC=MAXCYC
+                DO I = 2, MAXCY1
+                IF (IY(I).EQ.-1) IY(I)=10
+                IY(I) = IY(I-1) + IY(I)
+                ENDDO
+
+                !ADD IN CYCLES FOR REQUESTED YEARS...BUT DO NOT EXTEND THE END
+                !OR CHANGE THE BEGINNING OF THE SIMULATION.
+                IF (IWORK1(1).GT.0) THEN
+                DO IA=2,IWORK1(1)+1
+                        IF (IWORK1(IA).LE.IY(1).OR.IWORK1(IA).GE.IY(NCYC+1)) THEN
+                        CYCLE
+                        ELSE
+                        N=NCYC
+                        DO I=1,N
+                                IF (IWORK1(IA).GT.IY(I).AND.IWORK1(IA).LT.IY(I+1)) THEN
+                                NCYC=NCYC+1
+                                IF (NCYC.GT.MAXCYC) NCYC=MAXCYC
+                                DO K=NCYC+1,I+2,-1
+                                        IY(K)=IY(K-1)
+                                ENDDO
+                                IY(I+1)=IWORK1(IA)
+                                EXIT
+                                ENDIF
+                        ENDDO
                         ENDIF
-                    ENDDO
+                ENDDO
                 ENDIF
-            ENDDO
-        ENDIF
 
-!#ifdef FVSEXTENSIONS
-        !WRITE BUG MODEL HEADERS AND WRITE AND PROCESS OPTION LISTS
-        !THE CALL TO TMOPTS MUST BE PLACED BEFORE CALL OPEXPN AS TMOPTS
-        !CALLS SCHED WHICH CHANGES THE CONTENTS OF THE ARRAY IY.
-        CALL MPBOPS
-        CALL TMOPS
-        CALL DFBSCH
+        !#ifdef FVSEXTENSIONS
+                !WRITE BUG MODEL HEADERS AND WRITE AND PROCESS OPTION LISTS
+                !THE CALL TO TMOPTS MUST BE PLACED BEFORE CALL OPEXPN AS TMOPTS
+                !CALLS SCHED WHICH CHANGES THE CONTENTS OF THE ARRAY IY.
+                CALL MPBOPS
+                CALL TMOPS
+                CALL DFBSCH
 
-        !SET UP ECON COST & REVENUE INDEXES BY SPECIES
-        !CALL ECSETP PRIOR TO PROCESSING ACTIVITY SCHEDULE TO ENSURE CORRECT ECON ACTIVITY SORTING
-        CALL ECSETP(IY)
-!#endif /* FVSEXTENSIONS */
+                !SET UP ECON COST & REVENUE INDEXES BY SPECIES
+                !CALL ECSETP PRIOR TO PROCESSING ACTIVITY SCHEDULE TO ENSURE CORRECT ECON ACTIVITY SORTING
+                CALL ECSETP(IY)
+        !#endif /* FVSEXTENSIONS */
 
-        !PROCESS AND LIST THE ACTIVITY SCHEDULE.
-        CALL OPEXPN (JOSTND,NCYC,IY)
-        CALL OPCYCL (NCYC,IY)
-        IF(ITABLE(4).EQ.0)CALL OPLIST (.TRUE.,NPLT,MGMID,ITITLE)
+                !PROCESS AND LIST THE ACTIVITY SCHEDULE.
+                CALL OPEXPN (JOSTND,NCYC,IY)
+                CALL OPCYCL (NCYC,IY)
+                IF(ITABLE(4).EQ.0)CALL OPLIST (.TRUE.,NPLT,MGMID,ITITLE)
 
-        !SET UP INDEX POINTERS TO SPECIES SORT.
-        CALL SETUP
+                !SET UP INDEX POINTERS TO SPECIES SORT.
+                CALL SETUP
 
-        !CALCULATE TREES/ACRE ( = LOAD PROB )
-        CALL NOTRE
+                !CALCULATE TREES/ACRE ( = LOAD PROB )
+                CALL NOTRE
+
+                CALL fvsStopPoint (7,ISTOPRES)
+                IF (ISTOPRES.NE.0) RETURN
+                CALL fvsGetRtnCode(IRTNCD)
+                IF (IRTNCD.NE.0) RETURN
+                !BRANCH HERE IF RESTARTING FROM STOPCODE 7
+
+!      19 CONTINUE
+        end if
 
 !#ifdef FVSEXTENSIONS
         !WESTERN ROOT DISEASE MODEL VER. 3.0 INITIALIZATION
@@ -343,8 +351,6 @@ module fvs_step
         !LOAD OLD VOLUME VARIABLES WITH CYCLE 0 VOLUMES
         CALL FVSSTD (1)
 
-        !IF NAT CRUISE OUTPUT IS REQUESTED ... CALL NATCRZ PRINTER.
-        ! CALL NATCRZ (1)
 !#endif /*FVSREPORTS*/
 
         !DONE WITH DEAD TREES THAT WERE PRESENT IN THE INVENTORY. PURGE
@@ -475,22 +481,20 @@ module fvs_step
         !IF RUNNING FVSSTAND POST-PROCESSOR, CALL FILE PRINTER.
         CALL FVSSTD (1)
 
-        !IF NAT CRUISE OUTPUT IS REQUESTED ... CALL NATCRZ PRINTER.
-        ! CALL NATCRZ (1)
 !#endif /* FVSREPORTS */
 
-        !FIND AND RUN ANY SCHEDULED SYSTEM CALLS.
-        CALL OPFIND (1,MYACT,NTODO)
-        IF (NTODO.GT.0) THEN
-            DO ITODO=1,NTODO
-                CALL OPGET(ITODO,1,IDAT,IACTK,NP,PRM)
-                IF (IACTK.EQ.MYACT(1)) THEN
-                    CALL OPGETC (ITODO,SYSCMD)
-                    CALL OPDONE (ITODO,IY(ICYC+1)-1)
-                    IF (SYSCMD.NE.' ') CALL SYSTEM(SYSCMD)
-                ENDIF
-            ENDDO
-        ENDIF
+        ! !FIND AND RUN ANY SCHEDULED SYSTEM CALLS.
+        ! CALL OPFIND (1,MYACT,NTODO)
+        ! IF (NTODO.GT.0) THEN
+        !     DO ITODO=1,NTODO
+        !         CALL OPGET(ITODO,1,IDAT,IACTK,NP,PRM)
+        !         IF (IACTK.EQ.MYACT(1)) THEN
+        !             CALL OPGETC (ITODO,SYSCMD)
+        !             CALL OPDONE (ITODO,IY(ICYC+1)-1)
+        !             IF (SYSCMD.NE.' ') CALL SYSTEM(SYSCMD)
+        !         ENDIF
+        !     ENDDO
+        ! ENDIF
 
         ! Flag simulation as running
         sim_status = 2

@@ -26,7 +26,8 @@ try:
 except:
     pass
 
-with sqlite3.connect(fia_db) as conn:
+# Open in read only mode to avoid triggering database timestamp changes
+with sqlite3.connect(f'file:{fia_db}?mode=ro', uri=True) as conn:
     plot = pd.read_sql('select * from plot', conn).iloc[0]
     plot_cn = plot['cn']
 

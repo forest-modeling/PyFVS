@@ -28,13 +28,14 @@ class TreesTest(unittest.TestCase):
         except:
             pass
 
-        with sqlite3.connect(fia_db) as conn:
+        # Open in read only mode to avoid triggering database timestamp changes
+        with sqlite3.connect(f'file:{fia_db}?mode=ro', uri=True) as conn:
             plot = pd.read_sql('select * from plot', conn).iloc[0]
             plot_cn = plot['cn']
 
             ## FIXME: Aggregate condition or constrain trees to condition
             cond = pd.read_sql(f"select * from cond where plt_cn='{plot_cn}'", conn).iloc[0]
-            
+
             trees = pd.read_sql(f"select * from tree where plt_cn='{plot_cn}'", conn)
             # site_tree = pd.read_sql(f"select * from sitetree where plt_cn='{plot_cn}'", conn)
 

@@ -14,17 +14,81 @@
 
 # PyFVS
 
-> Python wrappers and utilities for using the Forest Vegetation Simulator
-
 Python wrappers and utilities for using the Forest Vegetation Simulator
+
+## Features
+
+ - FVS Class
+   - FVS Step API - Iterate projection cycles
+   - Initialize inventory trees from arrays
+   - Access to all FVS internal arrays and variables
+
+ - Keywords - Object based FVS keyword file generation
+
+ - Command line interface
+
+Documentation forthcoming
 
 ## Usage
 
-    >pyfvs --help
+**NOTE:** The PyFVS API is beta. Names and arguments may change as
+features evolve. Deprecation warnings will be raise when possible.
+However, there is guarantee of backward compatibility.
+
+### Command Line
+
+``` bash
+>pyfvs --help
+>pyfvs run PN -k path/to/keywords.key
+```
+
+### Run a simulation using an existing keyword file and treelist
+
+``` Python
+from pyfvs import fvs
+f = fvs.FVS('PN')
+kwds = 'path/to/keywords.key'
+f.init_projection(kwds)
+
+# Iterate through the simulation cycles
+for cycle in f:
+    print(cycle.year)
+    # Do something interesting
+
+# Closeout the simulation
+f.end_projection()
+```
+
+### Genarate keywords from a bareground simulation at runtime
+
+``` Python
+from pyfvs import fvs,keywords
+f = fvs.FVS('PN')
+# Setup the KeywordSet for the simulation
+kw = f.keywords
+# Grow for 20 periods
+kw += keywords.NUMCYCLE(20)
+# Add default STDINFO keyword
+kw += keywords.STDINFO()
+# This is a bareground simulation, so no treelist
+kw += keywords.NOTREES()
+# Initialize the ESTAB keywordset
+est = keywords.ESTAB()
+# Add 350 planted DF seedlings to the ESTAB
+est += keywords.PLANT(1,'DF',350)
+# Add the ESTAB keywordset to the simulation
+kw += est
+# Execute the simulation
+f.run()
+# Print the summary table
+print(f.summary)
+```
+
+
 
 <!-- pyscaffold-notes -->
 
 ## Note
 
-This project has been set up using PyScaffold 4.2. For details and usage
+This project has been set up using PyScaffold. For details and usage
 information on PyScaffold see https://pyscaffold.org/.

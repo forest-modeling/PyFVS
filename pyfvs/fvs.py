@@ -36,11 +36,15 @@ from pyfvs.keywords import keywords as kw
 pyfvs.init_logging()
 log = logging.getLogger('pyfvs.fvs')
 
-def deprecation(msg):
+def deprecation(msg, level=1):
     """
     Warn users about deprecated features.
     """
-    warnings.warn(msg, DeprecationWarning, stacklevel=2)
+    if level==1:
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
+    elif level>1:
+        raise RuntimeError(msg)
 
 class FVS(object):
     """
@@ -532,7 +536,7 @@ class FVS(object):
         """
         Return a generator to iterate through the projection cycles.
         """
-        deprecation('FVS.iter_projection is deprecated. Use FVS iterator protocol.')
+        deprecation('FVS.iter_projection is deprecated. Use FVS iterator protocol.', level=2)
         return self.__iter__()
 
     def __iter__(self):
@@ -552,7 +556,7 @@ class FVS(object):
         self.end_projection()
 
     def grow_projection(self, cycles=1):
-        deprecation('FVS.grow_projection is deprecated, use FVS.grow.')
+        deprecation('FVS.grow_projection is deprecated, use FVS.grow.', level=2)
         r = self.grow(cycles)
 
     def run(self):
