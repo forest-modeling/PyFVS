@@ -745,9 +745,12 @@ class FVS(object):
     def trees(self):
         dt = np.dtype([
                 ('cycle',np.uint8), ('year', np.uint16)
-                , ('plot_seq',np.uint16), ('tree_seq',np.uint16), ('tree_id',np.uint16), ('spp_seq',np.uint16), ('age',np.uint16), ('live_tpa',np.float32), ('live_dbh',np.float32), ('dbh_incr',np.float32)
-                , ('ht_total',np.float32), ('ht_incr',np.float32), ('cr_width',np.float32), ('cr_ratio',np.float32), ('ht_merch_cuft',np.float32), ('ht_merch_bdft',np.float32)
-                , ('cuft_total',np.float32), ('cuft_net',np.float32), ('bdft_net',np.float32), ('defect_cuft',np.float32), ('defect_bdft',np.float32)
+                , ('plot_seq',np.uint16), ('tree_seq',np.uint16), ('tree_id',np.uint16), ('spp_seq',np.uint16)
+                , ('age',np.uint16), ('live_tpa',np.float32), ('mort_tpa',np.float32), ('live_dbh',np.float32)
+                , ('dbh_incr',np.float32), ('ht_total',np.float32), ('ht_incr',np.float32), ('cr_width',np.float32)
+                , ('cr_ratio',np.float32), ('ht_merch_cuft',np.float32), ('ht_merch_bdft',np.float32)
+                , ('cuft_total',np.float32), ('cuft_net',np.float32), ('bdft_net',np.float32)
+                , ('defect_cuft',np.float32), ('defect_bdft',np.float32)
                 ])
 
         N = self.tree_data.num_recs.sum()

@@ -70,6 +70,9 @@ module tree_data
 
         integer :: i,x
 
+        ! Guard against rolling over the arrays
+        if (icyc>=maxcy1) return
+
         ! Increment the array position so that period zero is in the first slot
         i = icyc+1
 
@@ -84,6 +87,11 @@ module tree_data
         spp_seq(:itrn,i) = isp(:itrn)
         age(:itrn,i) = int(abirth(:itrn))
         live_tpa(:itrn,i) = prob(:itrn)/grospc
+
+        ! write(*,*) icyc, i
+        ! write(*,*) isp(:itrn)
+        ! write(*,*) cfv(:itrn)
+        ! write(*,*) wk1(:itrn)
 
         ! write(*,*) '    TPA:', itrn, prob(:itrn), grospc, live_tpa(:itrn,i)
 
@@ -117,7 +125,9 @@ module tree_data
 
     subroutine copy_mort_data()
 
-        ! Mortality estimates copied after the call to `morts` in grincr.f
+        ! Guard against rolling over the arrays
+        if ((icyc>=maxcy1) .or. (icyc==0)) return
+
         mort_tpa(:itrn,icyc+1) = wk2(:itrn)/grospc
 
     end subroutine copy_mort_data

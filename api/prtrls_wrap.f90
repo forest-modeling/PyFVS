@@ -13,6 +13,7 @@ subroutine prtrls_wrap(iwho)
 
         case (1)
             call copy_tree_data()
+            call copy_mort_data()
             call copy_forest_carbon()
             call copy_harvest_carbon()
             call copy_downwood()
