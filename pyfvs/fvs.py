@@ -77,7 +77,7 @@ class FVS(object):
        spp_attrs = fvs.fvsspeciescode(16)
     """
     def __init__(self, variant, stochastic=False, bootstrap=0, cleanup=True, treelist_format=None
-            , workspace=None):
+            , workspace=None, title=''):
         """
         Initialize a FVS variant library.
         """
@@ -88,6 +88,7 @@ class FVS(object):
         self.bootstrap = bootstrap
         self.cleanup = cleanup
         self.workspace = workspace
+        self.title = title
 
         self.root = None
         self.keywords_file = None
@@ -430,6 +431,9 @@ class FVS(object):
         Returns:
             keywords: An initialized KeywordSet object
         """
+        if not title:
+            title = self.title
+
         if not title:
             now = datetime.datetime.strftime(
                     datetime.datetime.now(), '%Y%m%d_%H%M%S')
