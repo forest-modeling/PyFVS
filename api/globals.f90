@@ -4,10 +4,6 @@
 module globals
     implicit none
 
-    ! Values to be set by the compiler
-    character(len=11), parameter :: compile_date = __DATE__
-    character(len=8), parameter :: compile_time = __TIME__
-
     character(len=4) :: svn
 
     INCLUDE 'INCLUDESVN.F90'
