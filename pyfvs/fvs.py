@@ -76,6 +76,24 @@ class FVS(object):
        # Return a tuple of species codes given an FVS ID using the FVS API.
        spp_attrs = fvs.fvsspeciescode(16)
     """
+
+    # Field map used to rename inventory to FVS tree attributes
+    # FVS array : Input field
+    inventory_field_map = dict(
+        plot_id='plot_id'
+        , tree_id='tree_id'
+        , history='history'
+        , prob='prob'
+        , species='species'
+        , diameter='diameter'
+        , diameter_growth='diameter_growth'
+        , height='height'
+        , total_height='total_height'
+        , height_growth='height_growth'
+        , crown='crown'
+        , age='age'
+    )
+
     def __init__(self, variant, stochastic=False, bootstrap=0, cleanup=True, treelist_format=None
             , workspace=None, title=''):
         """
@@ -152,7 +170,6 @@ class FVS(object):
             , rev_date = self.fvslib.revise(self.variant).strip().decode()
             )
 
-
     # @property
     # def trees(self):
     #     deprecation('FVS.trees is deprecated. Use FVS.fvs_trees or FVS.inventory_trees')
@@ -164,7 +181,7 @@ class FVS(object):
         A dataframe of inventory tree records.
 
         Columns correspond to the description in Essential FVS section 4.2:
-            (plot_id,tree_id,prob,tree_history,species,dbh,dg_incr
+            (plot_id,tree_id,prob,history,species,dbh,dg_incr
                 ,live_ht,trunc_ht,htg_incr,crown_ratio,
                 ,dmg1,svr1,dmg2,svr2,dmg3,svr3
                 ,value_class
@@ -181,24 +198,31 @@ class FVS(object):
         ## TODO: Check for required fields
         ## TODO: Defer loading arrays until the simulation is started
 
-        ## FVS array : Input field
-        field_map = dict(
-            plot_id='plot_id'
-            , tree_id='tree_id'
-            , history='history'
-            , prob='prob'
-            , species='species'
-            , diameter='diameter'
-            , diameter_growth='diameter_growth'
-            , height='height'
-            , total_height='total_height'
-            , height_growth='height_growth'
-            , crown='crown'
-            , age='age'
-        )
+        required = ['plot_id','tree_id','species','prob','diameter']
+        optional = ['history','height','crown','age','diameter_growth','height_growth']
 
-        trees = trees.loc[:,field_map.values()].copy()
-        trees.rename(columns={v:k for k,v in field_map.items()}, inplace=True)
+        # trees = trees.loc[:,field_map.values()].copy()
+        trees.rename(columns={v:k for k,v in self.inventory_field_map.items()}, inplace=True)
+
+        # Check for required columns
+        cols = list(trees.columns)
+        missing = [c for c in required if not c in cols]
+        if missing:
+            msg = f'Required columns missing from tree records: {missing}'
+            raise KeyError(msg)
+
+        # Warn about missing optional columns
+        missing = [c for c in optional if not c in cols]
+        if missing:
+            msg = f'** Optional columns missing from tree records: {missing}'
+            print(msg)
+
+        # Assign zeros to missing optional attributes
+        for col in missing:
+            trees[col] = 0
+
+        # Fill missing values with zeros
+        trees.fillna(0, inplace=True)
 
         # Now load the arrays
         inv = self.fvslib.inventory_trees
@@ -208,7 +232,7 @@ class FVS(object):
         inv.plot_id = trees['plot_id']
         inv.tree_id = trees['tree_id'] #.astype(int)
 
-        inv.tree_status = trees['history']
+        inv.history = trees['history']
 
         inv.trees = trees['prob']
         inv.species[:nrows] = trees['species']
@@ -216,28 +240,19 @@ class FVS(object):
         inv.diameter_growth = trees['diameter_growth']
         inv.height = trees['height']
 
-        # # Broken and dead tops have actualht<height
-        # tht = np.zeros(n)
-        # m = plot_trees['actualht']<plot_trees['ht']
-        # tht[m] = plot_trees['actualht'][m]
-        # inv.total_height = tht
+        # # # Broken and dead tops have actualht<height
+        # # tht = np.zeros(n)
+        # # m = plot_trees['actualht']<plot_trees['ht']
+        # # tht[m] = plot_trees['actualht'][m]
+        # # inv.total_height = tht
 
-        inv.height_growth = trees['height_growth']
-        inv.crown_ratio = trees['crown']
-        inv.tree_age = trees['age']
+        # inv.height_growth = trees['height_growth']
+        # inv.crown_ratio = trees['crown']
+        # inv.tree_age = trees['age']
 
         ## TODO: Add damage/severity columns
 
-        # # check for required fields
-        # rqd = ['plot_id','tree_id','tree_count','species','diameter']
-        # missing = [fld for fld in rqd if not fld in trees.columns]
-        # if missing:
-        #     raise ValueError(
-        #             'Inventory trees missing required fields: '
-        #             '{}'.format(str(missing)))
-
-        # print(trees)
-        self._inventory_trees = trees
+        # self._inventory_trees = trees
 
     def _load_fvslib(self):
         """
@@ -481,6 +496,7 @@ class FVS(object):
             self.root = os.path.join(self.workspace, fn)
             if not os.path.exists(self.root):
                 os.makedirs(self.root)
+                self._artifacts.append(self.root)
 
             keywords_fn = os.path.join(
                     self.root
@@ -583,7 +599,7 @@ class FVS(object):
         if self.fvs_step.sim_status <= 0:
             self.init_projection()
 
-        if not cycles:
+        if cycles<=0:
             cycles = self.num_cycles - self.current_cycle
 
         r = -1
@@ -620,7 +636,7 @@ class FVS(object):
 #                 try: os.remove(a)
 #                 except: pass
                 try:
-                    if os.path.exists(a) and os.path.isdir(a):
+                    if os.path.isdir(a):
                         shutil.rmtree(a)
                         if a == self._workspace:
                             self._workspace = None

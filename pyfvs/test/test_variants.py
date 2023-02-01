@@ -12,7 +12,7 @@ import numpy as np
 import pyfvs
 from pyfvs import fvs
 
-variants = [('pnc',), ('wcc',), ('soc',), ('cac',), ('oc',), ('op',), ('cac',), ('ecc',)]
+variants = [('pnc',), ('wcc',), ('soc',), ('cac',), ('oc',), ('op',), ('cac',), ('ecc',)]#, ('ncc',)]
 
 root = os.path.split(__file__)[0]
 bare_ground_params = [
@@ -23,6 +23,7 @@ bare_ground_params = [
         ['ecc', 'rmrs/ec_bareground.key', 'rmrs/ec_bareground.sum.save'],
         ['oc', 'rmrs/oc_bareground.key', 'rmrs/oc_bareground.sum.save'],
         ['op', 'rmrs/op_bareground.key', 'rmrs/op_bareground.sum.save'],
+        # ['nc', 'rmrs/nc_bareground.key', 'rmrs/nc_bareground.sum.save'],
         ]
 
 @pytest.mark.parametrize(('variant',), variants)

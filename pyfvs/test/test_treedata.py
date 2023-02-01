@@ -23,6 +23,7 @@ bare_ground_params = [
         # ['ec', 'rmrs/ec_bareground.key', 'rmrs/ec_bareground.sum.save'],
         ['oc', 'rmrs/oc_bareground.key', 'rmrs/oc_bareground.sum.save'],
         ['op', 'rmrs/op_bareground.key', 'rmrs/op_bareground.sum.save'],
+        # ['nc', 'rmrs/nc_bareground.key', 'rmrs/nc_bareground.sum.save'],
         ]
 
 @pytest.mark.parametrize(('variant', 'kwd_path', 'sum_path'), bare_ground_params)
@@ -121,4 +122,3 @@ def test_tree_data(variant, kwd_path, sum_path):
 if __name__ == '__main__':
     for r in bare_ground_params:
         test_tree_data(*r)
-

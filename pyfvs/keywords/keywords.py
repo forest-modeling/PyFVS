@@ -1862,6 +1862,21 @@ class SDIMAX(KeywordBase):
         self.stagnation = stagnation
         self.kargs = kargs
 
+class BAMAX(KeywordBase):
+    max_baa = IntegerField('Max BAA')
+
+    def __init__(self, max_baa=0
+            , **kargs):
+        """
+        Modifies the maximum density and the associated mortality pattern for the stand.
+
+        @param max_baa:  Maximum stand basal area per acre
+        """
+        KeywordBase.__init__(self, 'BAMAX', 'Maximum Stand Basal Area'
+                             , format=0, **kargs)
+
+        self.max_baa = max_baa
+
 class MORTMULT(KeywordBase):
     cycle = IntegerField('First Cycle')
     spp = CharacterField('Species')
@@ -2463,6 +2478,26 @@ class BAIMULT(KeywordBase):
         self.period = period
         self.species = species
         self.multiplier = multiplier
+
+class MODTYPE(KeywordBase):
+    """
+    Specifies the variant’s model type, the physiographic region and the forest type.
+    """
+    model_type = IntegerField('Model Type')
+    field2 = NullField()
+    forest_type = IntegerField('Forest Type')
+
+    def __init__(self, model_type=2, forest_type=None, **kargs):
+        """
+        Specifies the variant’s model type, the physiographic region and the forest type.
+
+        @param model_type:  Variant model subtype code
+        @param forest_type:  Initial FIA forest type code
+        """
+        KeywordBase.__init__(self, 'MODTYPE', 'Variant model type and initial forest type'
+                             , format=0, **kargs)
+        self.model_type = model_type
+        self.forest_type = forest_type
 
 # TODO: Fix readcord
 class READCORD(KeywordBase):

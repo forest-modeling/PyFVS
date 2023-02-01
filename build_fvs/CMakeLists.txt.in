@@ -62,8 +62,8 @@ set (main_src)
 
 file(STRINGS sourcelist.txt source_files)
 
-set(src_exts ".c;.cpp;.f")
-set(incl_exts ".h;.F77")
+set(src_exts ".c;.cpp;.f;.for;.F")
+set(incl_exts ".h;.F77;.INC")
 
 # List of F77 include files to translate to F90
 set(f77_includes)

@@ -58,3 +58,5 @@ dask-worker-space
 *.out
 *.trl
 *.sum
+/_cmake_test_compile
+*.mod
