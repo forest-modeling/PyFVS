@@ -1,9 +1,32 @@
 [build-system]
 # AVOID CHANGING REQUIRES: IT WILL BE UPDATED BY PYSCAFFOLD!
-requires = ["setuptools>=46.1.0", "setuptools_scm[toml]>=5", "wheel", "scikit-build", "cmake", "ninja", "m2w64-gcc-fortran"]
-build-backend = "setuptools.build_meta"
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel", "meson", "meson-python", "ninja"]
+build-backend = "mesonpy"
+
+[project]
+name = "pyfvs"
+description = "Python wrappers and utilities for using the Forest Vegetation Simulator"
+authors = [
+  {name="Tod Haren", email="tod.haren@gmail.com"},
+  ]
+license = {file="LICENSE.txt"}
+readme = {file="README.md", content-type="text/markdown"}
+keywords = ["Forest Modeling", "FVS"]
+
+dynamic = ["version"]
+
+[project.urls]
+repository = "https://github.com/forest-modeling/PyFVS"
+
+[project.scripts]
+pyfvs = "pyfvs.__main__:cli"
 
 [tool.setuptools_scm]
 # For smarter version schemes and other configuration options,
 # check out https://github.com/pypa/setuptools_scm
 version_scheme = "no-guess-dev"
+write_to = "pyfvs/_version.py"
+
+[tool.devpy]
+package = 'pyfvs'  # used by pytest
+commands = ['devpy.build', 'devpy.test']
