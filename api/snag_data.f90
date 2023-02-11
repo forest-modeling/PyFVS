@@ -15,7 +15,7 @@ module snag_data
     integer, dimension(maxcy1,mxsnag) :: spp_seq, year_dead
     integer, dimension(maxcy1) :: num_recs
 
-    save    
+    save
     contains
 
     subroutine copy_snag_data()

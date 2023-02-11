@@ -164,9 +164,9 @@ class FVS(object):
 
         self.version_info = dict(
             variant = self.variant
-            , comp_date = self.fvslib.globals.compile_date.astype(str)
-            , comp_time = self.fvslib.globals.compile_time.astype(str)
-            , rev_tag = self.fvslib.globals.svn.astype(str)
+            , comp_date = '' #self.fvslib.version.compile_date[0].astype(str)
+            , comp_time = '' #self.fvslib.version.compile_time[0].astype(str)
+            , rev_tag = '' #self.fvslib.globals.svn[0].astype(str)
             , rev_date = self.fvslib.revise(self.variant).strip().decode()
             )
 

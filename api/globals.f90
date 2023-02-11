@@ -1,10 +1,13 @@
 ! Load all common blocks and shared variables into a common namespace
 ! Thise provides API level access to shared data
 !
+! GFortran does not allow mixing free and fixed form comments in the
+! same source file. F77 include files are translated to F90 freeform.
+!
 module globals
     implicit none
 
-    character(len=4) :: svn
+    character(len=10) :: svn
 
     INCLUDE 'INCLUDESVN.F90'
 

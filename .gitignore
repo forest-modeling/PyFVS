@@ -60,3 +60,5 @@ dask-worker-space
 *.sum
 /_cmake_test_compile
 *.mod
+.mesonpy
+/.mesonpy-native-file.ini

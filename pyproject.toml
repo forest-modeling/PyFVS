@@ -1,6 +1,13 @@
 [build-system]
 # AVOID CHANGING REQUIRES: IT WILL BE UPDATED BY PYSCAFFOLD!
-requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel", "meson", "meson-python", "ninja"]
+requires = [
+  "setuptools>=45",
+  "setuptools_scm[toml]>=6.2",
+  "wheel",
+  "meson",
+  "meson-python>=0.13.0rc0",
+  "ninja"
+  ]
 build-backend = "mesonpy"
 
 [project]

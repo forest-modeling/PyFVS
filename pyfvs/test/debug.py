@@ -7,7 +7,7 @@ import numpy as np
 import pyfvs
 from pyfvs import fvs
 
-root = r'C:\workspace\forest-modeling\PyFVS\pyfvs\test'
+root = os.path.split(__file__)[0]
 variant = 'pn'
 kwd_path = f'{root}/rmrs/{variant}_bareground.key'
 sum_path = f'{root}/rmrs/{variant}_bareground.sum.save'

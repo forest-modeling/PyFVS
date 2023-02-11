@@ -2,7 +2,7 @@
 # Adapted from SciPy, https://github.com/scipy/scipy/blob/main/meson.build
 
 project(
-  'PyFVS',
+  'pyfvs',
   'c', 'cpp',
   meson_version: '>= 0.64.0',
   default_options : [
@@ -12,12 +12,18 @@ project(
     'fortran_std=legacy',
     #'blas=openblas',
     #'lapack=openblas'
-    ]
+    ],
+  # version: run_command('python -m setuptools_scm', check:true).stdout().strip().split('+')[0],
+  version: '0.3.0.dev0'
   )
 
 fs = import('fs')
 
-variants = ['pn',] #'wc','so','op','oc','ec','ca','nc']
+# variants = ['pn',]#'wc','so','op','oc','ec','ca','nc']
+# variants can be set in meson_options.txt or with command line arguments '-Dfvsvariants=pn,wc,op'
+variants = get_option('fvsvariants')
+message('Building FVS variants: @0@'.format(variants))
+
 project_folder = meson.project_source_root()
 
 sqlite_c_args = ['-DSQLITE_THREADSAFE=0','-DSQLITE_OMIT_LOAD_EXTENSION']
@@ -49,19 +55,42 @@ py3_dep = py3.dependency()
 message(py3.full_path())
 message(py3.get_install_dir())
 
+
 if ff.get_id() == 'gcc'
   add_global_arguments(
-    '-DMS_WIN64',
     '-DCMPgcc',
     '-DANSI',
-    '-DWINDOWS',
     language:['c','fortran']
     )
   add_project_arguments(
       '-cpp',
       language: 'fortran',
     )
+
+  if is_windows
+    add_global_arguments(
+      '-DWINDOWS',
+      '-DMS_WIN64',
+      language:['c','fortran']
+    )
+  else
+    # TODO: Add elif for Intel Compilers, and Mac
+    add_global_arguments(
+      '-Dunix',
+      language:['c','fortran']
+    )
+
+  endif
 endif
+
+# src_prefix = '../../'
+src_prefix = ''
+
+f90_gen = generator(
+  py3,
+  output: '@BASENAME@.F90',
+  arguments: ['_build_utils/convert_f77.py','@INPUT@', '@OUTPUT@']
+)
 
 ############## From scipy/meson.build subdir ###################
 # Platform detection
@@ -78,12 +107,16 @@ if is_windows
     add_project_arguments('-mlong-double-64', language: 'c')
     # Make fprintf("%zd") work (see https://github.com/rgommers/scipy/issues/118)
     add_project_arguments('-D__USE_MINGW_ANSI_STDIO=1', language: ['c', 'cpp'])
+
     # Manual add of MS_WIN64 macro when not using MSVC.
     # https://bugs.python.org/issue28267
-    bitness = run_command('_build_utils/gcc_build_bitness.py', check:true).stdout().strip()
-    if bitness == '64'
+    # NOTE: gcc -v reports to stderr not stdout
+    target = run_command('gcc','-v', check:true).stderr().strip().to_lower()
+    if target.contains('target: x86_64')
+      message('*** Add MS_WIN64 compiler flag')
       add_project_arguments('-DMS_WIN64', language: ['c', 'cpp', 'fortran'])
     endif
+
     # Silence warnings emitted by PyOS_snprintf for (%zd), see
     # https://github.com/rgommers/scipy/issues/118.
     # Use as c_args for extensions containing Cython code
@@ -101,7 +134,9 @@ if is_windows
 endif
 
 # add_project_arguments('-fno-second-underscore', language:'fortran')
-add_project_link_arguments('-Wl,--add-stdcall-alias', language:['c','fortran'])
+if is_windows
+  add_project_link_arguments('-Wl,--add-stdcall-alias', language:['c','fortran'])
+endif
 
 thread_dep = dependency('threads', required: false)
 
@@ -109,7 +144,7 @@ thread_dep = dependency('threads', required: false)
 incdir_numpy = run_command(py3,
   [
     '-c',
-    'import os; os.chdir(".."); import numpy; print(numpy.get_include())'
+    'import os; import numpy; os.chdir(".."); print(numpy.get_include())'
   ],
   check: true
 ).stdout().strip()
@@ -118,7 +153,7 @@ message(incdir_numpy)
 inc_np = include_directories(incdir_numpy)
 
 incdir_f2py = run_command(py3,
-    ['-c', 'import os; os.chdir(".."); import numpy.f2py; print(numpy.f2py.get_include())'],
+    ['-c', 'import os; import numpy.f2py; print(numpy.f2py.get_include())'],
     check : true
 ).stdout().strip()
 message(incdir_f2py)
@@ -199,6 +234,7 @@ foreach variant : variants
 
   h_include_dirs = []
   f77_include_dirs = []
+  f77_include_files = [] # Include files to be transformed to F90 and then included in globals.f90
   inc_include_dirs = []
   f90_inc_dirs = []
 
@@ -240,12 +276,14 @@ foreach variant : variants
       for_sources += f
     elif f.to_lower().endswith('.f90')
       f90_sources += f
-      if d not in f90_include_dirs
-        f90_include_dirs += d
+      ## FIXME: generated F90 files should be included as a generator
+      if d not in f90_inc_dirs
+        f90_inc_dirs += d
       endif
 
     # Include folders
     elif f.to_lower().endswith('.f77')
+      f77_include_files += f
       if d not in f77_include_dirs
         f77_include_dirs += d
       endif
@@ -262,6 +300,17 @@ foreach variant : variants
   endforeach
 
   #####################
+
+  # # Translate F77 to F90 includes for use in globals.f90
+  # f90_include_files = f90_gen.process(
+  #   f77_include_files
+  # )
+
+  # foreach f: f90_include_files
+  #   if d not in f90_include_dirs
+  #     f90_include_dirs += d
+  #   endif
+  # endforeach
 
   # Add variant specific wrappers
   if variant in ['pn','wc']
@@ -308,15 +357,19 @@ foreach variant : variants
 
   # F2PY command executes one level deeper, so change the include paths
   f2py_inc_dirs = []
-  foreach d : f90_inc_dirs + f77_include_dirs
+  foreach d : f77_include_dirs + f90_inc_dirs
     if d.startswith('api')
-      d = '..' / d
+      d = project_folder / d
     elif d.startswith('fvs')
-      d = '..' / d
+      d = project_folder / d
     endif
     f2py_inc_dirs += d
   endforeach
 
+  f2py_path_sep = ':'
+  if is_windows
+    f2py_path_sep = ';'
+  endif
   cmd = [
       py3.full_path(), '-m', 'numpy.f2py',
       '-m', lib_name,
@@ -324,7 +377,7 @@ foreach variant : variants
       # '--overwrite-signature',
       '--lower',
       # '--f2cmap',
-      '--include-paths',';'.join(f2py_inc_dirs),
+      '--include-paths', f2py_path_sep.join(f2py_inc_dirs),
       '@INPUT@',
       # 'skip: fvssetcmdlinec :'
       ]
@@ -363,8 +416,18 @@ foreach variant : variants
     c_args : [numpy_nodepr_api,] + sqlite_c_args,
     fortran_args : fortran_ignore_warnings,
     install : true,
-    install_dir : 'pyfvs'
+    # install_dir : 'pyfvs',
+    subdir: 'pyfvs'
     )
+
+    # # Declare f90_include_files dependencies
+    # f90_gen_files = declare_dependency(
+    #   sources: f90_include_files,
+    #   objects: f2py_source
+    # )
+
 
 # End variant loop
 endforeach
+
+subdir('pyfvs')
