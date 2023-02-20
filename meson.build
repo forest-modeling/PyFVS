@@ -86,11 +86,11 @@ endif
 # src_prefix = '../../'
 src_prefix = ''
 
-f90_gen = generator(
-  py3,
-  output: '@BASENAME@.F90',
-  arguments: ['_build_utils/convert_f77.py','@INPUT@', '@OUTPUT@']
-)
+# f90_gen = generator(
+#   py3,
+#   output: '@BASENAME@.F90',
+#   arguments: [meson.project_source_root() / '_build_utils/convert_f77.py','@INPUT@', '@OUTPUT@', '@OUTDIR@']
+# )
 
 ############## From scipy/meson.build subdir ###################
 # Platform detection
@@ -301,12 +301,22 @@ foreach variant : variants
 
   #####################
 
-  # # Translate F77 to F90 includes for use in globals.f90
+  # FIXME: Need to capture the output folder of generated source files
+  #        Can't foreach the generator output list
+  # Translate F77 to F90 includes for use in globals.f90
   # f90_include_files = f90_gen.process(
   #   f77_include_files
+  #   , preserve_path_from : meson.current_source_dir()
   # )
 
-  # foreach f: f90_include_files
+  # # Declare f90_include_files dependencies
+  # f90_gen_files = declare_dependency(
+  #   sources: f90_include_files
+  # )
+
+  # foreach f77: f77_include_files
+  #   f90 = f90_gen.process(f77)
+  #   d = fs.parent(f90)
   #   if d not in f90_include_dirs
   #     f90_include_dirs += d
   #   endif
@@ -342,7 +352,7 @@ foreach variant : variants
   # f90_sources += 'api/test.f90'
 
   ## TODO: Auto-generate F90 includes from F77
-  f90_inc_dirs += 'api/gen' / variant / 'include'
+  f90_inc_dirs += 'api/gen/@0@/include'.format(variant)
 
   #####################
 
@@ -365,6 +375,8 @@ foreach variant : variants
     endif
     f2py_inc_dirs += d
   endforeach
+
+  f2py_inc_dirs += get_option('prefix') / get_option('localstatedir')
 
   f2py_path_sep = ':'
   if is_windows
@@ -389,6 +401,7 @@ foreach variant : variants
     mod_c_wrap,
     input : api_sources,
     output : [mod_c_wrap, mod_f_wrap, mod_f90_wrap],
+    # depends: [f90_gen_files],
     command : cmd,
     install : false
     )
@@ -399,6 +412,7 @@ foreach variant : variants
   fvs_static_lib = static_library(
     lib_name,
     c_sources + cpp_sources + f_sources + for_sources + f90_sources,
+    # dependencies: f90_gen_files,
     include_directories : fvs_include_dirs,
     c_args : variant_args,
     fortran_args : variant_args,
@@ -420,13 +434,10 @@ foreach variant : variants
     subdir: 'pyfvs'
     )
 
-    # # Declare f90_include_files dependencies
-    # f90_gen_files = declare_dependency(
+    # declare_dependency(
     #   sources: f90_include_files,
-    #   objects: f2py_source
+    #   link_with: [fvs_static_lib, f2py_source]
     # )
-
-
 # End variant loop
 endforeach
 

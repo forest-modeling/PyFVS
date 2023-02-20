@@ -53,7 +53,6 @@ MANIFEST
 .conda*/
 .python-version
 /_skbuild
-/api/gen
 dask-worker-space
 *.out
 *.trl

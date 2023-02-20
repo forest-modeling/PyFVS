@@ -1,0 +1,8 @@
+!CODE SEGMENT INCLUDESVN
+!C----------
+!C COMMON
+!C----------
+!C
+      DATA SVN/"FS2023.1"/
+!C
+!C-----END SEGMENT
