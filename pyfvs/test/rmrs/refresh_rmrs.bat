@@ -3,7 +3,7 @@
 
 set fvs_bin=c:\fvsbin
 
-set variants=pn wc so ca op oc ec
+set variants=pn wc so ca op oc ec bm nc
 
 for %%v in (%variants%) do call :run_fvs %%v
 goto end

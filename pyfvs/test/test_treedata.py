@@ -20,10 +20,11 @@ bare_ground_params = [
         ['wc', 'rmrs/wc_bareground.key', 'rmrs/wc_bareground.sum.save'],
         ['so', 'rmrs/so_bareground.key', 'rmrs/so_bareground.sum.save'],
         ['ca', 'rmrs/ca_bareground.key', 'rmrs/ca_bareground.sum.save'],
-        # ['ec', 'rmrs/ec_bareground.key', 'rmrs/ec_bareground.sum.save'],
+        ['ec', 'rmrs/ec_bareground.key', 'rmrs/ec_bareground.sum.save'],
         ['oc', 'rmrs/oc_bareground.key', 'rmrs/oc_bareground.sum.save'],
         ['op', 'rmrs/op_bareground.key', 'rmrs/op_bareground.sum.save'],
         # ['nc', 'rmrs/nc_bareground.key', 'rmrs/nc_bareground.sum.save'],
+        # ['bm', 'rmrs/bm_bareground.key', 'rmrs/bm_bareground.sum.save'],
         ]
 
 @pytest.mark.parametrize(('variant', 'kwd_path', 'sum_path'), bare_ground_params)
