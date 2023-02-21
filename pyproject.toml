@@ -2,11 +2,11 @@
 # AVOID CHANGING REQUIRES: IT WILL BE UPDATED BY PYSCAFFOLD!
 requires = [
   "setuptools>=45",
-  "setuptools_scm[toml]>=6.2",
+#  "setuptools_scm[toml]>=6.2",
   "wheel",
-  "meson",
-  "meson-python>=0.13.0rc0",
-  "ninja"
+#  "meson",
+#  "meson-python>=0.13.0rc0",
+#  "ninja"
   ]
 build-backend = "mesonpy"
 
@@ -31,7 +31,8 @@ pyfvs = "pyfvs.__main__:cli"
 [tool.setuptools_scm]
 # For smarter version schemes and other configuration options,
 # check out https://github.com/pypa/setuptools_scm
-version_scheme = "no-guess-dev"
+version_scheme = "post-release"
+# version_scheme = "guess-next-dev"
 write_to = "pyfvs/_version.py"
 
 [tool.devpy]

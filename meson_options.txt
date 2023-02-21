@@ -1,5 +1,5 @@
 option('fvsvariants', type: 'array',
   choices: ['pn','wc','so','op','oc','ec','ca','nc'],
-  value: ['pn','wc'],
+  value: ['pn','wc','so','op','oc','ec','ca','nc'],
   description: 'FVS variants to build'
   )

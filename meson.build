@@ -13,16 +13,19 @@ project(
     #'blas=openblas',
     #'lapack=openblas'
     ],
-  # version: run_command('python -m setuptools_scm', check:true).stdout().strip().split('+')[0],
-  version: '0.3.0.dev0'
+  version: run_command('python','-m','setuptools_scm', check:true).stdout().strip().split('+')[0],
+  # version: '0.3.0.dev0'
   )
 
 fs = import('fs')
 
-# variants = ['pn',]#'wc','so','op','oc','ec','ca','nc']
+variants = ['pn','wc','so','op','oc','ec','ca','nc','bm']
 # variants can be set in meson_options.txt or with command line arguments '-Dfvsvariants=pn,wc,op'
-variants = get_option('fvsvariants')
+# variants = get_option('fvsvariants')
+
+message('******************************************************************')
 message('Building FVS variants: @0@'.format(variants))
+message('******************************************************************')
 
 project_folder = meson.project_source_root()
 
