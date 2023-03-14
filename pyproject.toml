@@ -37,4 +37,4 @@ write_to = "pyfvs/_version.py"
 
 [tool.devpy]
 package = 'pyfvs'  # used by pytest
-commands = ['devpy.build', 'devpy.test']
+commands = ['devpy.cmds.meson.build', 'devpy.cmds.meson.test']
