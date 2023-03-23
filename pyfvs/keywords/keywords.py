@@ -567,6 +567,10 @@ class KeywordSet(object):
 
 #         for keyword in self.items:
 #             s += '%s\n' % keyword.__str__()  # .strip()
+        ## FIXME: Strings added to items are being printed with extra line feeds
+        # for item in self.items:
+        #     if isinstance(item, (KeywordBase,)):
+        #         s += str(item)
         s += '\n'.join(str(i) for i in self.items)
         s += '\n'
 

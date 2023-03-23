@@ -1,14 +1,17 @@
 """
-Convert F77 fixed-form include files to F90 free-form
+Generate the globals.f90 module from F77 include files
 """
 
 import os
 import sys
 import re
 
-def convert(input, output):
+def f77_to_f90(source):
+  """
+  Return f90 compatible code from a legacy fixed-format F77 file
+  """
   # print('*****', input, output, outdir)
-  src = open(input).readlines()
+  src = open(source).readlines()
 
   # Strip newlines and trailing whitespace
   src = [l.rstrip() for l in src]
@@ -36,10 +39,10 @@ def convert(input, output):
   # Add back the newlines
   src = [l + '\n' for l in src]
 
-  with open(f'{output}', 'w') as f:
-    f.writelines(src)
+  return src
 
-def process_source(srclist, outdir):
+
+def process_source(srclist, outfile):
   print(f'Process source list: {srclist}')
   src_files = [f.strip() for f in open(srclist).readlines()]
   f77_src = [f for f in src_files if f.endswith('.F77')]
@@ -56,10 +59,3 @@ def process_source(srclist, outdir):
     outpath = f'{outdir}/{fn}.F90'
     print(inpath, outpath)
     convert(inpath, outpath)
-
-if __name__=='__main__':
-  if sys.argv[1].lower().endswith('sourcelist.txt'):
-    process_source(sys.argv[1], sys.argv[2])
-
-  else:
-    convert(sys.argv[1], sys.argv[2])

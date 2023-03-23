@@ -26,7 +26,7 @@ def bg_kwds():
     kwds += kw.MANAGED(0, True)
     kwds += kw.INVYEAR(2010)
     kwds += kw.DESIGN(0, 1, 999, 1, 0, 1, 1)
-    kwds += kw.NUMCYCLE(10)
+    kwds += kw.NUMCYCLE(40)
     kwds += kw.NOTREES()
 
     estab = kw.ESTAB(2010)
@@ -71,4 +71,3 @@ if __name__ == "__main__":
     unittest.main()
 #     kwds = bg_kwds()
 #     print(kwds)
-

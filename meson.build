@@ -19,7 +19,7 @@ project(
 
 fs = import('fs')
 
-variants = ['pn','wc','so','op','oc','ec','ca','nc','bm']
+variants = ['pn',]#'op','wc'] #,'so','oc','ec','ca','nc','bm']
 # variants can be set in meson_options.txt or with command line arguments '-Dfvsvariants=pn,wc,op'
 # variants = get_option('fvsvariants')
 
@@ -58,7 +58,6 @@ py3_dep = py3.dependency()
 message(py3.full_path())
 message(py3.get_install_dir())
 
-
 if ff.get_id() == 'gcc'
   add_global_arguments(
     '-DCMPgcc',
@@ -89,11 +88,11 @@ endif
 # src_prefix = '../../'
 src_prefix = ''
 
-# f90_gen = generator(
-#   py3,
-#   output: '@BASENAME@.F90',
-#   arguments: [meson.project_source_root() / '_build_utils/convert_f77.py','@INPUT@', '@OUTPUT@', '@OUTDIR@']
-# )
+f90_gen = generator(
+  py3,
+  output: '@BASENAME@.F90',
+  arguments: [meson.project_source_root() / '_build_utils/convert_f77.py','@INPUT@', '@OUTPUT@', '@OUTDIR@']
+)
 
 ############## From scipy/meson.build subdir ###################
 # Platform detection
@@ -225,6 +224,15 @@ foreach variant : variants
     ).stdout().strip()
   source_files = source_files.split('\n')
 
+  # # Generate the F90 include files
+  # ## TODO: This should be re-run as a dependency
+  # run_command(
+  #   py3,
+  #   '_build_utils\convert_f77.py',
+  #   source_fn,
+  #   'api\gen\@0@\include'.format(variant),
+  #   )
+
   # Compiler arguments, preprocessor directives, per variant
   variant_args = []
 
@@ -237,7 +245,8 @@ foreach variant : variants
 
   h_include_dirs = []
   f77_include_dirs = []
-  f77_include_files = [] # Include files to be transformed to F90 and then included in globals.f90
+  f77_include_files = []
+  f90_include_files = [] # Include files transformed from F77 to F90, available to included in globals.f90
   inc_include_dirs = []
   f90_inc_dirs = []
 
@@ -279,10 +288,10 @@ foreach variant : variants
       for_sources += f
     elif f.to_lower().endswith('.f90')
       f90_sources += f
-      ## FIXME: generated F90 files should be included as a generator
-      if d not in f90_inc_dirs
-        f90_inc_dirs += d
-      endif
+      # ## FIXME: generated F90 files should be included as a generator
+      # if d not in f90_inc_dirs
+      #   f90_inc_dirs += d
+      # endif
 
     # Include folders
     elif f.to_lower().endswith('.f77')
@@ -303,6 +312,15 @@ foreach variant : variants
   endforeach
 
   #####################
+
+  convert_f77 = files('_build_utils/convert_f77.py')
+  foreach src: f77_include_files
+    configure_file(
+      input: src,
+      output: '@BASENAME@.F90'.format(src),
+      command: [py3, convert_f77, '@INPUT@', '@OUTPUT@'],
+    )
+  endforeach
 
   # FIXME: Need to capture the output folder of generated source files
   #        Can't foreach the generator output list
@@ -354,8 +372,13 @@ foreach variant : variants
   # f90_sources += 'api/foo.f90'
   # f90_sources += 'api/test.f90'
 
-  ## TODO: Auto-generate F90 includes from F77
-  f90_inc_dirs += 'api/gen/@0@/include'.format(variant)
+  # ## TODO: Auto-generate F90 includes from F77
+  # f90_inc_dirs += 'api/gen/@0@/include'.format(variant)
+
+  # # Add the include folders as a dependency to trigger
+  # inc_dep = declare_dependency(
+  #   include_directories: f90_inc_dirs + f77_include_dirs
+  # )
 
   #####################
 
@@ -370,7 +393,8 @@ foreach variant : variants
 
   # F2PY command executes one level deeper, so change the include paths
   f2py_inc_dirs = []
-  foreach d : f77_include_dirs + f90_inc_dirs
+  basedir = meson.current_source_dir()
+  foreach d : f77_include_dirs #+ f90_inc_dirs
     if d.startswith('api')
       d = project_folder / d
     elif d.startswith('fvs')
@@ -380,6 +404,7 @@ foreach variant : variants
   endforeach
 
   f2py_inc_dirs += get_option('prefix') / get_option('localstatedir')
+  # f2py_inc_dirs = include_directories(f77_include_dirs)
 
   f2py_path_sep = ':'
   if is_windows
@@ -402,9 +427,9 @@ foreach variant : variants
   # Call the F2PY command and collect outputs
   f2py_source = custom_target(
     mod_c_wrap,
-    input : api_sources,
+    input : api_sources, # + f90_include_files + f77_include_files,
     output : [mod_c_wrap, mod_f_wrap, mod_f90_wrap],
-    # depends: [f90_gen_files],
+    # dependencies : [f90_include_files,],
     command : cmd,
     install : false
     )
@@ -422,6 +447,11 @@ foreach variant : variants
     install : false,
     )
 
+  # f90_inc_dep = declare_dependency(
+  #   sources: [f90_include_files, f77_include_files]
+  #   # link_with: [fvs_static_lib, f2py_source]
+  # )
+
   fvs_py_extension = py3.extension_module(
     lib_name,
     f2py_source,
@@ -437,10 +467,6 @@ foreach variant : variants
     subdir: 'pyfvs'
     )
 
-    # declare_dependency(
-    #   sources: f90_include_files,
-    #   link_with: [fvs_static_lib, f2py_source]
-    # )
 # End variant loop
 endforeach
 

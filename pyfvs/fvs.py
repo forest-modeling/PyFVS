@@ -544,8 +544,14 @@ class FVS(object):
         r = self.fvs_step.fvs_init(keywords_fn)
 
         # TODO: Handle and format error codes
+        fvs_error_codes = {
+            1: 'INVALID KEYWORD WAS SPECIFIED',
+            2: 'NO "STOP" RECORD IN KEYWORD FILE',
+        }
         if not r == 0:
-            log.error(f'FVS returned non-zero: {r}\n{keywords_fn}')
+            err = fvs_error_codes.get(r, 'Unknown')
+            msg = f'FVS Error {r}: {err}\n{keywords_fn}'
+            raise IOError(f'FVS ERROR: {r}\n{keywords_fn}')
 
         if self.stochastic:
             self.set_random_seed()
@@ -605,6 +611,7 @@ class FVS(object):
         r = -1
         for n in range(cycles):
             r = self.fvs_step.fvs_grow()
+            # f.fvslib.globals.iccode
             # TODO: Handle non-zero exit codes
 
         return r

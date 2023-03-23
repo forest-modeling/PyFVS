@@ -9,15 +9,29 @@ Setup on Windows
 
 Install [RTools 4.0](https://cran.r-project.org/bin/windows/Rtools/rtools40.html)
 
+NOTE: Use of distutils for development, packaging, and distribution, Python packaging is moving to Meson.
+NOTE: meson=1.0.0 has a bug in LINK_ARGS with a misplaced reference to "msvcrt", so use "ucrt"
 Add the compiler to the PATH variable
-    > set path=c:\rtools40\mingw64\bin;%PATH%
+    > set path=c:\rtools40\ucrt\bin;%PATH%
 
 Create the conda environment (or pyenv/pip equivalent)
-    > conda create -c conda-forge -n=pyfvs310 python=3.10 numpy pandas openpyxl meson=0.64 ninja click openpyxl
+    # FIXME: Maybe pin meson-python version or get from github
+    > conda create -c conda-forge -n=pyfvs310 python=3.10 meson=0.64 meson-python ninja numpy pandas click openpyxl nomkl confuse pytest build
 
-NOTE: meson=1.0.0 has a bug in LINK_ARGS with a misplaced reference to "msvcrt"
+    # Install meson-python from GitHub
+    >  python -m pip install git+https://github.com/mesonbuild/meson-python.git@7e090a7 --no-deps
 
-NOTE: Use of distutils for development, packaging, and distribution, Python packaging is moving to Meson.
+
+Clone the Repository
+--------------------
+
+    > cd /d c:\workspace
+    > git clone https://github.com/forest-modeling/PyFVS.git pyfvs-dev
+    > cd pyfvs-dev
+    # Pull the FVS submodule
+    > git submodule update --init
+    > git checkout build-dev
+
 
 Development
 -----------
@@ -26,6 +40,12 @@ Create environment and install dependencies
 Use **meson-python** for development.
 As of meson-python >= 0.13.0.rc0 editable installations are available
 
+Generate F90 include files from F77 for inclusion in globals.f90
+Repeat for each variant in the configuration.
+NOTE: This step may be automated in future revision
+
+    > python _build_utils\convert_f77.py .\fvs\bin\FVSpn_sourceList.txt api\gen\pn\include
+
 Install development (editable) mode
 
     > python -m pip install --no-build-isolation -e .
@@ -33,6 +53,8 @@ Install development (editable) mode
 To see verbose build progress and output
 
     > python -m pip install --no-build-isolation -v -e . --config-settings editable-verbose=true
+
+    ## TODO: Figure out how to pass fvsvariants configuration setting
 
 NOTE: In editable mode meson-python calls meson/ninja each time pyfvs is imported
 
@@ -44,7 +66,9 @@ Test
 Build Wheels
 ------------
 
-    > python -m pip wheel --no-build-isolation -v -w dist --config-settings builddir=build_py310 .
+    > python -m build --no-isolation
+
+    ##> python -m pip wheel --no-build-isolation -v -w dist --config-settings builddir=build_py310 .
 
 Build
 -----
