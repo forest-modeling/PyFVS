@@ -1,0 +1,45 @@
+! Load all common blocks and shared variables into a common namespace
+! Thise provides API level access to shared data
+!
+! GFortran does not allow mixing free and fixed form comments in the
+! same source file. F77 include files are translated to F90 freeform.
+!
+module globals
+    implicit none
+
+    character(len=10) :: svn
+
+    INCLUDE '@variant@_INCLUDESVN.F90'
+
+    INCLUDE '@variant@_PRGPRM.F90'
+    ! INCLUDE '@variant@_CONTRL.F90'
+    INCLUDE '@variant@_COEFFS.F90'
+    INCLUDE '@variant@_ESPARM.F90'
+    INCLUDE '@variant@_ESCOMN.F90'
+    INCLUDE '@variant@_ESTREE.F90'
+    INCLUDE '@variant@_PDEN.F90'
+    INCLUDE '@variant@_ECON.F90'
+    INCLUDE '@variant@_HTCAL.F90'
+    INCLUDE '@variant@_CONTRL.F90'
+    INCLUDE '@variant@_PLOT.F90'
+    INCLUDE '@variant@_RANCOM.F90'
+    INCLUDE '@variant@_SCREEN.F90'
+    INCLUDE '@variant@_VARCOM.F90'
+    INCLUDE '@variant@_FVSSTDCM.F90'
+    INCLUDE '@variant@_STDSTK.F90'
+
+    INCLUDE '@variant@_OPCOM.F90'
+
+    INCLUDE '@variant@_ARRAYS.F90'
+    INCLUDE '@variant@_OUTCOM.F90'
+    INCLUDE '@variant@_WORKCM.F90'
+
+    INCLUDE '@variant@_FMPARM.F90'
+    INCLUDE '@variant@_FMCOM.F90'
+    INCLUDE '@variant@_FMFCOM.F90'
+
+    save
+
+    contains
+
+end module globals

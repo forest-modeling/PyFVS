@@ -74,7 +74,6 @@ Build
 -----
 
 
-
     #> python setup.py develop --no-deps -- -DFVS_VARIANTS=pn,wc
     #> meson setup build_py310 --prefix=%CD%\build_py310\Lib\site-packages
     #> ninja -C build_py310
@@ -89,7 +88,7 @@ Test
 
 Folders
 -------
-    open-fvs: Source code from the Open-FVS project
+    fvs: Source code from the Open-FVS project
     build_fvs: CMake scripts to build open-fvs
     cmake: Scikit-Build CMake scripts
     pyfvs: PyFVS package root

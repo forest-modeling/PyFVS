@@ -31,10 +31,10 @@ install_data(
 
 ## TODO: Install FVS FMSC tests
 
-install_subdir(
-  'test',
-  install_dir: py3.get_install_dir() / 'pyfvs',
-  # exclude_files: exclude_files,
-  exclude_directories : ['__pycache__','.pytest_cache','notebooks'], #,'reg_test','fia_test','api_test']
-  # exclude_directories: exclude_dirs,
-  )
+# install_subdir(
+#   'test',
+#   install_dir: py3.get_install_dir() / 'pyfvs',
+#   # exclude_files: exclude_files,
+#   exclude_directories : ['__pycache__','.pytest_cache','notebooks'], #,'reg_test','fia_test','api_test']
+#   # exclude_directories: exclude_dirs,
+#   )

@@ -19,7 +19,9 @@ project(
 
 fs = import('fs')
 
-variants = ['pn',]#'op','wc'] #,'so','oc','ec','ca','nc','bm']
+# variants = ['pn','op','wc','ca'] #,'so','oc','ec','nc','bm']
+# variants = ['pn',]
+variants = ['pn','wc','ca','so']
 # variants can be set in meson_options.txt or with command line arguments '-Dfvsvariants=pn,wc,op'
 # variants = get_option('fvsvariants')
 
@@ -317,7 +319,7 @@ foreach variant : variants
   foreach src: f77_include_files
     configure_file(
       input: src,
-      output: '@BASENAME@.F90'.format(src),
+      output: variant + '_@BASENAME@.F90'.format(src),
       command: [py3, convert_f77, '@INPUT@', '@OUTPUT@'],
     )
   endforeach
@@ -356,9 +358,21 @@ foreach variant : variants
 
   #####################
 
+  conf_data = configuration_data()
+  conf_data.set('variant', variant)
+  configure_file(
+    input: 'api/globals.f90.in',
+    output: variant + '_globals.f90',
+    configuration: conf_data
+  )
+
+  # f90_sources += variant + '_globals.f90'
+  f90_sources += join_paths(meson.project_build_root(), variant + '_globals.f90')
+
   # Additional API files to compile
   f90_sources += 'api/version.f90'
-  f90_sources += 'api/globals.f90'
+  f90_sources += 'api/fvs_api.f90'
+  # f90_sources += 'api/globals.f90'
   # f90_sources += 'api/initialize.f90'
   f90_sources += 'api/inventory_trees.f90'
   f90_sources += 'api/fvs_step.f90'

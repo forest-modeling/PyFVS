@@ -88,9 +88,9 @@ def run(ctx,
         sys.exit(1)
 
     #
-    fvs.globals.use_fvs_morts = fvs_mort
-    fvs.globals.fast_age_search = False
-    fvs.globals.calc_forest_type = forest_type
+    fvs.fvs_api.use_fvs_morts = fvs_mort
+    fvs.fvs_api.fast_age_search = False
+    fvs.fvs_api.calc_forest_type = forest_type
 
     try:
         fvs.execute_projection(keywords)
@@ -116,16 +116,17 @@ def list_variants():
     print(msg)
     sys.exit(0)
 
-@cli.command(name='run-tests')
-@click.pass_context
-def run_tests(ctx):
-    'Run tests against the supported variants'
-    # print('run-tests not implemented')
-    import subprocess
-    p = os.path.join(os.path.dirname(__file__), 'test')
-    os.chdir(p)
-    subprocess.call('pytest')
-    sys.exit()
+# @cli.command(name='run-tests')
+# @click.pass_context
+# def run_tests(ctx):
+#     'Run tests against the supported variants'
+#     # print('run-tests not implemented')
+#     import subprocess
+#     p = os.path.join(os.path.dirname(__file__), 'test')
+#     print(f'Running tests from: {p}')
+#     os.chdir(p)
+#     subprocess.call('pytest')
+#     sys.exit()
 
 if __name__ == '__main__':
     cli()

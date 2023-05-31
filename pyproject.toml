@@ -38,3 +38,8 @@ write_to = "pyfvs/_version.py"
 [tool.devpy]
 package = 'pyfvs'  # used by pytest
 commands = ['devpy.build', 'devpy.test']
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]

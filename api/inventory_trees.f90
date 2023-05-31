@@ -4,13 +4,13 @@ module inventory_trees
   implicit none
 
   integer :: row_idx, num_rows
-  integer, allocatable, dimension(:) :: plot_id, tree_id, history
+  integer, allocatable, dimension(:) :: plot_id, tree_id, history, tree_val
   ! character(len=8, kind=c_char), allocatable, dimension(:) :: species
   ! character(len=1, kind=c_char), allocatable, dimension(:,:) :: species
-  character*8 :: species(1000) ! This works with F2PY and Numpy arrays
+  character*8 :: species(3000) ! This works with F2PY and Numpy arrays
   ! character(len=8), allocatable, dimension(:) :: species
   !f2py character(f2py_len=8) species
-  ! character(len=8) :: species(1000)
+  ! character(len=8) :: species(3000)
   real, allocatable, dimension(:) :: trees, diameter, diameter_growth
   real, allocatable, dimension(:) :: height, total_height, height_growth
   real, allocatable, dimension(:) :: crown_ratio, tree_age
@@ -45,6 +45,7 @@ module inventory_trees
     if (allocated(plot_id)) deallocate(plot_id)
     if (allocated(tree_id)) deallocate(tree_id)
     if (allocated(history)) deallocate(history)
+    if (allocated(tree_val)) deallocate(tree_val)
     ! if (allocated(species)) deallocate(species)
     if (allocated(trees)) deallocate(trees)
     if (allocated(diameter)) deallocate(diameter)
@@ -59,6 +60,7 @@ module inventory_trees
     allocate(plot_id(ntrees))
     allocate(tree_id(ntrees))
     allocate(history(ntrees))
+    allocate(tree_val(ntrees))
     ! allocate(character*8 :: species(ntrees))
     allocate(trees(ntrees))
     allocate(diameter(ntrees))
@@ -73,6 +75,7 @@ module inventory_trees
     plot_id(:) = 0
     tree_id(:) = 0
     history(:) = 0
+    tree_val(:) = 0
     species(:) = ''
     trees(:) = 0.0
     diameter(:) = 0.0

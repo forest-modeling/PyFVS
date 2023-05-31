@@ -187,7 +187,8 @@ class FVS(object):
                 ,value_class
         """
 
-        return self._inventory_trees
+        # return self._inventory_trees
+        return self.fvslib.inventory_trees
 
     @inventory_trees.setter
     def inventory_trees(self, trees):
@@ -246,9 +247,9 @@ class FVS(object):
         # # tht[m] = plot_trees['actualht'][m]
         # # inv.total_height = tht
 
-        # inv.height_growth = trees['height_growth']
-        # inv.crown_ratio = trees['crown']
-        # inv.tree_age = trees['age']
+        inv.height_growth = trees['height_growth']
+        inv.crown_ratio = trees['crown']
+        inv.tree_age = trees['age']
 
         ## TODO: Add damage/severity columns
 
@@ -468,6 +469,7 @@ class FVS(object):
                     If None then use self.keywords.
             trees: Inventory treelist instance.
         """
+        # print('***** HERE *******')
 
         if keywords is None:
             keywords = self.keywords
@@ -509,7 +511,8 @@ class FVS(object):
 
             # Write out the inventory trees
             has_inv = self.fvslib.inventory_trees.row_count()>0
-            if not has_inv and not keywords.find('TREESQL'):
+            notrees = keywords.find('NOTREES')
+            if not has_inv and not keywords.find('TREESQL') and not notrees:
                 # print('***NO TREESQL')
                 pth, fn = os.path.split(keywords_fn)
                 fn, ext = os.path.splitext(fn)
@@ -526,7 +529,7 @@ class FVS(object):
                     self._artifacts.append(trees_fn)
 
                 else:
-                    if not os.path.exists(trees_fn) and not keywords.find('NOTREES'):
+                    if not os.path.exists(trees_fn):
                         log.info('No inventory tree records, assume a bareground projection.')
                         keywords += kw.NOTREES()
 
@@ -541,6 +544,7 @@ class FVS(object):
             raise ValueError(msg)
 
         # fvs_init requires a path
+        # print('****', keywords_fn)
         r = self.fvs_step.fvs_init(keywords_fn)
 
         # TODO: Handle and format error codes
