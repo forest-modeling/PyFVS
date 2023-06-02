@@ -63,3 +63,4 @@ dask-worker-space
 /.mesonpy-native-file.ini
 /notebooks
 *.bak
+.mesonpy*

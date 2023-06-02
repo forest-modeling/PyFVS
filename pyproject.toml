@@ -28,6 +28,9 @@ repository = "https://github.com/forest-modeling/PyFVS"
 [project.scripts]
 pyfvs = "pyfvs.__main__:cli"
 
+[tool.setuptools]
+packages = ["pyfvs",]
+
 [tool.setuptools_scm]
 # For smarter version schemes and other configuration options,
 # check out https://github.com/pypa/setuptools_scm
