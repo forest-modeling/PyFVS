@@ -40,8 +40,9 @@ module inventory_trees
 
   end function
 
-  subroutine initialize(ntrees)
-    integer :: ntrees
+  subroutine reset()
+    ! deallocate the inventory arrays
+
     if (allocated(plot_id)) deallocate(plot_id)
     if (allocated(tree_id)) deallocate(tree_id)
     if (allocated(history)) deallocate(history)
@@ -56,6 +57,13 @@ module inventory_trees
     if (allocated(crown_ratio)) deallocate(crown_ratio)
     if (allocated(tree_age)) deallocate(tree_age)
     if (allocated(damage_codes)) deallocate(damage_codes)
+
+  end subroutine
+
+  subroutine initialize(ntrees)
+    integer :: ntrees
+
+    call reset()
 
     allocate(plot_id(ntrees))
     allocate(tree_id(ntrees))

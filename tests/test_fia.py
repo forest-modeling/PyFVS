@@ -21,7 +21,7 @@ forest_code = 612
 
 class TreesTest(unittest.TestCase):
 
-    def test_fsv_trees(self):
+    def test_fvs_trees(self):
 
         try:
             os.makedirs(workspace)

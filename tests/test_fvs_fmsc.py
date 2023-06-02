@@ -3,23 +3,25 @@ Run tests from the FVS submodule
 """
 
 import os
-import unittest
 import pytest
 import pandas as pd
 import numpy as np
+import time
 
 import pyfvs
 from pyfvs import fvs
 
 root = os.path.split(__file__)[0]
+fvs_tests = f'{root}/../fvs/tests'
+
 fmsc_params = [
-        ['pn', '../../fvs/tests/FVSpn/pnt01.key', '../../fvs/tests/FVSpn/pnt01.sum.save'],
-        ['wc', '../../fvs/tests/FVSwc/wct01.key', '../../fvs/tests/FVSwc/wct01.sum.save'],
-        ['so', '../../fvs/tests/FVSso/sot01.key', '../../fvs/tests/FVSso/sot01.sum.save'],
-        ['ca', '../../fvs/tests/FVSca/cat01.key', '../../fvs/tests/FVSca/cat01.sum.save'],
-        ['ec', '../../fvs/tests/FVSec/ect01.key', '../../fvs/tests/FVSec/ect01.sum.save'],
-        ['oc', '../../fvs/tests/FVSoc/oct01.key', '../../fvs/tests/FVSoc/oct01.sum.save'],
-        ['op', '../../fvs/tests/FVSop/opt01.key', '../../fvs/tests/FVSop/opt01.sum.save'],
+        ['pn', f'{fvs_tests}/FVSpn/pnt01.key', f'{fvs_tests}/FVSpn/pnt01.sum.save'],
+        ['wc', f'{fvs_tests}/FVSwc/wct01.key', f'{fvs_tests}/FVSwc/wct01.sum.save'],
+        ['so', f'{fvs_tests}/FVSso/sot01.key', f'{fvs_tests}/FVSso/sot01.sum.save'],
+        ['ca', f'{fvs_tests}/FVSca/cat01.key', f'{fvs_tests}/FVSca/cat01.sum.save'],
+        ['ec', f'{fvs_tests}/FVSec/ect01.key', f'{fvs_tests}/FVSec/ect01.sum.save'],
+        ['oc', f'{fvs_tests}/FVSoc/oct01.key', f'{fvs_tests}/FVSoc/oct01.sum.save'],
+        ['op', f'{fvs_tests}/FVSop/opt01.key', f'{fvs_tests}/FVSop/opt01.sum.save'],
         ]
 
 @pytest.mark.parametrize(('variant', 'kwd_path', 'sum_path'), fmsc_params)
@@ -40,7 +42,7 @@ def test_fmsc(variant, kwd_path, sum_path):
     except:
         raise
 
-    f.init_projection(os.path.join(root, kwd_path))
+    f.init_projection(os.path.abspath(kwd_path))
 
     for c in range(f.globals.ncyc):
         r = f.grow()

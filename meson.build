@@ -90,11 +90,11 @@ endif
 # src_prefix = '../../'
 src_prefix = ''
 
-f90_gen = generator(
-  py3,
-  output: '@BASENAME@.F90',
-  arguments: [meson.project_source_root() / '_build_utils/convert_f77.py','@INPUT@', '@OUTPUT@', '@OUTDIR@']
-)
+# f90_gen = generator(
+#   py3,
+#   output: '@BASENAME@.F90',
+#   arguments: [meson.project_source_root() / '_build_utils/convert_f77.py','@INPUT@', '@OUTPUT@', '@OUTDIR@']
+# )
 
 ############## From scipy/meson.build subdir ###################
 # Platform detection

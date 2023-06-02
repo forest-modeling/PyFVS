@@ -275,11 +275,16 @@ class FVS(object):
         log.debug('Loaded FVS variant {} library from {}'.format(
                 self.variant, self.fvslib.__file__))
 
+        ## NOTE: Extension modules cannot be unloaded and array data will persist between run
+
         # Initialize the FVS parameters and arrays
         # FIXME: This api function is subject to change
         self.fvslib.fvs_step.init_blkdata()
         self.fvslib.tree_data.init_tree_data()
         # self.fvslib.initialize_api.init()
+
+        # Ensure there aren't any inventory records hanging around from previous runs
+        self.fvslib.inventory_trees.reset()
 
     # TODO: Add species code translation methods.
     @property
