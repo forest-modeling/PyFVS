@@ -103,7 +103,8 @@ is_mingw = is_windows and cc.get_id() == 'gcc'
 cython_c_args = []
 if is_windows
   # For mingw-w64, link statically against the UCRT.
-  gcc_link_args = ['-lucrt', '-static', '-lquadmath']
+  #gcc_link_args = ['-lucrt', '-static', '-lquadmath']
+  gcc_link_args = ['-static', '-lquadmath']
   if is_mingw
     add_project_link_arguments(gcc_link_args, language: ['c', 'cpp'])
     # Force gcc to float64 long doubles for compatibility with MSVC
