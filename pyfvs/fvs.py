@@ -164,10 +164,10 @@ class FVS(object):
 
         self.version_info = dict(
             variant = self.variant
-            , comp_date = '' #self.fvslib.version.compile_date[0].astype(str)
-            , comp_time = '' #self.fvslib.version.compile_time[0].astype(str)
-            , rev_tag = '' #self.fvslib.globals.svn[0].astype(str)
-            , rev_date = self.fvslib.revise(self.variant).strip().decode()
+            , compile_date = self.fvslib.version.compile_date.tobytes().decode().strip()
+            , compile_time = self.fvslib.version.compile_time.tobytes().decode().strip()
+            , revision_tag = self.fvslib.globals.svn.tobytes().decode().strip()
+            , revision_date = self.fvslib.revise(self.variant).decode().strip()
             )
 
     # @property
@@ -200,7 +200,11 @@ class FVS(object):
         ## TODO: Defer loading arrays until the simulation is started
 
         required = ['plot_id','tree_id','species','prob','diameter']
-        optional = ['history','height','crown','age','diameter_growth','height_growth']
+        optional = [
+            'history','height','crown','age'
+            ,'diameter_growth','height_growth'
+            ,'tree_val','tree_rx_code'
+            ]
 
         # trees = trees.loc[:,field_map.values()].copy()
         trees.rename(columns={v:k for k,v in self.inventory_field_map.items()}, inplace=True)
@@ -249,6 +253,8 @@ class FVS(object):
 
         inv.height_growth = trees['height_growth']
         inv.crown_ratio = trees['crown']
+        inv.tree_val = trees['tree_val']
+        inv.tree_rx_code = trees['tree_rx_code']
         inv.tree_age = trees['age']
 
         ## TODO: Add damage/severity columns
@@ -787,6 +793,7 @@ class FVS(object):
                 , ('cr_ratio',np.float32), ('ht_merch_cuft',np.float32), ('ht_merch_bdft',np.float32)
                 , ('cuft_total',np.float32), ('cuft_net',np.float32), ('bdft_net',np.float32)
                 , ('defect_cuft',np.float32), ('defect_bdft',np.float32)
+                , ('tree_val',np.uint16), ('tree_rx_code',np.uint16)
                 ])
 
         N = self.tree_data.num_recs.sum()

@@ -5,4 +5,6 @@
 
 @REM check for rtools40/ucrt64/bin/gfortran.exe
 
-python -m pip install --no-build-isolation -v -e . --config-settings editable-verbose=true
+python -m pip install --no-build-isolation -v -e . ^
+  --config-settings=editable-verbose=true ^
+  --config-settings=setup-args="-Dfvsvariants=pn,wc,ca"

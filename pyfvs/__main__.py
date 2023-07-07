@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 
+import pandas as pd
 import click
 
 import pyfvs
@@ -32,11 +33,12 @@ def cli(ctx, version=False):
 @click.option('-d', '--debug', is_flag=True, help='Set logging level to debug.')
 @click.option('-s', '--stochastic', is_flag=True, help='Run FVS with stochastic components.')
 @click.option('-p', '--prompt', is_flag=True, help='Prompt the user for I/O files.')
+@click.option('-t', '--trees', 'trees_path', required=False, type=click.Path(exists=True), help='Path to a csv file of inventory trees.')
 @click.option('--fvs-mort', is_flag=True, help='Use the former FVS mortality functions for PN & WC variants.')
 @click.option('--forest-type', is_flag=True, help='Calculate FVS forest type.')
 def run(ctx,
     variant, keywords=None, bootstrap=False, debug=False, stochastic=False, prompt=False
-    , fvs_mort=False, forest_type=False
+    , fvs_mort=False, forest_type=False, trees_path=None
     ):
     """
     Run the FVS <variant> using the PyFVS command line
@@ -92,14 +94,21 @@ def run(ctx,
     fvs.fvs_api.fast_age_search = False
     fvs.fvs_api.calc_forest_type = forest_type
 
+    if trees_path:
+        trees = pd.read_csv(trees_path)
+        fvs.inventory_trees = trees
+
     try:
         fvs.execute_projection(keywords)
     except:
         log.exception('Error running FVS.')
         sys.exit(1)
 
-    cols = ['year','age','tpa','baa','top_ht','tcuft','mcuft','mbdft','rem_mbdft','mort']
-    print(fvs.summary.loc[:,cols])
+    cols = ['year','age','tpa','baa','qmd','top_ht','tcuft','mcuft','mbdft','rem_mbdft','mort']
+    summary = fvs.summary
+    summary['qmd'] = (summary['baa']/summary['tpa']/0.005454154)**0.5
+
+    print(summary.loc[:,cols])
     # print(fvs.summary.columns)
     # print(fvs.outcom_mod.iosum[:6, :fvs.num_cycles + 1].T)
 #     print(fvs.get_summary('merch bdft'))

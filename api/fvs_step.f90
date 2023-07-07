@@ -128,110 +128,109 @@ module fvs_step
         !
         !******************     EXECUTION BEGINS     ******************
         !
-        DEBUG=.FALSE.
+      DEBUG=.FALSE.
+!-----------
+!  SEE IF WE NEED TO DO SOME DEBUG.
+!  NEEDED FOR STOP/RESTART DEBUG OPTION TO CONTINUE.
+!-----------
+      CALL DBCHK (DEBUG,'MAIN',4,0)
 
-!#ifdef FVSSTARTSTOP
-        !Check the current return code, if -1 the cmdLine has never been processed.
-        call fvsGetRtnCode(IRTNCD)
-        if (IRTNCD == -1) then
-            lenCl = 0
-            CALL fvsSetCmdLine(' ',lenCl,IRTNCD)
-            IF (IRTNCD.NE.0) RETURN
-        endif
+!     Check the current return code, if -1 the cmdLine has never been processed.
 
-        !FIND THE RESTART, AND BRANCH AS REQUIRED
-        call fvsRestart (IRSTRTCD)
-        call fvsGetRtnCode(IRTNCD)
-        if (DEBUG) then
-            fmt = "('In FVS, IRSTRTCD=',I2,' IRTNCD=',I2)"
-            write(JOSTND,fmt) IRSTRTCD,IRTNCD
-        endif
-        if (IRTNCD.ne.0) return
-        if (IRSTRTCD.lt.0) return
-        ! if (IRSTRTCD.eq.7) goto 19
-        if (IRSTRTCD.ne.7) then
+      call fvsGetRtnCode(IRTNCD)
+      if (IRTNCD == -1) then
+        lenCl = 0
+        CALL fvsSetCmdLine(' ',lenCl,IRTNCD)
+        IF (IRTNCD.NE.0) RETURN
+      endif
 
-                if (IRSTRTCD.ge.1) return !in fvs.f this code skips over the initialization routines and the time increment
-        !#endif /* FVSSTARTSTOP */
+!     FIND THE RESTART, AND BRANCH AS REQUIRED
 
-                ICL1=0
-                LSTART = .TRUE.
-                LFLAG = .TRUE.
-                ICYC=0
+      call fvsRestart (IRSTRTCD)
+      call fvsGetRtnCode(IRTNCD)
+      IF (DEBUG) WRITE(JOSTND,*) "In FVS, IRSTRTCD=",IRSTRTCD, &
+                                  " IRTNCD=",IRTNCD
+      if (IRTNCD.ne.0) return
+      if (IRSTRTCD.lt.0) return
 
-                !INITIATE THE PROGNOSIS
-                CALL INITRE
-                CALL fvsGetRtnCode(IRTNCD)
-                IF (IRTNCD.NE.0) RETURN
+      if (IRSTRTCD.ge.1) then
+        call fvs_grow(IRTNCD)
+        return
+      endif
+
+      if (IRSTRTCD.ne.7) then
+      ! if (IRSTRTCD.eq.7) goto 19
+      ! if (IRSTRTCD.ge.1) goto 41
+!
+        ICL1=0
+        LSTART = .TRUE.
+        LFLAG = .TRUE.
+        ICYC=0
+
+        !INITIATE THE PROGNOSIS
+        CALL INITRE
+        CALL fvsGetRtnCode(IRTNCD)
+        IF (IRTNCD.NE.0) RETURN
 
         !#ifdef FVSREPORTS
-                !SEE IF WE NEED TO DO SOME DEBUG.
-                CALL DBCHK (DEBUG,'MAIN',4,0)
+        !SEE IF WE NEED TO DO SOME DEBUG.
+        CALL DBCHK (DEBUG,'MAIN',4,0)
         !#endif /* FVSREPORTS */
 
-                !PROCESS ARRAY IY
-                IF (NCYC.LE.0)  NCYC=1
-                IF (NCYC.GT.MAXCYC) NCYC=MAXCYC
-                DO I = 2, MAXCY1
-                IF (IY(I).EQ.-1) IY(I)=10
-                IY(I) = IY(I-1) + IY(I)
-                ENDDO
+        !PROCESS ARRAY IY
+        IF (NCYC.LE.0)  NCYC=1
+        IF (NCYC.GT.MAXCYC) NCYC=MAXCYC
+        DO I = 2, MAXCY1
+          IF (IY(I).EQ.-1) IY(I)=10
+          IY(I) = IY(I-1) + IY(I)
+        ENDDO
 
-                !ADD IN CYCLES FOR REQUESTED YEARS...BUT DO NOT EXTEND THE END
-                !OR CHANGE THE BEGINNING OF THE SIMULATION.
-                IF (IWORK1(1).GT.0) THEN
-                DO IA=2,IWORK1(1)+1
-                        IF (IWORK1(IA).LE.IY(1).OR.IWORK1(IA).GE.IY(NCYC+1)) THEN
-                        CYCLE
-                        ELSE
-                        N=NCYC
-                        DO I=1,N
-                                IF (IWORK1(IA).GT.IY(I).AND.IWORK1(IA).LT.IY(I+1)) THEN
-                                NCYC=NCYC+1
-                                IF (NCYC.GT.MAXCYC) NCYC=MAXCYC
-                                DO K=NCYC+1,I+2,-1
-                                        IY(K)=IY(K-1)
-                                ENDDO
-                                IY(I+1)=IWORK1(IA)
-                                EXIT
-                                ENDIF
-                        ENDDO
-                        ENDIF
-                ENDDO
+        !ADD IN CYCLES FOR REQUESTED YEARS...BUT DO NOT EXTEND THE END
+        !OR CHANGE THE BEGINNING OF THE SIMULATION.
+        IF (IWORK1(1).GT.0) THEN
+          DO IA=2,IWORK1(1)+1
+            IF (IWORK1(IA).LE.IY(1).OR.IWORK1(IA).GE.IY(NCYC+1)) THEN
+              CYCLE
+            ELSE
+              N=NCYC
+              DO I=1,N
+                IF (IWORK1(IA).GT.IY(I).AND.IWORK1(IA).LT.IY(I+1)) THEN
+                  NCYC=NCYC+1
+                  IF (NCYC.GT.MAXCYC) NCYC=MAXCYC
+                  DO K=NCYC+1,I+2,-1
+                    IY(K)=IY(K-1)
+                  ENDDO
+                  IY(I+1)=IWORK1(IA)
+                  EXIT
                 ENDIF
+              ENDDO
+            ENDIF
+          ENDDO
+        ENDIF
 
-        !#ifdef FVSEXTENSIONS
-                !WRITE BUG MODEL HEADERS AND WRITE AND PROCESS OPTION LISTS
-                !THE CALL TO TMOPTS MUST BE PLACED BEFORE CALL OPEXPN AS TMOPTS
-                !CALLS SCHED WHICH CHANGES THE CONTENTS OF THE ARRAY IY.
-                CALL MPBOPS
-                CALL TMOPS
-                CALL DFBSCH
+!#ifdef FVSEXTENSIONS
+        !WRITE BUG MODEL HEADERS AND WRITE AND PROCESS OPTION LISTS
+        !THE CALL TO TMOPTS MUST BE PLACED BEFORE CALL OPEXPN AS TMOPTS
+        !CALLS SCHED WHICH CHANGES THE CONTENTS OF THE ARRAY IY.
+        CALL MPBOPS
+        CALL TMOPS
+        CALL DFBSCH
 
-                !SET UP ECON COST & REVENUE INDEXES BY SPECIES
-                !CALL ECSETP PRIOR TO PROCESSING ACTIVITY SCHEDULE TO ENSURE CORRECT ECON ACTIVITY SORTING
-                CALL ECSETP(IY)
-        !#endif /* FVSEXTENSIONS */
+        !SET UP ECON COST & REVENUE INDEXES BY SPECIES
+        !CALL ECSETP PRIOR TO PROCESSING ACTIVITY SCHEDULE TO ENSURE CORRECT ECON ACTIVITY SORTING
+        CALL ECSETP(IY)
+!#endif /* FVSEXTENSIONS */
 
-                !PROCESS AND LIST THE ACTIVITY SCHEDULE.
-                CALL OPEXPN (JOSTND,NCYC,IY)
-                CALL OPCYCL (NCYC,IY)
-                IF(ITABLE(4).EQ.0)CALL OPLIST (.TRUE.,NPLT,MGMID,ITITLE)
+        !PROCESS AND LIST THE ACTIVITY SCHEDULE.
+        CALL OPEXPN (JOSTND,NCYC,IY)
+        CALL OPCYCL (NCYC,IY)
+        IF(ITABLE(4).EQ.0)CALL OPLIST (.TRUE.,NPLT,MGMID,ITITLE)
 
-                !SET UP INDEX POINTERS TO SPECIES SORT.
-                CALL SETUP
+        !SET UP INDEX POINTERS TO SPECIES SORT.
+        CALL SETUP
 
-                !CALCULATE TREES/ACRE ( = LOAD PROB )
-                CALL NOTRE
-
-                CALL fvsStopPoint (7,ISTOPRES)
-                IF (ISTOPRES.NE.0) RETURN
-                CALL fvsGetRtnCode(IRTNCD)
-                IF (IRTNCD.NE.0) RETURN
-                !BRANCH HERE IF RESTARTING FROM STOPCODE 7
-
-!      19 CONTINUE
-        end if
+        !CALCULATE TREES/ACRE ( = LOAD PROB )
+        CALL NOTRE
 
 !#ifdef FVSEXTENSIONS
         !WESTERN ROOT DISEASE MODEL VER. 3.0 INITIALIZATION
@@ -250,134 +249,143 @@ module fvs_step
         !THE CYCLE-1 OPTIONS.
         CALL OPCSET(ICYC)
 
-        !CALIBRATE GROWTH FUNCTIONS AND FILL GAPS
-        !SDICLS IS CALLED HERE SO CROWNS WILL DUB CORRECTLY IN VARIANTS
-        !USING THE WEIBULL DISTRIBUTION
-        CALL SDICLS(0,0.,999.,1,SDIAC,SDIAC2,STAGEA,STAGEB,0)
-        CALL CRATET
-
-        !SET CALIBRATION AND FLAG BEST TREE RECORDS FOR ESTAB. MODEL.
-        CALL ESFLTR
-
-        ICYC = 0
-
-        !COMPUTE INITIAL CROWN WIDTH VALUES.
-        CALL CWIDTH
-
-        !COMPUTE INITIAL VOLUME STATISTICS
-        CALL VOLS
-
-        !COMPUTE INITIAL PERCENTILE POINTS IN THE DISTRIBUTION OF
-        !DIAMETERS FOR ALL VOLUME STANDARDS.  FIRST CONVERT VOLUMES TO A
-        !PER ACRE REPRESENTATION (SKIP IF THERE ARE NO TREE RECORDS).
-        IF (ITRN.GT.0) THEN
-            DO I=1,ITRN
-                CFV(I)=CFV(I)*PROB(I)
-                BFV(I)=BFV(I)*PROB(I)
-                WK1(I)=WK1(I)*PROB(I)
-            ENDDO
-        ENDIF
-        CALL PCTILE(ITRN,IND,CFV,WK3,OCVCUR(7))
-        CALL DIST(ITRN,OCVCUR,WK3)
-        CALL PCTILE(ITRN,IND,BFV,WK3,OBFCUR(7))
-        CALL DIST(ITRN,OBFCUR,WK3)
-        CALL PCTILE(ITRN,IND,WK1,WK3,OMCCUR(7))
-        CALL DIST(ITRN,OMCCUR,WK3)
-
-        !IF THERE ARE TREE RECORDS, THEN: CONVERT CFV TO A PER TREE
-        !REPRESENTATION.
-        IF (ITRN.GT.0) THEN
-            DO I=1,ITRN
-                CFV(I)=CFV(I)/PROB(I)
-                BFV(I)=BFV(I)/PROB(I)
-                WK1(I)=WK1(I)/PROB(I)
-            ENDDO
-        ENDIF
-
-        !ASSIGN THE EXAMPLE TREES TO THE OUTPUT ARRAYS.
-        CALL EXTREE
-
-!#ifdef FVSREPORTS
-        !FIND OUT IF THE COVER MODEL WILL BE CALLED.
-!        CALL CVGO (LCVGO)
-
-        !CALL **CVBROW** TO COMPUTE SHRUB DENSITY AND WILDLIFE
-        !BROWSE STATISTICS (MAKE THIS CALL REGARDLESS OF LCVGO).
-        if(DEBUG) then
-            fmt = "(' CALLING CVBROW, CYCLE=',I2)"
-            write(JOSTND,fmt) ICYC
-        endif
-        CALL CVBROW (.FALSE.)
-
-        !CALL **CVCNOP** TO COMPUTE CANOPY COVER STATISTICS.
-        if (DEBUG) then
-            fmt = "(' CALLING CVCNOP, CYCLE =',I2)"
-            write (JOSTND,fmt) ICYC
-        endif
-        call CVCNOP(.false.)
-
-        !CALL **STATS** TO COMPUTE STATISTICAL DESCRIPTION OF INPUT DATA.
-        if (DEBUG) then
-            fmt = "(' CALLING STATS, CYCLE = ',I2)"
-            write(JOSTND,fmt) ICYC
-        endif
-        CALL STATS
-
-        !WRITE OUTPUT HEADING FOR STAND COMP TABLE IF NOT TO BE SUPPRESSED
-        !USING DELOTAB KEYWORD.
-        IF (ITABLE(1) .EQ. 0) CALL GHEADS (NPLT,MGMID,JOSTND,0,ITITLE)
-!#endif /* FVSREPORTS */
-
-        !WRITE INITIAL STAND STATISTICS.  MAKE SURE THAT ICL6 IS POSITIVE
-        ICL6=1
-        CALL DISPLY
-
-!#ifdef FVSSTARTSTOP
+        !PROCESS STOPPOINT 7
+        CALL fvsStopPoint (7,ISTOPRES)
+        IF (ISTOPRES.NE.0) RETURN
         CALL fvsGetRtnCode(IRTNCD)
         IF (IRTNCD.NE.0) RETURN
+        !BRANCH HERE IF RESTARTING FROM STOPCODE 7
+        !19 CONTINUE
+      endif
+
+      !CALIBRATE GROWTH FUNCTIONS AND FILL GAPS
+      !SDICLS IS CALLED HERE SO CROWNS WILL DUB CORRECTLY IN VARIANTS
+      !USING THE WEIBULL DISTRIBUTION
+      CALL SDICLS(0,0.,999.,1,SDIAC,SDIAC2,STAGEA,STAGEB,0)
+      CALL CRATET
+
+      !SET CALIBRATION AND FLAG BEST TREE RECORDS FOR ESTAB. MODEL.
+      CALL ESFLTR
+
+      ICYC = 0
+
+      !COMPUTE INITIAL CROWN WIDTH VALUES.
+      CALL CWIDTH
+
+      !COMPUTE INITIAL VOLUME STATISTICS
+      CALL VOLS
+
+      !COMPUTE INITIAL PERCENTILE POINTS IN THE DISTRIBUTION OF
+      !DIAMETERS FOR ALL VOLUME STANDARDS.  FIRST CONVERT VOLUMES TO A
+      !PER ACRE REPRESENTATION (SKIP IF THERE ARE NO TREE RECORDS).
+      IF (ITRN.GT.0) THEN
+        DO I=1,ITRN
+          CFV(I)=CFV(I)*PROB(I)
+          BFV(I)=BFV(I)*PROB(I)
+          WK1(I)=WK1(I)*PROB(I)
+        ENDDO
+      ENDIF
+      CALL PCTILE(ITRN,IND,CFV,WK3,OCVCUR(7))
+      CALL DIST(ITRN,OCVCUR,WK3)
+      CALL PCTILE(ITRN,IND,BFV,WK3,OBFCUR(7))
+      CALL DIST(ITRN,OBFCUR,WK3)
+      CALL PCTILE(ITRN,IND,WK1,WK3,OMCCUR(7))
+      CALL DIST(ITRN,OMCCUR,WK3)
+
+      !IF THERE ARE TREE RECORDS, THEN: CONVERT CFV TO A PER TREE
+      !REPRESENTATION.
+      IF (ITRN.GT.0) THEN
+        DO I=1,ITRN
+          CFV(I)=CFV(I)/PROB(I)
+          BFV(I)=BFV(I)/PROB(I)
+          WK1(I)=WK1(I)/PROB(I)
+        ENDDO
+      ENDIF
+
+      !ASSIGN THE EXAMPLE TREES TO THE OUTPUT ARRAYS.
+      CALL EXTREE
+
+!#ifdef FVSREPORTS
+      !FIND OUT IF THE COVER MODEL WILL BE CALLED.
+!        CALL CVGO (LCVGO)
+
+      !CALL **CVBROW** TO COMPUTE SHRUB DENSITY AND WILDLIFE
+      !BROWSE STATISTICS (MAKE THIS CALL REGARDLESS OF LCVGO).
+      if(DEBUG) then
+          fmt = "(' CALLING CVBROW, CYCLE=',I2)"
+          write(JOSTND,fmt) ICYC
+      endif
+      CALL CVBROW (.FALSE.)
+
+      !CALL **CVCNOP** TO COMPUTE CANOPY COVER STATISTICS.
+      if (DEBUG) then
+          fmt = "(' CALLING CVCNOP, CYCLE =',I2)"
+          write (JOSTND,fmt) ICYC
+      endif
+      call CVCNOP(.false.)
+
+      !CALL **STATS** TO COMPUTE STATISTICAL DESCRIPTION OF INPUT DATA.
+      if (DEBUG) then
+          fmt = "(' CALLING STATS, CYCLE = ',I2)"
+          write(JOSTND,fmt) ICYC
+      endif
+      CALL STATS
+
+      !WRITE OUTPUT HEADING FOR STAND COMP TABLE IF NOT TO BE SUPPRESSED
+      !USING DELOTAB KEYWORD.
+      IF (ITABLE(1) .EQ. 0) CALL GHEADS (NPLT,MGMID,JOSTND,0,ITITLE)
+!#endif /* FVSREPORTS */
+
+      !WRITE INITIAL STAND STATISTICS.  MAKE SURE THAT ICL6 IS POSITIVE
+      ICL6=1
+      CALL DISPLY
+
+!#ifdef FVSSTARTSTOP
+      CALL fvsGetRtnCode(IRTNCD)
+      IF (IRTNCD.NE.0) RETURN
 !#endif /* FVSSTARTSTOP */
 
 !#ifdef FVSREPORTS
-        !IF TREE LIST OUTPUT IS REQUESTED...CALL TREE LIST PRINTER.
-        CALL MISPRT
+      !IF TREE LIST OUTPUT IS REQUESTED...CALL TREE LIST PRINTER.
+      CALL MISPRT
 !#endif /*FVSREPORTS*/
 
-        CALL PRTRLS_WRAP (1)
+      CALL PRTRLS_WRAP (1)
 
 !#ifdef FVSREPORTS
-        !CREATE THE INITIAL STAND VISULIZATION.
-        CALL SVSTART
+      !CREATE THE INITIAL STAND VISULIZATION.
+      CALL SVSTART
 
-        !LOAD OLD VOLUME VARIABLES WITH CYCLE 0 VOLUMES
-        CALL FVSSTD (1)
+      !LOAD OLD VOLUME VARIABLES WITH CYCLE 0 VOLUMES
+      CALL FVSSTD (1)
 
 !#endif /*FVSREPORTS*/
 
-        !DONE WITH DEAD TREES THAT WERE PRESENT IN THE INVENTORY. PURGE
-        !THEM FROM THE LIST (VIA RESET POINTER)
-        IREC2=MAXTP1
+      !DONE WITH DEAD TREES THAT WERE PRESENT IN THE INVENTORY. PURGE
+      !THEM FROM THE LIST (VIA RESET POINTER)
+      IREC2=MAXTP1
 
 !#ifdef FVSEXTENSIONS
-        !WESTERN ROOT DISEASE MODEL VER. 3.0 MODEL INITIALIZATION
-        CALL RDMN1 (2)
-        CALL RDPR
+      !WESTERN ROOT DISEASE MODEL VER. 3.0 MODEL INITIALIZATION
+      CALL RDMN1 (2)
+      CALL RDPR
 
-        !BLISTER RUST MODEL INITIALIZATION
-        CALL BRSETP
-        CALL BRPR
+      !BLISTER RUST MODEL INITIALIZATION
+      CALL BRSETP
+      CALL BRPR
 !#endif /*FVSEXTENSTIONS*/
 
-        LFLAG = .FALSE.
-        LSTART = .FALSE.
+      LFLAG = .FALSE.
+      LSTART = .FALSE.
 
-        !INITIALIZE TYPE 1 EVENT MONTITOR VARIABLES
-        CALL EVTSTV(-1)
+      !INITIALIZE TYPE 1 EVENT MONTITOR VARIABLES
+      CALL EVTSTV(-1)
 
-        !This is 40, the entrance to the grower loop in fvs.f
+      !This is 40, the entrance to the grower loop in fvs.f
 
-        ! Flag the simulation as initialized
-        sim_status = 1
-        return
+      ! Flag the simulation as initialized
+      sim_status = 1
+      return
     end subroutine fvs_init
 
     subroutine fvs_grow(irtncd)

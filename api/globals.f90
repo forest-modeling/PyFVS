@@ -38,6 +38,8 @@ module globals
     INCLUDE 'FMCOM.F90'
     INCLUDE 'FMFCOM.F90'
 
+    INCLUDE 'SVDATA.F90'
+
     save
 
     contains

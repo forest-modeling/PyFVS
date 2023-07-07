@@ -64,3 +64,8 @@ dask-worker-space
 /notebooks
 *.bak
 .mesonpy*
+/tests/reg_test
+/tests/api_test
+.RData
+.Rhistory
+*.zip

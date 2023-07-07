@@ -21,9 +21,9 @@ fs = import('fs')
 
 # variants = ['pn','op','wc','ca'] #,'so','oc','ec','nc','bm']
 # variants = ['pn',]
-variants = ['pn','wc','ca','so']
+# variants = ['pn','wc','ca','so']
 # variants can be set in meson_options.txt or with command line arguments '-Dfvsvariants=pn,wc,op'
-# variants = get_option('fvsvariants')
+variants = get_option('fvsvariants')
 
 message('******************************************************************')
 message('Building FVS variants: @0@'.format(variants))
@@ -258,6 +258,7 @@ foreach variant : variants
   api_sources = []
   api_names = [
     'fvs.f',
+    # 'apisubs.f',
     'htcalc.f',
     'cmdline.f',
     'forkod.f',
@@ -371,6 +372,8 @@ foreach variant : variants
   f90_sources += join_paths(meson.project_build_root(), variant + '_globals.f90')
 
   # Additional API files to compile
+  # f90_sources += 'api/apisubs.f90'
+
   f90_sources += 'api/version.f90'
   f90_sources += 'api/fvs_api.f90'
   # f90_sources += 'api/globals.f90'
@@ -444,7 +447,7 @@ foreach variant : variants
     mod_c_wrap,
     input : api_sources, # + f90_include_files + f77_include_files,
     output : [mod_c_wrap, mod_f_wrap, mod_f90_wrap],
-    # dependencies : [f90_include_files,],
+    depend_files : [f77_include_files,],
     command : cmd,
     install : false
     )

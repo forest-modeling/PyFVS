@@ -12,7 +12,7 @@ module tree_data
         !ARRAYS
         idtree, itre, isp, prob, dbh, dg, ht, &
         ht2td, htg, cfv, bfv, wk1, defect, crwdth, icr, pct, abirth, &
-        imc, &
+        imc, kutkod, &
         !VARCOM
         ptbalt, &
         !WORKCM
@@ -26,7 +26,7 @@ module tree_data
     !       of tree objects type(tree), dimension(maxcy1,maxtre) :: sim_trees
     !FIXME: The array dimensions are backwards and need to be column major
     integer, dimension(maxcy1) :: num_recs
-    integer, dimension(maxtre,maxcy1) :: tree_seq,tree_id,plot_seq,age,spp_seq,tree_val
+    integer, dimension(maxtre,maxcy1) :: tree_seq,tree_id,plot_seq,age,spp_seq,tree_val,tree_rx_code
     real, dimension(maxtre,maxcy1) :: &
             live_tpa,cut_tpa,mort_tpa,live_dbh,dbh_incr,ba_pctl,pnt_bal &
             ,ht_total,ht_merch_cuft,ht_merch_bdft,ht_incr,cr_width,cr_ratio &
@@ -44,6 +44,7 @@ module tree_data
         tree_seq(:,:) = 0
         tree_id(:,:) = 0
         tree_val(:,:) = 0
+        tree_rx_code(:,:) = 0
         plot_seq(:,:) = 0
         spp_seq(:,:) = 0
         age(:,:) = 0
@@ -88,6 +89,7 @@ module tree_data
         tree_seq(:itrn,i) = (/(x, x=1,itrn, 1)/)
         tree_id(:itrn,i) = idtree(:itrn)
         tree_val(:itrn,i) = imc(:itrn)
+        tree_rx_code(:itrn,i) = kutkod(:itrn)
         plot_seq(:itrn,i) = itre(:itrn)
         spp_seq(:itrn,i) = isp(:itrn)
         age(:itrn,i) = int(abirth(:itrn))
