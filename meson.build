@@ -376,7 +376,7 @@ foreach variant : variants
 
   f90_sources += 'api/version.f90'
   f90_sources += 'api/fvs_api.f90'
-  # f90_sources += 'api/globals.f90'
+  # f90_sources += 'api/sim_monitor.f90'
   # f90_sources += 'api/initialize.f90'
   f90_sources += 'api/inventory_trees.f90'
   f90_sources += 'api/fvs_step.f90'

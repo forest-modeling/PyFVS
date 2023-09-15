@@ -16,9 +16,9 @@ Add the compiler to the PATH variable
 
 Create the conda environment (or pyenv/pip equivalent)
     # FIXME: Maybe pin meson-python version or get from github
-    > conda create -c conda-forge -n=pyfvs310 python=3.10 meson=0.64 meson-python ninja numpy pandas click openpyxl nomkl confuse pytest build
+    > conda create -c conda-forge -n=pyfvs310 python=3.10 meson>=1.1.1 meson-python>=0.13.2 ninja numpy pandas click openpyxl nomkl confuse pytest build
 
-    # Install meson-python from GitHub
+    # Install meson-python from GitHub (optional)
     >  python -m pip install git+https://github.com/mesonbuild/meson-python.git@7e090a7 --no-deps
 
 

@@ -2,5 +2,6 @@ option('fvsvariants', type: 'array',
   choices: ['pn','wc','so','op','oc','ec','ca','nc'],
   #value: ['pn','wc','so','op','oc','ec','ca','nc'],
   value: ['pn','wc','ca'],
+  # value: ['pn',],
   description: 'FVS variants to build'
   )

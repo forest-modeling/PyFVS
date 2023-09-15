@@ -170,6 +170,16 @@ class FVS(object):
             , revision_date = self.fvslib.revise(self.variant).decode().strip()
             )
 
+    def fvs_callback(self, stage):
+        """
+        A function that is called by FVS from various locations during the simulation loop
+
+        Args
+        ----
+        stage: Integer indicating the current growth cycle location
+        """
+        return 0
+
     # @property
     # def trees(self):
     #     deprecation('FVS.trees is deprecated. Use FVS.fvs_trees or FVS.inventory_trees')
@@ -590,7 +600,7 @@ class FVS(object):
         # Don't assume we're at the beginning
         cycles = self.num_cycles - self.current_cycle
         for n in range(cycles):
-            r = self.fvs_step.fvs_grow()
+            r = self.fvs_step.fvs_grow(self.fvs_callback)
             # TODO: Check return code and raise execption for critical errors
             yield n
 
@@ -625,7 +635,7 @@ class FVS(object):
 
         r = -1
         for n in range(cycles):
-            r = self.fvs_step.fvs_grow()
+            r = self.fvs_step.fvs_grow(self.fvs_callback)
             # f.fvslib.globals.iccode
             # TODO: Handle non-zero exit codes
 

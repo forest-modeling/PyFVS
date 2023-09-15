@@ -412,6 +412,14 @@ module fvs_step
         DATA MYACT/100/
         INTEGER IRSTRTCD,ISTOPDONE,lenCl
 
+        ! grow_callback is added by F2PY
+        !! TODO: Move grow_callback to a module for general use
+        !f2py intent(callback) grow_callback
+        external grow_callback
+        integer grow_callback
+        integer cb_rtn,stage
+        !f2py cb_rtn = grow_callback(stage)
+
         character(len=100) :: fmt
 
         ! Ensure the simulation is initialized or running
@@ -435,9 +443,20 @@ module fvs_step
         endif
 !#endif /* FVSDEBUG */
 
-        CALL TREGRO
+        ! Callback before tree growth is estimated
+        cb_rtn = grow_callback(10)
+        if (cb_rtn.ne.0) return
+
+        ! Pass the callback to the growth routines
+        CALL TREGRO(grow_callback)
         !! FIXME:
         !! call step_tregro()
+
+        ! Callback after tree growth is applied
+        ! if (present(grow_callback)) then
+        cb_rtn = grow_callback(30)
+        if (cb_rtn.ne.0) return
+        ! endif
 
 !#ifdef FVSSTARTSTOP
         CALL fvsGetRtnCode(IRTNCD)
