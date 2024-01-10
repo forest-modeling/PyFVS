@@ -36,7 +36,7 @@ packages = ["pyfvs",]
 # check out https://github.com/pypa/setuptools_scm
 version_scheme = "post-release"
 # version_scheme = "guess-next-dev"
-write_to = "pyfvs/_version.py"
+version_file = "pyfvs/_version.py"
 
 [tool.devpy]
 package = 'pyfvs'  # used by pytest
