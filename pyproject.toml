@@ -1,12 +1,14 @@
 [build-system]
 # AVOID CHANGING REQUIRES: IT WILL BE UPDATED BY PYSCAFFOLD!
 requires = [
-  "setuptools>=45",
-#  "setuptools_scm[toml]>=6.2",
+  "setuptools>=64",
+  "setuptools_scm[toml]>=8",
   "wheel",
-#  "meson",
-#  "meson-python>=0.13.0rc0",
-#  "ninja"
+  "meson",
+  "meson-python>=0.15",
+  "ninja",
+  "patchelf ; platform_system != 'Windows'", ## Only linux???
+#  "cython"
   ]
 build-backend = "mesonpy"
 
