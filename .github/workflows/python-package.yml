@@ -53,6 +53,7 @@ jobs:
         if [ "$RUNNER_OS" == "Linux" ]; then
           python -m pip install patchelf
         fi
+      shell: bash
         
     - name: Build and package
       run: |
