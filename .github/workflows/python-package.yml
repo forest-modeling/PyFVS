@@ -53,7 +53,7 @@ jobs:
         python -m pip install click 'numpy<1.26' pandas matplotlib build wheel setuptools setuptools_scm meson-python pytest ninja
 
     - name: Install Patchelf
-      if: runner.os != 'Windows'
+      if: runner.os == 'Linux'
       run: |
         python -m pip install patchelf
         
