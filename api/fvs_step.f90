@@ -44,27 +44,44 @@ module fvs_step
 
     contains
 
-    subroutine init_blkdata()
-        ! Initialize the variant parameters and arrays
-        ! TODO: This should probably be elevated to a toplevel routine.
-        ! TODO: Perhaps this should initialize whatever setcmdline is doing.
-
-#ifdef _WINDLL
-        !GCC$ ATTRIBUTES STDCALL,DLLEXPORT :: init_blkdata
-#endif
+    ! BLOCK DATA procedures need to be referenced in order to be linked by the compiler
+    ! This is a hack related to the F2PY implementation
+    !! FIXME: Try linking BLOCK DATA using EXTERNAL references
+    !!        https://gcc.gnu.org/onlinedocs/gcc-3.4.6/g77/Block-Data-and-Libraries.html
+    !!        Perhaps these can be referenced in the "globals" module
+    subroutine donotcall()
+        ! external fmcblk !NOTE: This did not work as-is
         call blkdat()
         call esblkd()
         call cubrds()
         call keywds()
         call svblkd()
         call dbsblkd()
-        ! call fmcblk() ! TODO:Broken
-        ! call dfblkd() ! TODO: Add preprocessing ifdef to enable DFB and MPB sub models
-        ! call mpblkd()
+        call fmcblk()
+    end subroutine donotcall
 
-        ! print *, 'JOSTD: ', jostnd
+!     subroutine init_blkdata()
+!         ! Initialize the variant parameters and arrays
+!         ! TODO: This should probably be elevated to a toplevel routine.
+!         ! TODO: Perhaps this should initialize whatever setcmdline is doing.
 
-    end subroutine init_blkdata
+! #ifdef _WINDLL
+!         !GCC$ ATTRIBUTES STDCALL,DLLEXPORT :: init_blkdata
+! #endif
+!         ! call blkdat()
+!         ! call esblkd()
+!         ! call cubrds()
+!         ! call keywds()
+!         ! call svblkd()
+!         ! call dbsblkd()
+
+!         ! call fmcblk()
+!         ! call dfblkd() ! TODO: Add preprocessing ifdef to enable DFB and MPB sub models
+!         ! call mpblkd()
+
+!         ! print *, 'JOSTD: ', jostnd
+
+!     end subroutine init_blkdata
 
     subroutine fvs_init(keywords_file, irtncd)
         ! Initialize an FVS run.  Extracted from fvs.f to break the execution
@@ -105,7 +122,7 @@ module fvs_step
 
         ! Initialize parameters and arrays
         ! TODO: This should probably be elevated to a toplevel call
-        call init_blkdata()
+        ! call init_blkdata()
 
         ! Perform Cleanup tasks to perform between runs
 

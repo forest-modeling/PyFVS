@@ -154,6 +154,7 @@ class FVS(object):
         self._inventory_trees = None
         self._spp_codes = None
         self._spp_seq = None
+        self._fia_spp_seq = None
         self._spp_fia_codes = None
         self._spp_plant_codes = None
 
@@ -184,6 +185,11 @@ class FVS(object):
     # def trees(self):
     #     deprecation('FVS.trees is deprecated. Use FVS.fvs_trees or FVS.inventory_trees')
     #     return self.fvs_trees
+
+    ## TODO: Inventory trees and projection trees could have the same schema
+    ##       mort_tpa: measured/periodic mortality
+    ##       dg/htg: measured growth
+    ##       Add a flag for tripled records, ingrowth, measured/projected
 
     @property
     def inventory_trees(self):
@@ -295,7 +301,7 @@ class FVS(object):
 
         # Initialize the FVS parameters and arrays
         # FIXME: This api function is subject to change
-        self.fvslib.fvs_step.init_blkdata()
+        # self.fvslib.fvs_step.init_blkdata()
         self.fvslib.tree_data.init_tree_data()
         # self.fvslib.initialize_api.init()
 
@@ -326,6 +332,17 @@ class FVS(object):
         return self._spp_seq
 
     @property
+    def fia_spp_seq(self):
+        """
+        Return a dictionary mapping FIA species codes to FVS species sequence number.
+        """
+        if self._fia_spp_seq is None:
+            fiajsp = [int(s.replace(b'    ',b'0')) for s in self.fvslib.globals.fiajsp]
+            self._fia_spp_seq = dict(zip(fiajsp, range(1,self.globals.maxsp+1)))
+
+        return self._fia_spp_seq
+
+    @property
     def spp_fia_codes(self):
         """
         Return a dictionary mapping of species translations {fvs abbv: fia code,...}
@@ -353,7 +370,7 @@ class FVS(object):
         """
         if self.fvslib is None:
             # return None
-            raise AttributeError
+            raise AttributeError('An FVS variant has not been initialized')
 
         try:
             v = getattr(self.fvslib, attr, None)
@@ -587,7 +604,7 @@ class FVS(object):
         """
         Return a generator to iterate through the projection cycles.
         """
-        deprecation('FVS.iter_projection is deprecated. Use FVS iterator protocol.', level=2)
+        deprecation('FVS.iter_projection is deprecated. Use the FVS iterator protocol.', level=2)
         return self.__iter__()
 
     def __iter__(self):
@@ -651,6 +668,7 @@ class FVS(object):
                 self.end_projection()
         except:
             # FIXME: should this pass silently?
+            warnings.RuntimeWarning('FVS did not end quietly.')
             pass
 
     def end_projection(self):
@@ -775,7 +793,12 @@ class FVS(object):
             raise ValueError('One or more trees are required, got nothing.')
 
     @property
+    def cycle(self):
+        return int(self.globals.icyc)
+
+    @property
     def current_cycle(self):
+        warnings.warn('Use of `current_cycle` is deprecated use `cycle` instead', DeprecationWarning, stacklevel=2)
         return int(self.globals.icyc)
 
     @property
@@ -822,6 +845,21 @@ class FVS(object):
 
         return pd.DataFrame(trees)
         # return trees
+
+    @property
+    def carbon_summary(self):
+        carb_cols = [
+            'c_above_total','c_above_merch','c_below_live','c_below_dead'
+            ,'c_stand_dead','c_down_dead','c_floor','c_shrub_herb','c_total'
+            ,'c_removed','c_fire'
+            ,'c_hwp_products','c_hwp_landfill','c_hwp_energy'
+            ,'c_hwp_emissions','c_hwp_stored','c_hwp_removed'
+        ]
+        df = pd.DataFrame(
+            self.fvslib.carbon_data.carbon_summary[:,:self.num_cycles + 1].T
+            , columns=carb_cols
+            )
+        return df
 
     @property
     def summary(self):

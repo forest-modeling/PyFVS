@@ -1,5 +1,5 @@
 ! Load all common blocks and shared variables into a common namespace
-! Thise provides API level access to shared data
+! This provides API level access to shared data
 !
 ! GFortran does not allow mixing free and fixed form comments in the
 ! same source file. F77 include files are translated to F90 freeform.
@@ -37,6 +37,7 @@ module globals
     INCLUDE 'FMPARM.F90'
     INCLUDE 'FMCOM.F90'
     INCLUDE 'FMFCOM.F90'
+    INCLUDE 'FMPROP.F90'
 
     INCLUDE 'SVDATA.F90'
 

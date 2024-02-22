@@ -6,6 +6,9 @@ Modules and objects for executing and interacting with FVS variants.
 @author: Tod Haren, tod.haren at gmail
 """
 
+## TODO: Implement lat-lon variant lookup, embed simplified variant polygons, implement point in polygon
+##       https://stackoverflow.com/questions/36399381/whats-the-fastest-way-of-checking-if-a-point-is-inside-a-polygon-in-python
+
 import os
 import sys
 import logging
@@ -29,6 +32,9 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
+## TODO: Import package modules
+# from pyfvs.fvs import *
+# from pyfvs.keywords import *
 
 # Configuration is stored in a YAML file
 # Package defaults will be in ./config_default.yaml
@@ -150,7 +156,7 @@ def list_variants():
             mod = importlib.import_module(lib)
             status = 'OK'
         except:
-            raise
+            # raise
             status = 'Failed'
 
         vars[varname] = {'lib':lib, 'status':status}

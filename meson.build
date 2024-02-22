@@ -265,7 +265,8 @@ foreach variant : variants
     'revise.f',
     'keywds.f',
     'esblkd.f',
-    'blkdat.f'
+    'blkdat.f',
+    'fmcblk.f'
     ]
 
   # src_root = project_folder / 'fvs'

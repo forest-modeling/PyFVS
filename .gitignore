@@ -69,3 +69,5 @@ dask-worker-space
 .RData
 .Rhistory
 *.zip
+/build_wsl/
+/conda

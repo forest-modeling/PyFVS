@@ -95,6 +95,8 @@ def test_bare_ground(variant, kwd_path, sum_path):
         if 'merch' in fld:
             continue
         assert np.all(np.isclose(sum_check.loc[:, fld], sum_test.loc[:, fld], atol=1))
+        
+    print('Done')
 
 if __name__ == '__main__':
     test_bare_ground(*bare_ground_params[0])
