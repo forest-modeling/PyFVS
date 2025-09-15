@@ -137,19 +137,10 @@ def list_variants():
     import glob
     import importlib
 
-    root = os.path.dirname(__file__)
-    _vars = set()
-    for sfx in imp.EXTENSION_SUFFIXES:
-        _vars.update(glob.glob(os.path.join(root, f'*{sfx}')))
+    import pyfvs.variants as v
 
     vars = {}
-    for var in _vars:
-        libname = os.path.splitext(os.path.basename(var))[0]
-        if not (libname.startswith('fvs') or libname.startswith('_fvs')):
-            continue
-
-        modname = libname.split('.')[0].lower()
-        varname = modname[3:].upper()
+    for varname,modname in v.variant_libs.items():
         lib = 'pyfvs.{}'.format(modname)
         # print(f'Attempt to import: {lib}')
         try:

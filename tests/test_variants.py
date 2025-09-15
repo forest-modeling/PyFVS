@@ -11,12 +11,9 @@ import numpy as np
 
 import pyfvs
 from pyfvs import fvs
+import pyfvs.variants as v
 
-variants = [
-    ('pn',),
-    ('wc',), ('so',), ('ca',), ('oc',), ('op',), ('ca',), ('ec',),
-    # ('ncc',)
-    ]
+variants = [(v.lower(),) for v in v.variants]
 
 root = os.path.split(__file__)[0]
 bare_ground_params = [

@@ -1,3 +1,22 @@
+# Generate the variants file
+conf_data = configuration_data()
+
+# stringify the variant library dictionary
+libs_str = '{'
+foreach k,v : variant_libs
+  libs_str += '"' + k.to_upper() + '":"' + v + '",'
+endforeach
+libs_str += '}'
+
+conf_data.set('VARIANT_LIBS', libs_str)
+configure_file(
+  input: 'variants.py.in',
+  output: 'variants.py',
+  configuration: conf_data,
+  install: true,
+  install_dir: py3.get_install_dir() / 'pyfvs'
+)
+
 python_sources = [
   '__init__.py',
   '__main__.py',

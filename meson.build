@@ -37,6 +37,9 @@ sqlite_c_args = ['-DSQLITE_THREADSAFE=0','-DSQLITE_OMIT_LOAD_EXTENSION']
 mingw = meson.get_compiler('c').get_id() == 'mingw'
 cc = meson.get_compiler('c')
 
+# Map variants to library names
+variant_libs = {}
+
 ## TODO: SciPy suppresses many compiler warnings, copy that here
 
 m_dep = cc.find_library('m', required : false)
@@ -485,6 +488,9 @@ foreach variant : variants
     # install_dir : 'pyfvs',
     subdir: 'pyfvs'
     )
+
+  # Store the variant library name
+  variant_libs = variant_libs + {variant:lib_name}
 
 # End variant loop
 endforeach
