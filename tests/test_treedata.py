@@ -11,21 +11,24 @@ import numpy as np
 
 import pyfvs
 from pyfvs import fvs
+import pyfvs.variants as v
 
-variants = [('pnc',), ('wcc',), ('soc',), ('cac',), ('oc',), ('op',)]#, ('ecc',)]
+variants = [v.lower() for v in v.variants]
+variants_tuples = [(v.lower(),) for v in v.variants]
 
 root = os.path.split(__file__)[0]
 bare_ground_params = [
         ['pn', 'rmrs/pn_bareground.key', 'rmrs/pn_bareground.sum.save'],
         ['wc', 'rmrs/wc_bareground.key', 'rmrs/wc_bareground.sum.save'],
-        # ['so', 'rmrs/so_bareground.key', 'rmrs/so_bareground.sum.save'],
-        # ['ca', 'rmrs/ca_bareground.key', 'rmrs/ca_bareground.sum.save'],
-        # ['ec', 'rmrs/ec_bareground.key', 'rmrs/ec_bareground.sum.save'],
-        # ['oc', 'rmrs/oc_bareground.key', 'rmrs/oc_bareground.sum.save'],
+        ['so', 'rmrs/so_bareground.key', 'rmrs/so_bareground.sum.save'],
+        ['ca', 'rmrs/ca_bareground.key', 'rmrs/ca_bareground.sum.save'],
+        ['ec', 'rmrs/ec_bareground.key', 'rmrs/ec_bareground.sum.save'],
+        ['oc', 'rmrs/oc_bareground.key', 'rmrs/oc_bareground.sum.save'],
         ['op', 'rmrs/op_bareground.key', 'rmrs/op_bareground.sum.save'],
-        # ['nc', 'rmrs/nc_bareground.key', 'rmrs/nc_bareground.sum.save'],
-        # ['bm', 'rmrs/bm_bareground.key', 'rmrs/bm_bareground.sum.save'],
+        ['nc', 'rmrs/nc_bareground.key', 'rmrs/nc_bareground.sum.save'],
         ]
+
+bare_ground_params = [p for p in bare_ground_params if p[0] in variants]
 
 @pytest.mark.parametrize(('variant', 'kwd_path', 'sum_path'), bare_ground_params)
 def test_tree_data(variant, kwd_path, sum_path):

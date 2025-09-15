@@ -162,7 +162,7 @@ class FVS(object):
         self._artifacts = []
 
         # print(self.workspace)
-
+        
         self.version_info = dict(
             variant = self.variant
             , compile_date = self.fvslib.version.compile_date.tobytes().decode().strip()
@@ -170,6 +170,8 @@ class FVS(object):
             , revision_tag = self.fvslib.globals.svn.tobytes().decode().strip()
             , revision_date = self.fvslib.revise(self.variant).decode().strip()
             )
+        
+        self.fvs_version = self.version_info
 
     def fvs_callback(self, stage):
         """
@@ -179,6 +181,7 @@ class FVS(object):
         ----
         stage: Integer indicating the current growth cycle location
         """
+        # print(f'FVS Callback: {stage}')
         return 0
 
     # @property
@@ -581,8 +584,13 @@ class FVS(object):
             log.error(msg)
             raise ValueError(msg)
 
+        # Set the grow callback
+        # self.fvs_step.set_grow_callback(fvs_callback)
+        # self.fvs_step.grow_callback_ptr = fvs_callback
+
         # fvs_init requires a path
         # print('****', keywords_fn)
+        # r = self.fvs_step.fvs_init(keywords_fn, fvs_callback)
         r = self.fvs_step.fvs_init(keywords_fn)
 
         # TODO: Handle and format error codes
@@ -615,7 +623,7 @@ class FVS(object):
             self.init_projection()
 
         # Don't assume we're at the beginning
-        cycles = self.num_cycles - self.current_cycle
+        cycles = self.num_cycles - self.cycle
         for n in range(cycles):
             r = self.fvs_step.fvs_grow(self.fvs_callback)
             # TODO: Check return code and raise execption for critical errors
@@ -648,7 +656,7 @@ class FVS(object):
             self.init_projection()
 
         if cycles<=0:
-            cycles = self.num_cycles - self.current_cycle
+            cycles = self.num_cycles - self.cycle
 
         r = -1
         for n in range(cycles):
@@ -803,7 +811,7 @@ class FVS(object):
 
     @property
     def year(self):
-        return int(self.globals.iy[self.current_cycle])
+        return int(self.globals.iy[self.cycle])
 
     @property
     def num_cycles(self):

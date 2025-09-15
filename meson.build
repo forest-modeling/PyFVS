@@ -9,7 +9,8 @@ project(
     'buildtype=debugoptimized',
     'c_std=c99',
     'cpp_std=c++14',
-    'fortran_std=legacy',
+    # 'fortran_std=legacy',
+    'fortran_std=f2003',
     #'blas=openblas',
     #'lapack=openblas'
     ],
@@ -432,16 +433,54 @@ foreach variant : variants
   if is_windows
     f2py_path_sep = ';'
   endif
+
+  # Generate the PYF signature file
+  f2py_pyf_pre = '@0@_pre.pyf'.format(lib_name)
+  cmd = [
+    py3.full_path(), '-m', 'numpy.f2py',
+    '-m', lib_name,
+    '-h', f2py_pyf_pre,
+    '--overwrite-signature',
+    '--lower',
+    # '--no-wrap-modules',
+    # '--f2cmap',
+    # '--include-paths', f2py_path_sep.join(f2py_inc_dirs),
+    '@INPUT@',
+    # 'skip: fvssetcmdlinec :',
+    # 'only: init_tree_data fvs_init fvs_grow fvs_end :'
+  ]
+
+  # Call the F2PY command and collect the PYF
+  f2py_pyf_gen = custom_target(
+    f2py_pyf_pre,
+    input : api_sources + f90_include_files + f77_include_files,
+    output : [f2py_pyf_pre],
+    # depend_files : [f77_include_files,],
+    command : cmd,
+    install : false
+    )
+
+  # Post-process the PYF to strip common blocks
+  f2py_pyf_name = '@0@.pyf'.format(lib_name)
+  strip_common = files('_build_utils/strip_common.py')
+  f2py_pyf_strip = custom_target(
+    'strip_common_'+variant,
+    input: f2py_pyf_gen[0],
+    output: [f2py_pyf_name],
+    command: [
+      py3,
+      strip_common,
+      f2py_pyf_gen[0],
+      f2py_pyf_name
+      ]
+    )
+
+  # Generate the F2PY wrappers
   cmd = [
       py3.full_path(), '-m', 'numpy.f2py',
-      '-m', lib_name,
-      # '-h', '@0@.pyf'.format(lib_name),
-      # '--overwrite-signature',
-      '--lower',
-      # '--f2cmap',
-      '--include-paths', f2py_path_sep.join(f2py_inc_dirs),
+      # '-m', lib_name,
+      # '--include-paths', f2py_path_sep.join(f2py_inc_dirs),
       '@INPUT@',
-      # 'skip: fvssetcmdlinec :'
       ]
 
   # message(' '.join(cmd))
@@ -449,8 +488,11 @@ foreach variant : variants
   # Call the F2PY command and collect outputs
   f2py_source = custom_target(
     mod_c_wrap,
-    input : api_sources, # + f90_include_files + f77_include_files,
+    # input : 'build/cp310/fvspn.pyf',
+    # input : api_sources + f90_include_files + f77_include_files,
+    input : f2py_pyf_strip[0],
     output : [mod_c_wrap, mod_f_wrap, mod_f90_wrap],
+    # output : [mod_c_wrap, mod_f90_wrap],
     depend_files : [f77_include_files,],
     command : cmd,
     install : false

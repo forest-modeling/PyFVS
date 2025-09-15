@@ -2,19 +2,19 @@ module fvs_step
     !Implements the FVS grower loop in a step-wise manner.
     !The included subroutines fvs_init, fvs_grow, and fvs_end are extractions
     !   from the fvs subroutine in fvs.f and implement it's component parts.
-    !
-    !   Several core FVS 'include' files have been rougly ported to f90 modules
-    !   to support 'use' statements, streamline compilation, and to take
-    !   advantage of modern Fortran functionality and language integration
-    !   tools (primarily F2PY).
-    !
-    !   Additional core FVS routines have been modified to support the step API.
-    !   The modified routines have been renamed and are called only from the
-    !   step API routines.
+    !   
+    !   A callback function has been incorporated in the the grow loop at 
+    !   key stages. The callback provides a mechanism for interogating and 
+    !   potentially modifying FVS arrays and variables at runtime from
+    !   external procedures. This facilitates debugging, data capture, 
+    !   advanced calibration, and integration with secondary models.
+    !   
+    !   Additional core FVS routines have been modified to support the step API
+    !   and callback functionality.
     !
     !   Modified FVS routines:
-    !       tregro.f => step_tregro.f
-    !       grincr.f => step_grincr.f
+    !       tregro.f
+    !       grincr.f
     !
     !Author: Tod Haren, tod.haren@gmail.com
     !Date: 10/2013
@@ -40,10 +40,12 @@ module fvs_step
 
     use tree_data, only: init_tree_data
 
+    implicit none
+
     integer :: sim_status=0
 
     contains
-
+    
     ! BLOCK DATA procedures need to be referenced in order to be linked by the compiler
     ! This is a hack related to the F2PY implementation
     !! FIXME: Try linking BLOCK DATA using EXTERNAL references
@@ -60,29 +62,6 @@ module fvs_step
         call fmcblk()
     end subroutine donotcall
 
-!     subroutine init_blkdata()
-!         ! Initialize the variant parameters and arrays
-!         ! TODO: This should probably be elevated to a toplevel routine.
-!         ! TODO: Perhaps this should initialize whatever setcmdline is doing.
-
-! #ifdef _WINDLL
-!         !GCC$ ATTRIBUTES STDCALL,DLLEXPORT :: init_blkdata
-! #endif
-!         ! call blkdat()
-!         ! call esblkd()
-!         ! call cubrds()
-!         ! call keywds()
-!         ! call svblkd()
-!         ! call dbsblkd()
-
-!         ! call fmcblk()
-!         ! call dfblkd() ! TODO: Add preprocessing ifdef to enable DFB and MPB sub models
-!         ! call mpblkd()
-
-!         ! print *, 'JOSTD: ', jostnd
-
-!     end subroutine init_blkdata
-
     subroutine fvs_init(keywords_file, irtncd)
         ! Initialize an FVS run.  Extracted from fvs.f to break the execution
         ! into explicit components for improved interaction with external code.
@@ -94,7 +73,6 @@ module fvs_step
 !#define xFVSEXTENSIONS
 !#define xFVSSTARTSTOP
 !#define xFVSDEBUG
-
 
         implicit none
 
@@ -108,6 +86,20 @@ module fvs_step
 
         character(len=*), intent(in) :: keywords_file
         integer, intent(out) :: irtncd
+
+        ! external grow_callback
+        ! integer grow_callback
+! !       Define the growth cycle callback interface
+!         abstract interface
+!           function func (z)
+!             integer :: func
+!             integer, intent (in) :: z
+!           end function func
+!         end interface
+        
+!         !f2py procedure(func), intent(hide) :: grow_callback
+!         procedure(func) :: grow_callback
+!         ! integer cb_rtn
 
         character(len=256) :: keywords
         character(len=100) :: fmt
@@ -170,10 +162,11 @@ module fvs_step
       if (IRTNCD.ne.0) return
       if (IRSTRTCD.lt.0) return
 
-      if (IRSTRTCD.ge.1) then
-        call fvs_grow(IRTNCD)
-        return
-      endif
+!       if (IRSTRTCD.ge.1) then
+!         !! TODO: Does this need to check the grow_callback value?
+!         call fvs_grow(IRTNCD, grow_callback)
+!         return
+!       endif
 
       if (IRSTRTCD.ne.7) then
       ! if (IRSTRTCD.eq.7) goto 19
@@ -405,9 +398,10 @@ module fvs_step
       return
     end subroutine fvs_init
 
-    subroutine fvs_grow(irtncd)
+    subroutine fvs_grow(irtncd, grow_callback)
         !Execute a FVS grow cycle.  Adapted from fvs.f
-        use tree_data, only: save_tree_data,copy_tree_data,copy_mort_data,copy_cuts_data
+        ! use tree_data, only: save_tree_data,copy_tree_data,copy_mort_data,copy_cuts_data
+        ! use, intrinsic :: iso_c_binding
         implicit none
 
 #ifdef _WINDLL
@@ -429,14 +423,12 @@ module fvs_step
         DATA MYACT/100/
         INTEGER IRSTRTCD,ISTOPDONE,lenCl
 
-        ! grow_callback is added by F2PY
-        !! TODO: Move grow_callback to a module for general use
-        !f2py intent(callback) grow_callback
+        ! this works for passing a callback
+        integer :: grow_callback
         external grow_callback
-        integer grow_callback
-        integer cb_rtn,stage
-        !f2py cb_rtn = grow_callback(stage)
-
+        
+        integer cb_rtn
+        
         character(len=100) :: fmt
 
         ! Ensure the simulation is initialized or running
@@ -459,15 +451,17 @@ module fvs_step
             write(JOSTND,fmt) ICYC
         endif
 !#endif /* FVSDEBUG */
-
+        
         ! Callback before tree growth is estimated
         cb_rtn = grow_callback(10)
-        if (cb_rtn.ne.0) return
+        if (cb_rtn.ne.0) then
+            write(*,*) 'Grow Callback returned != 0: ', cb_rtn
+            irtncd = cb_rtn
+            return
+        end if
 
         ! Pass the callback to the growth routines
         CALL TREGRO(grow_callback)
-        !! FIXME:
-        !! call step_tregro()
 
         ! Callback after tree growth is applied
         ! if (present(grow_callback)) then

@@ -13,7 +13,8 @@ import pyfvs
 from pyfvs import fvs
 import pyfvs.variants as v
 
-variants = [(v.lower(),) for v in v.variants]
+variants = [v.lower() for v in v.variants]
+variants_tuples = [(v.lower(),) for v in v.variants]
 
 root = os.path.split(__file__)[0]
 bare_ground_params = [
@@ -27,7 +28,9 @@ bare_ground_params = [
         ['nc', 'rmrs/nc_bareground.key', 'rmrs/nc_bareground.sum.save'],
         ]
 
-@pytest.mark.parametrize(('variant',), variants)
+bare_ground_params = [p for p in bare_ground_params if p[0] in variants]
+
+@pytest.mark.parametrize(('variant',), variants_tuples)
 def test_load_variant(variant):
     """
     Test that variant libraries load and initialize.

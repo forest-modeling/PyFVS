@@ -6,7 +6,8 @@ requires = [
   "wheel",
   "meson",
   "meson-python>=0.15",
-  "ninja",
+  "numpy",
+#  "ninja",
   "patchelf ; platform_system != 'Windows'", ## Only linux???
 #  "cython"
   ]
