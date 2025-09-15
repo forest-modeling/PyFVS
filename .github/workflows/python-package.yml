@@ -67,6 +67,7 @@ jobs:
         name: pyfvs-${{ runner.os }}-py${{ matrix.python-version }}-wheels
         path: dist/*.whl
         if-no-files-found: warn
+        overwrite: true
         
     - name: Store Sdist
       uses: actions/upload-artifact@v4
@@ -74,6 +75,7 @@ jobs:
         name: pyfvs-sdist
         path: dist/*.tar.gz
         if-no-files-found: warn
+        overwrite: true
 #     - name: Test with pytest
 #       run: |
 #         pytest
