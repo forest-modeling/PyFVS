@@ -4,7 +4,7 @@
 project(
   'pyfvs',
   'c', 'cpp',
-  meson_version: '>= 0.64.0',
+  meson_version: '>= 1.8',
   default_options : [
     'buildtype=debugoptimized',
     'c_std=c99',
@@ -78,7 +78,7 @@ if ff.get_id() == 'gcc'
   if is_windows
     add_global_arguments(
       '-DWINDOWS',
-      '-DMS_WIN64',
+      # '-DMS_WIN64',
       language:['c','fortran']
     )
   else

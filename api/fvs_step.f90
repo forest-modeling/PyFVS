@@ -44,6 +44,14 @@ module fvs_step
 
     integer :: sim_status=0
 
+    ! Grow Loop Callback Stages
+    !! FIXME: These are not properly initialized
+    integer,parameter :: GCB_PRE_GROW  = 10 ! Prior to growth estimates
+    integer,parameter :: GCB_INCR      = 20 ! Within tregro.f, immediately after grinc.f, DG & HTG estimated, but not applied, MORT applied
+    integer,parameter :: GCB_DIAM_HT   = 25 ! Within grinc.f, DG & HTG estimated (not applied), but before mortality estimates
+    integer,parameter :: GCB_MORT      = 26 ! Within grinc.f, after mortality estimated, before tripling
+    integer,parameter :: GCB_POST_GROW = 30 ! After to growth estimates are applied
+
     contains
     
     ! BLOCK DATA procedures need to be referenced in order to be linked by the compiler
@@ -87,8 +95,7 @@ module fvs_step
         character(len=*), intent(in) :: keywords_file
         integer, intent(out) :: irtncd
 
-        ! external grow_callback
-        ! integer grow_callback
+        ! integer, external grow_callback
 ! !       Define the growth cycle callback interface
 !         abstract interface
 !           function func (z)
@@ -410,7 +417,7 @@ module fvs_step
 
         !Python F2PY Interface Directives
         !f2py integer,intent(out) :: irtncd
-
+        
         integer, intent(out) :: irtncd
 
         INTEGER I,IA,N,K,NTODO,ITODO,IACTK,IDAT,NP
@@ -424,11 +431,14 @@ module fvs_step
         INTEGER IRSTRTCD,ISTOPDONE,lenCl
 
         ! this works for passing a callback
-        integer :: grow_callback
-        external grow_callback
+        integer,external,optional :: grow_callback
+        !f2py optional :: grow_callback
+        !f2py integer, intent(in) :: x
+        !f2py integer :: y
+        !f2py y = grow_callback(x)
         
         integer cb_rtn
-        
+
         character(len=100) :: fmt
 
         ! Ensure the simulation is initialized or running
@@ -453,21 +463,27 @@ module fvs_step
 !#endif /* FVSDEBUG */
         
         ! Callback before tree growth is estimated
-        cb_rtn = grow_callback(10)
-        if (cb_rtn.ne.0) then
-            write(*,*) 'Grow Callback returned != 0: ', cb_rtn
-            irtncd = cb_rtn
-            return
+        if (present(grow_callback)) then
+            cb_rtn = grow_callback(GCB_PRE_GROW)
+            if (cb_rtn.ne.0) then
+                write(*,*) 'Grow Callback returned != 0: ', cb_rtn
+                irtncd = cb_rtn
+                return
+            end if
         end if
 
         ! Pass the callback to the growth routines
         CALL TREGRO(grow_callback)
 
         ! Callback after tree growth is applied
-        ! if (present(grow_callback)) then
-        cb_rtn = grow_callback(30)
-        if (cb_rtn.ne.0) return
-        ! endif
+        if (present(grow_callback)) then
+            cb_rtn = grow_callback(GCB_POST_GROW)
+            if (cb_rtn.ne.0) then
+                write(*,*) 'Grow Callback returned != 0: ', cb_rtn
+                irtncd = cb_rtn
+                return
+            end if
+        end if
 
 !#ifdef FVSSTARTSTOP
         CALL fvsGetRtnCode(IRTNCD)

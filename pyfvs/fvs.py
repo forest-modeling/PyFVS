@@ -94,6 +94,14 @@ class FVS(object):
         , age='age'
     )
 
+    step_callback_stages = {
+        10: 'GCB_PRE_GROW',
+        20: 'GCB_INCR',
+        25: 'GCB_DIAM_HT',
+        26: 'GCB_MORT',
+        30: 'GCB_POST_GROW'
+    }
+
     def __init__(self, variant, stochastic=False, bootstrap=0, cleanup=True, treelist_format=None
             , workspace=None, title=''):
         """

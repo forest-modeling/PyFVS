@@ -1,3 +1,5 @@
+api/gen
+
 # Temporary and binary files
 *~
 *.py[cod]
