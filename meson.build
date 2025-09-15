@@ -9,8 +9,8 @@ project(
     'buildtype=debugoptimized',
     'c_std=c99',
     'cpp_std=c++14',
-    # 'fortran_std=legacy',
-    'fortran_std=f2003',
+    'fortran_std=legacy',
+    # 'fortran_std=f2003',
     #'blas=openblas',
     #'lapack=openblas'
     ],
