@@ -153,20 +153,20 @@ thread_dep = dependency('threads', required: false)
 incdir_numpy = run_command(py3,
   [
     '-c',
-    'import os; import numpy; os.chdir(".."); print(numpy.get_include())'
+    'import os; import numpy; os.chdir(".."); print(os.path.abspath(numpy.get_include()))'
   ],
   check: true
 ).stdout().strip()
-message(incdir_numpy)
+message('Numpy Include: ' + incdir_numpy)
 
-inc_np = include_directories(incdir_numpy)
+inc_np = include_directories(fs.relative_to(incdir_numpy, meson.current_source_dir()))
 
 incdir_f2py = run_command(py3,
-    ['-c', 'import os; import numpy.f2py; print(numpy.f2py.get_include())'],
+    ['-c', 'import os; import numpy.f2py; print(os.path.abspath(numpy.f2py.get_include()))'],
     check : true
 ).stdout().strip()
-message(incdir_f2py)
-inc_f2py = include_directories(incdir_f2py)
+message('F2PY Include: ' + incdir_f2py)
+inc_f2py = include_directories(fs.relative_to(incdir_f2py, meson.current_source_dir()))
 fortranobject_c = incdir_f2py / 'fortranobject.c'
 
 cc = meson.get_compiler('c')

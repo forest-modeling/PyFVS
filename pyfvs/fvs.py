@@ -71,7 +71,7 @@ class FVS(object):
 
     Usage:
         fvs = FVS(<variant abbreviation>)
-        fvs.run_fvs(<path to keyword file>)
+        fvs.execute_projection(<path to keyword file>)
 
        # Return a tuple of species codes given an FVS ID using the FVS API.
        spp_attrs = fvs.fvsspeciescode(16)
@@ -223,7 +223,6 @@ class FVS(object):
         Set the inventory trees dataframe
         """
 
-        ## TODO: Check for required fields
         ## TODO: Defer loading arrays until the simulation is started
 
         required = ['plot_id','tree_id','species','prob','diameter']
@@ -644,6 +643,10 @@ class FVS(object):
         r = self.grow(cycles)
 
     def run(self):
+        deprecation('FVS.run is deprecated, use FVS.grow_all.', level=2)
+        self.grow_all()
+
+    def grow_all(self):
         """
         Convenience method to execute and end a complete projection.
         """
@@ -684,7 +687,7 @@ class FVS(object):
                 self.end_projection()
         except:
             # FIXME: should this pass silently?
-            warnings.RuntimeWarning('FVS did not end quietly.')
+            warnings.warn('FVS did not end quietly.', RuntimeWarning, stacklevel=2)
             pass
 
     def end_projection(self):
@@ -737,7 +740,7 @@ class FVS(object):
         Convenience method to execute all cycles.
 
         Args:
-            keywords: Path of the keyword file initialize FVS with.
+            kwds: Path of the keyword file initialize FVS with.
             trees: Trees dataset
         """
 
@@ -942,7 +945,7 @@ class FVS(object):
             raise
 
         # Return the summary values for the cycles in the run
-        return(self.fvslib.commmon.iosum[i, :self.num_cycles + 1])
+        return(self.fvslib.globals.iosum[i, :self.num_cycles + 1])
 
 error_codes = {
     1: 'Invalid keyword specified.',

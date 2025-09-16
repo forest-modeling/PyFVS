@@ -37,19 +37,20 @@ for c in range(f.globals.ncyc):
 r = f.end_projection()
 
 
-f = fvs.FVS(variant)
-# f.fvs_step.init_params()
+## FIXME: The callback is supposed to be optional
+# f = fvs.FVS(variant)
+# # f.fvs_step.init_params()
 
-print('\n\ninit - no callback')
-f.init_projection(os.path.join(root, kwds))
+# print('\n\ninit - no callback')
+# f.init_projection(os.path.join(root, kwds))
 
-for c in range(f.globals.ncyc):
-  print(f'Cycle: {c}')
-  r = f.fvs_step.fvs_grow()
-  if r!=0:
-    print(f'FVS Grow Error Code: {r}')
-    break
+# for c in range(f.globals.ncyc):
+#   print(f'Cycle: {c}')
+#   r = f.fvs_step.fvs_grow()
+#   if r!=0:
+#     print(f'FVS Grow Error Code: {r}')
+#     break
 
-r = f.end_projection()
+# r = f.end_projection()
 
 print('Done')

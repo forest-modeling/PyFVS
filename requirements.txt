@@ -1,6 +1,6 @@
-python>=3.8
 numpy
 pandas
+openpyxl
 matplotlib
 click
 confuse
