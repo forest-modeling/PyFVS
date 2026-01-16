@@ -10,8 +10,6 @@
 [![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/PyFVS)
 -->
 
-[![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
-
 # PyFVS
 
 Python wrappers and utilities for using the Forest Vegetation Simulator
@@ -20,7 +18,7 @@ The PyFVS [FVS source code](https://github.com/forest-modeling/ForestVegetationS
 
 ## Documentation
 
-Check out the new AI generated documentation and [wiki](https://deepwiki.com/forest-modeling/PyFVS)
+Check out the new AI generated documentation [wiki](https://deepwiki.com/forest-modeling/PyFVS).
 
 ## Features
 
@@ -65,7 +63,7 @@ for cycle in f:
 f.end_projection()
 ```
 
-### Genarate keywords from a bareground simulation at runtime
+### Genarate keywords for a bareground simulation
 
 ``` Python
 from pyfvs import fvs,keywords
