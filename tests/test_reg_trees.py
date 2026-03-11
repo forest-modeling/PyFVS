@@ -84,10 +84,10 @@ sim.inventory_trees = rx_trees
 # inv.print_trees()
 
 # sim.init_projection(kw)
-# r = sim.run()
+# r = sim.grow_all()
 # r = sim.execute_projection(kw)
 sim.keywords = kw
-r = sim.run()
+r = sim.grow_all()
 print(sim.summary)
 
 print('FVS Return Code: %s' % r)

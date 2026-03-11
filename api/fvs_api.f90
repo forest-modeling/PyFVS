@@ -25,4 +25,15 @@ module fvs_api
 
   contains
 
+  function get_mrule_idx(spp) result(idx)
+    integer :: spp, idx
+
+    ! TODO: Expand to lookup multiple species or groups of species
+    idx = 1 ! conifer
+    if (spp>=300) then
+      idx = 2 ! hardwood
+    end if
+
+  end function get_mrule_idx
+
 end module fvs_api

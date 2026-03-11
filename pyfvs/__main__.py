@@ -2,7 +2,9 @@
 import os
 import sys
 import logging
+import importlib
 
+import numpy as np
 import pandas as pd
 import click
 
@@ -29,6 +31,7 @@ def cli(ctx, version=False):
 @click.pass_context
 @click.argument('variant', metavar='<variant>')
 @click.option('-k', '--keywords', type=click.Path(exists=True), help='Path to the FVS keyword file to execute.')
+@click.option('-c', '--commandline', is_flag=True, default=False, help='Run FVS using the legacy commandline routine.')
 @click.option('-b', '--bootstrap', is_flag=True, help='(not impl) Bootstrap resampling of sample plot data.')
 @click.option('-d', '--debug', is_flag=True, help='Set logging level to debug.')
 @click.option('-s', '--stochastic', is_flag=True, help='Run FVS with stochastic components.')
@@ -37,7 +40,7 @@ def cli(ctx, version=False):
 @click.option('--fvs-mort', is_flag=True, help='Use the former FVS mortality functions for PN & WC variants.')
 @click.option('--forest-type', is_flag=True, help='Calculate FVS forest type.')
 def run(ctx,
-    variant, keywords=None, bootstrap=False, debug=False, stochastic=False, prompt=False
+    variant, keywords=None, commandline=False, bootstrap=False, debug=False, stochastic=False, prompt=False
     , fvs_mort=False, forest_type=False, trees_path=None
     ):
     """
@@ -72,6 +75,16 @@ def run(ctx,
         msg = 'The keyword file is does not exist: {}'.format(keywords)
         log.error(msg)
         sys.exit(1)
+    
+    if commandline:
+        # Run the legacy commandline routine using the provided keywords
+        variant_libname = f'pyfvs.fvs{variant.lower()}'
+        fvslib = importlib.import_module(variant_libname)
+        cl = f'--keywordfile={keywords}'
+        fvslib.fvssetcmdline(cl,len(cl))
+        fvslib.fvs()
+        
+        sys.exit(0)
 
     # Execute the run
     try:
@@ -106,7 +119,7 @@ def run(ctx,
 
     cols = ['year','age','tpa','baa','qmd','top_ht','tcuft','mcuft','mbdft','rem_mbdft','mort']
     summary = fvs.summary
-    summary['qmd'] = (summary['baa']/summary['tpa']/0.005454154)**0.5
+    summary['qmd'] = np.round((summary['baa']/summary['tpa']/0.005454154)**0.5,1)
 
     print(summary.loc[:,cols])
     # print(fvs.summary.columns)

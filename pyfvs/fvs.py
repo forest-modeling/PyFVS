@@ -246,7 +246,7 @@ class FVS(object):
         missing = [c for c in optional if not c in cols]
         if missing:
             msg = f'** Optional columns missing from tree records: {missing}'
-            print(msg)
+            log.debug(msg)
 
         # Assign zeros to missing optional attributes
         for col in missing:
@@ -889,7 +889,8 @@ class FVS(object):
         cols = ['year','age','tpa','tcuft','mcuft','mbdft'
                 ,'rem_tpa','rem_tcuft','rem_mcuft','rem_mbdft'
                 ,'baa','ccf','top_ht','per_len','accr','mort'
-                ,'sam_wgt','for_type','size','stock']
+                ,'sam_wgt','for_type','size','stock'
+                ,'cuft_saw','rem_cuft_saw']
 
         df = pd.DataFrame.from_records(
             self.fvslib.globals.iosum[:, :self.num_cycles + 1].T
@@ -903,8 +904,8 @@ class FVS(object):
 
         Args:
             variable: The summary variable to return. One of the following:
-                year, age, tpa, total cuft, merch cuft, merch bdft,
-                removed tpa, removed total cuft, removed merch cuft,
+                year, age, tpa, total cuft, merch cuft, saw cuft, merch bdft,
+                removed tpa, removed total cuft, removed merch cuft, removed saw cuft,
                 removed merch bdft, baa after, ccf after, top ht after,
                 period length, accretion, mortality, sample weight,
                 forest type, size class, stocking class
@@ -916,21 +917,23 @@ class FVS(object):
             , 'tpa': 2
             , 'total cuft': 3
             , 'merch cuft': 4
-            , 'merch bdft': 5
-            , 'removed tpa': 6
-            , 'removed total cuft': 7
-            , 'removed merch cuft': 8
-            , 'removed merch bdft': 9
-            , 'baa after':10
-            , 'ccf after':11
-            , 'top ht after':12
-            , 'period length':13
-            , 'accretion':14
-            , 'mortality':15
-            , 'sample weight':16
-            , 'forest type':17
-            , 'size class':18
-            , 'stocking class':19
+            , 'saw cuft': 5
+            , 'merch bdft': 6
+            , 'removed tpa': 7
+            , 'removed total cuft': 8
+            , 'removed merch cuft': 9
+            , 'removed saw cuft': 10
+            , 'removed merch bdft': 11
+            , 'baa after':12
+            , 'ccf after':13
+            , 'top ht after':14
+            , 'period length':15
+            , 'accretion':16
+            , 'mortality':17
+            , 'sample weight':18
+            , 'forest type':19
+            , 'size class':20
+            , 'stocking class':21
             }
 
         try:

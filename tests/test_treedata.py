@@ -52,11 +52,13 @@ def test_tree_data(variant, kwd_path, sum_path):
     r = f.end_projection()
     assert r == 0
 
-    widths = [4, 4, 6, 4, 5, 4, 4, 5, 6, 6, 6, 6, 6, 6, 6, 4, 5, 4, 4, 5, 8, 5, 6, 8, 4, 2, 1]
+    widths = [4, 4, 6, 4, 5, 4, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 5, 4, 4, 5, 8, 5, 6, 8, 4, 2, 1]
     fldnames = (
             'year,age,tpa,baa,sdi,ccf,top_ht,qmd,total_cuft'
-            ',merch_cuft,merch_bdft,rem_tpa,rem_total_cuft'
-            ',rem_merch_cuft,rem_merch_bdft,res_baa,res_sdi'
+            ',merch_cuft,saw_cuft,merch_bdft'
+            ',rem_tpa,rem_total_cuft'
+            ',rem_merch_cuft,rem_saw_cuft,rem_merch_bdft'
+            ',res_baa,res_sdi'
             ',res_ccf,res_top_ht,resid_qmd,grow_years'
             ',annual_acc,annual_mort,mai_merch_cuft,for_type'
             ',size_class,stocking_class'
@@ -94,30 +96,31 @@ def test_tree_data(variant, kwd_path, sum_path):
     assert np.all(np.isclose(check_baa, baa, atol=1))
 
     ## FIXME: Volume mrules.f includes modified merch rules for ODF
-    # # Total CuFt +/- 1
-    # tpa = f.tree_data.live_tpa[:, :ncyc + 1]
-    # cuft = f.tree_data.cuft_total[:, :ncyc + 1]
-    # tot_cuft = np.round(np.sum(tpa * cuft, axis=0), 0).astype(int)
-    # check_cuft = sum_check.loc[:, 'total_cuft'].values
-    # assert np.all(np.isclose(check_cuft, tot_cuft, atol=1))
+    # Total CuFt +/- 1
+    tpa = f.tree_data.live_tpa[:, :ncyc + 1]
+    cuft = f.tree_data.cuft_total[:, :ncyc + 1]
+    tot_cuft = np.round(np.sum(tpa * cuft, axis=0), 0).astype(int)
+    check_cuft = sum_check.loc[:, 'total_cuft'].values
+    assert np.all(np.isclose(check_cuft, tot_cuft, atol=1))
 
-    # # Total BdFt +/- 1
-    # tpa = f.tree_data.live_tpa[:, :ncyc + 1]
-    # bdft = f.tree_data.bdft_net[:, :ncyc + 1]
-    # tot_bdft = np.round(np.sum(tpa * bdft, axis=0), 0).astype(int)
-    # check_bdft = sum_check.loc[:, 'merch_bdft'].values
-    # assert np.all(np.isclose(check_bdft, tot_bdft, atol=1))
+    # Total BdFt +/- 1
+    tpa = f.tree_data.live_tpa[:, :ncyc + 1]
+    bdft = f.tree_data.bdft_net[:, :ncyc + 1]
+    tot_bdft = np.round(np.sum(tpa * bdft, axis=0), 0).astype(int)
+    check_bdft = sum_check.loc[:, 'merch_bdft'].values
+    assert np.all(np.isclose(check_bdft, tot_bdft, atol=1))
 
-    # # Cut TPA +/ 1
-    # cut_tpa = f.tree_data.cut_tpa[:, :ncyc + 1]
-    # bdft = f.tree_data.bdft_net[:, :ncyc + 1]
-    # cut_bdft = np.round(np.sum(cut_tpa * bdft, axis=0), 0).astype(int)
-    # check_cut = sum_check.loc[:, 'rem_merch_bdft'].values
-    # # print(np.round(np.sum(cut_tpa, axis=0), 0).astype(int))
-    # # print(cut_bdft)
-    # # print(check_cut)
-    # assert np.all(np.isclose(check_cut, cut_bdft, atol=1))
+    # Cut TPA +/ 1
+    cut_tpa = f.tree_data.cut_tpa[:, :ncyc + 1]
+    bdft = f.tree_data.bdft_net[:, :ncyc + 1]
+    cut_bdft = np.round(np.sum(cut_tpa * bdft, axis=0), 0).astype(int)
+    check_cut = sum_check.loc[:, 'rem_merch_bdft'].values
+    # print(np.round(np.sum(cut_tpa, axis=0), 0).astype(int))
+    # print(cut_bdft)
+    # print(check_cut)
+    assert np.all(np.isclose(check_cut, cut_bdft, atol=1))
 
+    ## TODO: Add sawlog volume fields
     ## TODO: Test mortality arrays
     ## TODO: Test snag arrays
     ## TODO: Test carbon reports

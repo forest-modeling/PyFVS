@@ -13,25 +13,30 @@ def convert(input, output):
   # Strip newlines and trailing whitespace
   src = [l.rstrip() for l in src]
 
+  last_code_line = 0
   for i in range(len(src)):
     if not src[i].strip():
       continue
 
     if src[i][0].lower()=='c':
       src[i] = '!' + src[i]
+      continue
 
     if src[i][0]=='*':
       src[i] = '!' + src[i]
-
+      continue
+    
     # Replace F77 line continuations
     if len(src[i])>=6 and src[i][5] in ('&','>'):
       if len(src[i][6:].strip())>0:
         # Strip the continuation character
         src[i] = '      ' + src[i][6:]
         # Continuation goes at the end of the previous line
-        src[i-1] = src[i-1] + ' &'
+        src[last_code_line] = src[last_code_line] + ' &'
       else:
         src[i] = ''
+    
+    last_code_line = i
 
   # Add back the newlines
   src = [l + '\n' for l in src]

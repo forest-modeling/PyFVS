@@ -26,6 +26,11 @@ def strip_common(path, outpath):
 
     new_lines.append(line)
 
+  # for i,line in enumerate(new_lines):
+  #   _line = line.strip()
+  #   if _line.startswith('subroutine fvs('):
+  #     new_lines[i+1] = '            integer intent(out) :: irtncd\n'
+
   with open(outpath, 'w') as f:
     f.writelines(new_lines)
 

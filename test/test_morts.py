@@ -1,6 +1,9 @@
+import os
+
 from pyfvs import fvs
 
-kwds = 'test/nc_carbon.key'
+root = os.path.split(__file__)[0]
+kwds = root + '/nc_carbon.key'
 
 f = fvs.FVS('wc')
 f.fvs_api.use_fvs_morts=True

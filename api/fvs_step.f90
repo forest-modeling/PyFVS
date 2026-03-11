@@ -46,11 +46,11 @@ module fvs_step
 
     ! Grow Loop Callback Stages
     !! FIXME: These are not properly initialized
-    integer,parameter :: GCB_PRE_GROW  = 10 ! Prior to growth estimates
-    integer,parameter :: GCB_INCR      = 20 ! Within tregro.f, immediately after grinc.f, DG & HTG estimated, but not applied, MORT applied
-    integer,parameter :: GCB_DIAM_HT   = 25 ! Within grinc.f, DG & HTG estimated (not applied), but before mortality estimates
-    integer,parameter :: GCB_MORT      = 26 ! Within grinc.f, after mortality estimated, before tripling
-    integer,parameter :: GCB_POST_GROW = 30 ! After to growth estimates are applied
+    integer,parameter :: GCB_PRE_GROW     = 10 ! Prior to growth estimates
+    integer,parameter :: GCB_INCR         = 20 ! Within tregro.f, immediately after grinc.f, DG & HTG estimated, but not applied, MORT applied
+    integer,parameter :: GCB_POST_DG_HTG  = 25 ! Within grinc.f, DG & HTG estimated (not applied), but before mortality estimates
+    integer,parameter :: GCB_POST_MORT    = 26 ! Within grinc.f, after mortality estimated, before tripling
+    integer,parameter :: GCB_POST_GROW    = 30 ! After to growth estimates are applied
 
     contains
     

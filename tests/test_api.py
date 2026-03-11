@@ -40,13 +40,14 @@ class TreesTest(unittest.TestCase):
 
         kw += estab
 
-        sim.run()
+        sim.grow_all()
 
         default_summary = sim.summary.copy()
 
         sim = fvs.FVS(fvs_variant, workspace=workspace, cleanup=False)
-        sim.fvslib.globals.use_api_mrules = True
-        sim.fvslib.globals.mrule_maxlen = [40,32]
+
+        sim.fvslib.fvs_api.use_api_mrules = True
+        sim.fvslib.fvs_api.mrule_maxlen = [40,32]
 
         kw = sim.keywords
         kw += kwds.STDINFO(location=forest_code)
@@ -59,7 +60,7 @@ class TreesTest(unittest.TestCase):
 
         kw += estab
 
-        sim.run()
+        sim.grow_all()
 
         test_summary = sim.summary.copy()
 

@@ -10,7 +10,9 @@ import time
 
 import pyfvs
 from pyfvs import fvs
+import pyfvs.variants as v
 
+variants = [v.lower() for v in v.variants]
 root = os.path.split(__file__)[0]
 fvs_tests = f'{root}/../fvs/tests'
 
@@ -23,6 +25,8 @@ fmsc_params = [
         ['oc', f'{fvs_tests}/FVSoc/oct01.key', f'{fvs_tests}/FVSoc/oct01.sum.save'],
         ['op', f'{fvs_tests}/FVSop/opt01.key', f'{fvs_tests}/FVSop/opt01.sum.save'],
         ]
+
+fmsc_params = [p for p in fmsc_params if p[0] in variants]
 
 @pytest.mark.parametrize(('variant', 'kwd_path', 'sum_path'), fmsc_params)
 def test_fmsc(variant, kwd_path, sum_path):
@@ -41,7 +45,9 @@ def test_fmsc(variant, kwd_path, sum_path):
 
     except:
         raise
-
+    
+    print('***', f.fvslib.__file__)
+    
     f.init_projection(os.path.abspath(kwd_path))
 
     for c in range(f.globals.ncyc):
@@ -50,12 +56,12 @@ def test_fmsc(variant, kwd_path, sum_path):
     r = f.end_projection()
     assert r == 0
 
-    widths = [4, 4, 6, 4, 5, 4, 4, 5, 6, 6, 6, 6, 6, 6, 6, 4, 5, 4, 4, 5, 8, 5, 6, 8, 4, 2, 1]
+    widths = [4, 4, 6, 4, 5, 4, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 5, 4, 4, 5, 8, 5, 6, 8, 4, 2, 1]
     fldnames = (
             'year,age,tpa,baa,sdi,ccf,top_ht,qmd,total_cuft'
-            ',merch_cuft,merch_bdft'
+            ',merch_cuft,saw_cuft,merch_bdft'
             ',rem_tpa,rem_total_cuft'
-            ',rem_merch_cuft,rem_merch_bdft'
+            ',rem_merch_cuft,rem_saw_cuft,rem_merch_bdft'
             ',res_baa,res_sdi'
             ',res_ccf,res_top_ht,resid_qmd,grow_years'
             ',annual_acc,annual_mort,mai_merch_cuft,for_type'
@@ -75,14 +81,20 @@ def test_fmsc(variant, kwd_path, sum_path):
 
     # print(sum_check.iloc[:n]['year'])
     # print(sum_test.iloc[:n]['year'])
-    for fld in fldnames[:18]:
+    for fld in fldnames: #[:9]:
         ## FIXME: Volume mrules.f includes modified merch rules for ODF
-        if 'merch' in fld:
+        if 'merch' in fld or 'saw' in fld:
             continue
         a = sum_check.iloc[:n][fld].astype(float)
         b = sum_test.iloc[:n][fld].astype(float)
-        assert np.all(np.isclose(a, b, atol=1))
-
-
+        if not np.all(np.isclose(a, b, atol=1)):
+            print(fld)
+            # print(a)
+            # print(b)
+            print(np.array([a,b]).T)
+            raise AssertionError()
+        
 if __name__ == '__main__':
+    # for params in fmsc_params:
+    #     test_fmsc(*params)
     test_fmsc(*fmsc_params[0])
