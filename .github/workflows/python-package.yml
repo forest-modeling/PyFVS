@@ -82,6 +82,7 @@ jobs:
     # Store the source distribution one time per build
     - name: Create sdist
       run: |
+        python -m pip install build
         python -m build --sdist --no-isolation
         
     - name: Store Sdist
