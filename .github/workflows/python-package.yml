@@ -40,7 +40,7 @@ jobs:
         submodules: recursive
         
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
         architecture: 'x64'
@@ -66,20 +66,23 @@ jobs:
         python -m build --no-isolation
         
     - name: Store Wheel
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: pyfvs-${{ runner.os }}-py${{ matrix.python-version }}-wheels
         path: dist/*.whl
         if-no-files-found: warn
         overwrite: true
-        
+
+  store-artifacts:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    # TODO: Add steps to gather wheels and publish to PyPI
+    # Store the source distribution one time per build
     - name: Store Sdist
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: pyfvs-sdist
         path: dist/*.tar.gz
         if-no-files-found: warn
         overwrite: true
-#     - name: Test with pytest
-#       run: |
-#         pytest
