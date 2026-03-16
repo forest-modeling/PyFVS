@@ -63,7 +63,7 @@ jobs:
         
     - name: Build and package
       run: |
-        python -m build --no-isolation
+        python -m build --wheel --no-isolation
         
     - name: Store Wheel
       uses: actions/upload-artifact@v7
@@ -78,7 +78,12 @@ jobs:
     needs: build
     steps:
     # TODO: Add steps to gather wheels and publish to PyPI
+    # TODO: Merge artifacts, uses: [actions/upload-artifact/merge@v4](https://github.com)
     # Store the source distribution one time per build
+    - name: Create sdist
+      run: |
+        python -m build --sdist --no-isolation
+        
     - name: Store Sdist
       uses: actions/upload-artifact@v7
       with:
