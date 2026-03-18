@@ -82,19 +82,27 @@ jobs:
       with:
         submodules: recursive
         
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v6
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.13
         architecture: 'x64'
         cache: 'pip'
         
     # TODO: Add steps to gather wheels and publish to PyPI
     # TODO: Merge artifacts, uses: [actions/upload-artifact/merge@v4](https://github.com)
     # Store the source distribution one time per build
-    - name: Create sdist
+    - name: Install dependencies
       run: |
         python -m pip install click numpy pandas matplotlib build wheel setuptools setuptools_scm meson-python pytest ninja
+        
+    - name: Install Patchelf
+      if: runner.os == 'Linux'
+      run: |
+        python -m pip install patchelf
+        
+    - name: Create sdist
+      run: |
         python -m build --sdist --no-isolation
         
     - name: Store Sdist
