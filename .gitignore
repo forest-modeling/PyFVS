@@ -74,3 +74,6 @@ dask-worker-space
 *.zip
 /build_wsl/
 /conda
+# pixi environments
+.pixi/*
+!.pixi/config.toml

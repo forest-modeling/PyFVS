@@ -24,6 +24,7 @@ readme = {file="README.md", content-type="text/markdown"}
 keywords = ["Forest Modeling", "FVS"]
 
 dynamic = ["version"]
+dependencies = ["build>=1.5.0,<2"]
 
 [project.urls]
 repository = "https://github.com/forest-modeling/PyFVS"
@@ -49,3 +50,34 @@ commands = ['devpy.build', 'devpy.test']
 addopts = [
     "--import-mode=importlib",
 ]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-dependencies]
+#pyfvs = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+python = "3.13.*"
+numpy = ">=2.4.3,<3"
+click = ">=8.3.3,<9"
+wheel = ">=0.47.0,<0.48"
+meson = ">=1.11.1,<2"
+meson-python = ">=0.19.0,<0.20"
+setuptools = ">=82.0.1,<83"
+setuptools_scm = ">=9.2.2,<10"
+gcc = ">=15.2.0,<15.3"
+gxx = ">=15.2.0,<15.3"
+gfortran = ">=15.2.0,<15.3"
+pandas = ">=3.0.2,<4"
+ninja = ">=1.13.2,<2"
+pip = ">=26.1.1,<27"
+confuse = ">=2.2.0,<3"
+pytest = ">=9.0.3,<10"
+openpyxl = ">=3.1.5,<4"
+
+[target.linux-64.dependencies]
+patchelf = ">=0.17.2,<0.18"
