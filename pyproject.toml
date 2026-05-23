@@ -9,7 +9,8 @@ requires = [
   "numpy",
 #  "ninja",
   "patchelf ; platform_system != 'Windows'", ## Only linux???
-#  "cython"
+#  "cython",
+  "build>=1.5.0,<2"
   ]
 build-backend = "mesonpy"
 
@@ -24,7 +25,12 @@ readme = {file="README.md", content-type="text/markdown"}
 keywords = ["Forest Modeling", "FVS"]
 
 dynamic = ["version"]
-dependencies = ["build>=1.5.0,<2"]
+dependencies = [
+  "confuse",
+  "click",
+  "numpy",
+  "pandas"
+  ]
 
 [project.urls]
 repository = "https://github.com/forest-modeling/PyFVS"
@@ -56,7 +62,8 @@ channels = ["conda-forge"]
 platforms = ["linux-64"]
 
 [tool.pixi.tasks]
-build-dev = "python -m pip install --no-build-isolation -e ."
+dev = "python -m pip install --no-build-isolation -e ."
+build = "python -m build --no-isolation"
 
 [tool.pixi.dependencies]
 python = "3.13.*"
@@ -75,7 +82,6 @@ ninja = ">=1.13.2,<2"
 pip = ">=26.1.1,<27"
 confuse = ">=2.2.0,<3"
 pytest = ">=9.0.3,<10"
-openpyxl = ">=3.1.5,<4"
 
 [target.linux-64.dependencies]
 patchelf = ">=0.17.2,<0.18"
