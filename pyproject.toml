@@ -32,7 +32,8 @@ dependencies = [
   "click>=8.0.0,<9",
   "pandas>=2.2.2",
   "numpy>=2.1.0,<3",
-  "pandas>=3.0.2,<4"
+  "pandas>=3.0.2,<4",
+  "typing-extensions" # required by confuse
   ]
 
 [project.urls]
