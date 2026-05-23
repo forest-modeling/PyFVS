@@ -30,9 +30,8 @@ dynamic = ["version"]
 dependencies = [
   "confuse>=2.0.0,<3",
   "click>=8.0.0,<9",
-  "pandas>=2.2.2",
+  "pandas>=2.2.2,<4",
   "numpy>=2.1.0,<3",
-  "pandas>=3.0.2,<4",
   "typing-extensions" # required by confuse
   ]
 
