@@ -5,9 +5,9 @@ name: Build Packages
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build:
@@ -80,6 +80,8 @@ jobs:
         path: dist/*.tar.gz
         if-no-files-found: warn
         overwrite: true
-#     - name: Test with pytest
-#       run: |
-#         pytest
+
+    - name: Test with pytest
+      working-directory: .
+      run: |
+        pytest
