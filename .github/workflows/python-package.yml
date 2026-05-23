@@ -54,7 +54,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install .
+        python -m pip install confuse typing-extensions click numpy pandas matplotlib build wheel setuptools setuptools_scm meson-python pytest ninja
 
     - name: Install Patchelf
       if: runner.os == 'Linux'
