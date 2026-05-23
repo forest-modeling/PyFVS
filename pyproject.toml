@@ -23,13 +23,16 @@ authors = [
 license = {file="LICENSE.txt"}
 readme = {file="README.md", content-type="text/markdown"}
 keywords = ["Forest Modeling", "FVS"]
+requires-python = ">=3.10"
 
 dynamic = ["version"]
+
 dependencies = [
-  "confuse",
-  "click",
-  "numpy",
-  "pandas"
+  "confuse>=2.0.0,<3",
+  "click>=8.0.0,<9",
+  "pandas>=2.2.2",
+  "numpy>=2.1.0,<3",
+  "pandas>=3.0.2,<4"
   ]
 
 [project.urls]
@@ -37,6 +40,15 @@ repository = "https://github.com/forest-modeling/PyFVS"
 
 [project.scripts]
 pyfvs = "pyfvs.__main__:cli"
+
+[dependency-groups]
+test = [
+  "pytest>=9.0.3,<10"
+]
+dev = [
+  "pytest>=9.0.3,<10",
+  "openpyxl>=3.1.5,<4"
+]
 
 [tool.setuptools]
 packages = ["pyfvs",]
@@ -66,22 +78,31 @@ dev = "python -m pip install --no-build-isolation -e ."
 build = "python -m build --no-isolation"
 
 [tool.pixi.dependencies]
-python = "3.13.*"
-numpy = ">=2.4.3,<3"
-click = ">=8.3.3,<9"
+# Python runtime and build tools
+python = "3.14.*"
+# Build system dependencies
 wheel = ">=0.47.0,<0.48"
 meson = ">=1.11.1,<2"
 meson-python = ">=0.19.0,<0.20"
 setuptools = ">=82.0.1,<83"
 setuptools_scm = ">=9.2.2,<10"
+ninja = ">=1.13.2,<2"
+pip = ">=26.1.1,<27"
+# Compilers and toolchain
 gcc = ">=15.2.0,<15.3"
 gxx = ">=15.2.0,<15.3"
 gfortran = ">=15.2.0,<15.3"
+# Project runtime and dev dependencies (pinned for reproducibility)
+# These should be kept in sync with [project] dependencies and [dependency-groups]
+numpy = ">=2.4.3,<3"
 pandas = ">=3.0.2,<4"
-ninja = ">=1.13.2,<2"
-pip = ">=26.1.1,<27"
+click = ">=8.3.3,<9"
 confuse = ">=2.2.0,<3"
 pytest = ">=9.0.3,<10"
+openpyxl = ">=3.1.5,<4"
+
+[tool.pixi.pypi-dependencies]
+build = ">=1.5.0,<2"
 
 [target.linux-64.dependencies]
 patchelf = ">=0.17.2,<0.18"
