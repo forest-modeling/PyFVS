@@ -84,4 +84,5 @@ jobs:
     - name: Test with pytest
       working-directory: .
       run: |
+        pip install dist/*.whl
         pytest
