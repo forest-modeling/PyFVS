@@ -13,7 +13,7 @@ from pyfvs import fvs
 import pyfvs.variants as v
 
 variants = [v.lower() for v in v.variants]
-root = os.path.split(__file__)[0]
+root = os.path.dirname(os.path.abspath(__file__))
 fvs_tests = f'{root}/../fvs/tests'
 
 fmsc_params = [
@@ -30,14 +30,14 @@ fmsc_params = [p for p in fmsc_params if p[0] in variants]
 
 @pytest.mark.parametrize(('variant', 'kwd_path', 'sum_path'), fmsc_params)
 def test_fmsc(variant, kwd_path, sum_path):
-
     ## NOTE: FMSC tests are in the FVS subfolder, which won't be available with an out-of-source build
     if not os.path.exists(kwd_path):
         pytest.skip('FMSC keyword file not found: {}'.format(kwd_path))
         return None
 
     try:
-        f = fvs.FVS(variant)
+        workspace = os.path.dirname(kwd_path)
+        f = fvs.FVS(variant, workspace=workspace, cleanup=False)
 
     except ImportError:
         pytest.skip('No variant library: {}'.format(variant))

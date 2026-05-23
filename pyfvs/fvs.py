@@ -318,6 +318,9 @@ class FVS(object):
         # Ensure there aren't any inventory records hanging around from previous runs
         self.fvslib.inventory_trees.reset()
 
+        # Reset the FVS API to clear any existing data and state
+        self.fvs_api.reset()
+
     # TODO: Add species code translation methods.
     @property
     def spp_codes(self):
