@@ -89,3 +89,24 @@ jobs:
         pip install confuse typing-extensions openpyxl click pandas matplotlib 
         pip install dist/*.whl
         pytest
+
+  publish:
+    name: Publish to TestPyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+          
+      - name: Publish to TestPyPI
+        if: github.ref == 'refs/heads/dev'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/  # Directs upload to TestPyPI
+        
