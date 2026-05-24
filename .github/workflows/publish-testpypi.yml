@@ -2,7 +2,7 @@ name: Publish to TestPyPI
 
 on:
   workflow_run:
-    workflows: ["Main Build Workflow"] # Must match the 'name' of your primary build workflow
+    workflows: ["Build Packages"] # Must match the 'name' of your primary build workflow
     types:
       - completed
 
