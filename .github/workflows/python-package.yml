@@ -101,8 +101,9 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-package-distributions
-          path: dist/
+          pattern: pyfvs-*
+          path: dist
+          merge-multiple: true
           
       - name: Publish to TestPyPI
         if: github.ref == 'refs/heads/dev'
