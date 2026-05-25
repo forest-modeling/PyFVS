@@ -37,8 +37,6 @@ jobs:
           # Build for Python 3.10 to 3.13. 3.14 may not yet be supported by cibuildwheel.
           CIBW_BUILD: cp310-* cp311-* cp312-* cp313-*
           CIBW_SKIP: "*-win32 *_i686"
-          #CIBW_CONFIG_SETTINGS: "-Dfvsvariants=pn,op,wc,ca,so,oc,ec,nc,bm" # Pass variants to meson build
-          CIBW_CONFIG_SETTINGS: "-Dfvsvariants=pn"
           
           # Linux specific: install gfortran in the manylinux container
           CIBW_BEFORE_ALL_LINUX: >
@@ -55,7 +53,7 @@ jobs:
 
           # Testing
           CIBW_TEST_REQUIRES: pytest confuse typing-extensions openpyxl click pandas matplotlib
-          CIBW_TEST_COMMAND: pytest tests
+          CIBW_TEST_COMMAND: pytest {project}/tests
 
       - uses: actions/upload-artifact@v4
         with:
