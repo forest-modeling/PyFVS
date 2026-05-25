@@ -10,7 +10,7 @@ requires = [
   "ninja",
   "patchelf ; platform_system != 'Windows'", ## Only linux???
 #  "cython",
-  "build>=1.5.0,<2"
+  "build"
   ]
 build-backend = "mesonpy"
 
