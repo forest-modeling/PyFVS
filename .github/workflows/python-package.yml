@@ -58,13 +58,16 @@ jobs:
         # Install build dependencies inside the wheel-build environment
         CIBW_BEFORE_BUILD_LINUX: |
           dnf install -y gcc-gfortran ninja-build &&
-          pip install click numpy pandas matplotlib build wheel setuptools setuptools_scm meson-python pytest ninja patchelf
+          pip install click numpy pandas build wheel setuptools setuptools_scm meson-python ninja patchelf
 
         CIBW_BEFORE_BUILD_WINDOWS: |
-          pip install click numpy pandas matplotlib build wheel setuptools setuptools_scm meson-python pytest ninja
+          pip install click numpy pandas build wheel setuptools setuptools_scm meson-python ninja
 
         CIBW_BUILD_FRONTEND: "build"
         CIBW_BUILD_VERBOSITY: 1
+
+        CIBW_TEST_REQUIRES: pytest openpyxl
+        CIBW_TEST_COMMAND: pytest {project}/tests
 
       with:
         output-dir: dist
@@ -97,8 +100,8 @@ jobs:
     - name: Install build dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install click numpy pandas matplotlib build wheel \
-          setuptools setuptools_scm meson-python pytest ninja patchelf
+        python -m pip install click numpy pandas build wheel \
+          setuptools setuptools_scm meson-python ninja patchelf
 
     - name: Create sdist
       run: python -m build --sdist --no-isolation
