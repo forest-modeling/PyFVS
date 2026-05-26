@@ -537,4 +537,4 @@ foreach variant : variants
 # End variant loop
 endforeach
 
-subdir('pyfvs')
+subdir('src/pyfvs')

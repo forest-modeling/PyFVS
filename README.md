@@ -16,6 +16,15 @@ Python wrappers and utilities for using the Forest Vegetation Simulator
 
 The PyFVS [FVS source code](https://github.com/forest-modeling/ForestVegetationSimulator/tree/open-dev) is forked from the [USFS FVS GitHub](https://github.com/USDAForestService/ForestVegetationSimulator) repository, [open-dev](https://github.com/USDAForestService/ForestVegetationSimulator/tree/open-dev) branch
 
+  _____            ______ __      __  _____ 
+ |  __ \          |  ____|\ \    / / / ____|
+ | |__) | _    _  | |__    \ \  / / | (____  
+ |  ___/ | |  | | |  __|    \ \/ /   \___  \ 
+ | |     | |__| | | |        \  /    ____) |
+ |_|      \____ | |_|         \/    |______/ 
+            __/ |                            
+           |___/
+           
 ## Documentation
 
 Check out the new AI generated documentation [wiki](https://deepwiki.com/forest-modeling/PyFVS).
