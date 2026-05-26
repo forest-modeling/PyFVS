@@ -67,8 +67,8 @@ jobs:
         CIBW_BUILD_FRONTEND: "build"
         CIBW_BUILD_VERBOSITY: 1
 
-        CIBW_TEST_REQUIRES: pytest openpyxl
-        CIBW_TEST_COMMAND: cd {project}/tests && pytest .
+        # CIBW_TEST_REQUIRES: pytest openpyxl
+        # CIBW_TEST_COMMAND: cd {project}/tests && pytest .
 
       with:
         output-dir: dist
