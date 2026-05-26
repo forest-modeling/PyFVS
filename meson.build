@@ -358,8 +358,8 @@ foreach variant : variants
     variant_args += '-DFVS_MORTS_WRAP'
 
     # Add the wrappers to the file lists
-    f_sources += 'api/variant/@0@/morts_fvs.f'.format(variant)
-    f90_sources += 'api/morts_wrap.f90'
+    f_sources += 'src/api/variant/@0@/morts_fvs.f'.format(variant)
+    f90_sources += 'src/api/morts_wrap.f90'
 
   endif
 
@@ -368,7 +368,7 @@ foreach variant : variants
   conf_data = configuration_data()
   conf_data.set('variant', variant)
   configure_file(
-    input: 'api/globals.f90.in',
+    input: 'src/api/globals.f90.in',
     output: variant + '_globals.f90',
     configuration: conf_data
   )
@@ -377,26 +377,26 @@ foreach variant : variants
   f90_sources += join_paths(meson.project_build_root(), variant + '_globals.f90')
 
   # Additional API files to compile
-  # f90_sources += 'api/apisubs.f90'
+  # f90_sources += 'src/api/apisubs.f90'
 
-  f90_sources += 'api/version.f90'
-  f90_sources += 'api/fvs_api.f90'
-  # f90_sources += 'api/sim_monitor.f90'
-  # f90_sources += 'api/initialize.f90'
-  f90_sources += 'api/inventory_trees.f90'
-  f90_sources += 'api/fvs_step.f90'
-  f90_sources += 'api/tree_data.f90'
-  f90_sources += 'api/snag_data.f90'
-  f90_sources += 'api/carbon_data.f90'
-  f90_sources += 'api/downwood_data.f90'
-  # f90_sources += 'api/step_tregro.f90'
-  f90_sources += 'api/prtrls_wrap.f90'
-  # f90_sources += 'api/stop_wrap.f90'
-  # f90_sources += 'api/foo.f90'
-  # f90_sources += 'api/test.f90'
+  f90_sources += 'src/api/version.f90'
+  f90_sources += 'src/api/fvs_api.f90'
+  # f90_sources += 'src/api/sim_monitor.f90'
+  # f90_sources += 'src/api/initialize.f90'
+  f90_sources += 'src/api/inventory_trees.f90'
+  f90_sources += 'src/api/fvs_step.f90'
+  f90_sources += 'src/api/tree_data.f90'
+  f90_sources += 'src/api/snag_data.f90'
+  f90_sources += 'src/api/carbon_data.f90'
+  f90_sources += 'src/api/downwood_data.f90'
+  # f90_sources += 'src/api/step_tregro.f90'
+  f90_sources += 'src/api/prtrls_wrap.f90'
+  # f90_sources += 'src/api/stop_wrap.f90'
+  # f90_sources += 'src/api/foo.f90'
+  # f90_sources += 'src/api/test.f90'
 
   # ## TODO: Auto-generate F90 includes from F77
-  # f90_inc_dirs += 'api/gen/@0@/include'.format(variant)
+  # f90_inc_dirs += 'src/api/gen/@0@/include'.format(variant)
 
   # # Add the include folders as a dependency to trigger
   # inc_dep = declare_dependency(

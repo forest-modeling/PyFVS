@@ -79,8 +79,8 @@ channels = ["conda-forge"]
 platforms = ["linux-64"]
 
 [tool.pixi.tasks]
-dev = "python -m pip install --no-build-isolation -e ."
-build = "python -m build --no-isolation"
+dev = "python -m pip install -e . --no-build-isolation --verbose"
+build = "python -m build --no-isolation --verbose"
 
 [tool.pixi.dependencies]
 # Python runtime and build tools
