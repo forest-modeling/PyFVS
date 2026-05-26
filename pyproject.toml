@@ -70,6 +70,10 @@ addopts = [
     "--import-mode=importlib",
 ]
 
+[tool.cibuildwheel]
+test-requires = ["pytest","openpyxl"]
+test-command = "pytest {project}/tests"
+
 [tool.pixi.workspace]
 channels = ["conda-forge"]
 platforms = ["linux-64"]
