@@ -14,8 +14,7 @@
 
 Python wrappers and utilities for using the Forest Vegetation Simulator
 
-The PyFVS [FVS source code](https://github.com/forest-modeling/ForestVegetationSimulator/tree/open-dev) is forked from the [USFS FVS GitHub](https://github.com/USDAForestService/ForestVegetationSimulator) repository, [open-dev](https://github.com/USDAForestService/ForestVegetationSimulator/tree/open-dev) branch
-
+``` Text
   _____            ______ __      __  _____ 
  |  __ \          |  ____|\ \    / / / ____|
  | |__) | _    _  | |__    \ \  / / | (____  
@@ -24,10 +23,22 @@ The PyFVS [FVS source code](https://github.com/forest-modeling/ForestVegetationS
  |_|      \____ | |_|         \/    |______/ 
             __/ |                            
            |___/
-           
+```
+
+### Project Status
+- ![GitHub Tag](https://img.shields.io/github/v/tag/forest-modeling/PyFVS)
+
+- [![Github Actions](https://github.com/forest-modeling/PyFVS/actions/workflows/python-package.yml/badge.svg)](https://github.com/forest-modeling/PyFVS/actions/workflows/python-package.yml)
+
+- [![PyPI-Server](https://img.shields.io/pypi/v/PyFVS.svg)](https://pypi.org/project/PyFVS/)
+
+- [![Monthly Downloads](https://pepy.tech/badge/PyFVS/month)](https://pepy.tech/project/PyFVS)
+
+The PyFVS [FVS source code](https://github.com/forest-modeling/ForestVegetationSimulator/tree/open-dev) is forked from the [USFS FVS GitHub](https://github.com/USDAForestService/ForestVegetationSimulator) repository, [open-dev](https://github.com/USDAForestService/ForestVegetationSimulator/tree/open-dev) branch
+
 ## Documentation
 
-Check out the new AI generated documentation [wiki](https://deepwiki.com/forest-modeling/PyFVS).
+Check out the AI generated documentation [wiki](https://deepwiki.com/forest-modeling/PyFVS).
 
 ## Features
 
@@ -96,12 +107,3 @@ f.run()
 # Print the summary table
 print(f.summary)
 ```
-
-
-
-<!-- pyscaffold-notes -->
-
-## Note
-
-This project has been set up using PyScaffold. For details and usage
-information on PyScaffold see https://pyscaffold.org/.
