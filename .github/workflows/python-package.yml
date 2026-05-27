@@ -21,7 +21,7 @@ jobs:
             compiler-version: 15
           - os: windows-latest
             compiler: gcc
-            compiler-version: 13
+            compiler-version: 15
 
     steps:
     - name: Fortran Setup
