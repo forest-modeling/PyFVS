@@ -195,5 +195,3 @@ Wheel files for the current system will be placed in the dist folder along with 
 ```bash
 pixi run build "pn,wc"
 ```
-
-Both `dev` and `build` accept optional 
