@@ -8,7 +8,7 @@ on: [push, pull_request]
 
 jobs:
   make-wheels:
-    name: Build wheels for $${{matrix.python}} on ${{ matrix.os }} (compiler ${{ matrix.compiler-version }})
+    name: Build wheels for ${{ matrix.python }} on ${{ matrix.os }} (compiler ${{ matrix.compiler-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
