@@ -7,10 +7,10 @@ requires = [
   "meson",
   "meson-python>=0.15",
   "numpy",
-#  "ninja",
+  "ninja",
   "patchelf ; platform_system != 'Windows'", ## Only linux???
 #  "cython",
-  "build>=1.5.0,<2"
+  "build"
   ]
 build-backend = "mesonpy"
 
@@ -30,9 +30,8 @@ dynamic = ["version"]
 dependencies = [
   "confuse>=2.0.0,<3",
   "click>=8.0.0,<9",
-  "pandas>=2.2.2",
+  "pandas>=2.2.2,<4",
   "numpy>=2.1.0,<3",
-  "pandas>=3.0.2,<4",
   "typing-extensions" # required by confuse
   ]
 
@@ -59,7 +58,8 @@ packages = ["pyfvs",]
 # check out https://github.com/pypa/setuptools_scm
 version_scheme = "post-release"
 # version_scheme = "guess-next-dev"
-version_file = "pyfvs/_version.py"
+local_scheme = "no-local-version"
+version_file = "src/pyfvs/_version.py"
 
 [tool.devpy]
 package = 'pyfvs'  # used by pytest
@@ -70,13 +70,17 @@ addopts = [
     "--import-mode=importlib",
 ]
 
+[tool.cibuildwheel]
+test-requires = ["pytest","openpyxl"]
+test-command = "pytest {project}/tests"
+
 [tool.pixi.workspace]
 channels = ["conda-forge"]
 platforms = ["linux-64"]
 
 [tool.pixi.tasks]
-dev = "python -m pip install --no-build-isolation -e ."
-build = "python -m build --no-isolation"
+dev = "python -m pip install -e . --no-build-isolation --verbose"
+build = "python -m build --no-isolation --verbose"
 
 [tool.pixi.dependencies]
 # Python runtime and build tools

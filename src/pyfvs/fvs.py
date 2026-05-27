@@ -10,7 +10,6 @@ Created on Nov 29, 2014
 """
 
 from dataclasses import field
-from distutils.log import debug
 import os
 import sys
 import re
