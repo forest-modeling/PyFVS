@@ -76,9 +76,8 @@ jobs:
         overwrite: true
 
   test-wheels:
-    name: Run tests with the built wheel
+    name: Run tests against wheel built for ${{ matrix.python }} on ${{ matrix.os }} (compiler ${{ matrix.compiler-version }})
     needs: [ make-wheels ]
-    name: Test wheels for ${{ matrix.python }} on ${{ matrix.os }} (compiler ${{ matrix.compiler-version }})
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install wheel
