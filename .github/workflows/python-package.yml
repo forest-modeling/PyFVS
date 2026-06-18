@@ -126,7 +126,7 @@ jobs:
   publish-testpypi:
     name: Publish to TestPyPI (dev branch)
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
-    needs: [ make-wheels, make-sdist ]
+    needs: [ make-sdist, test-wheels ]
     runs-on: ubuntu-latest
     environment:
       name: testpypi
@@ -158,7 +158,7 @@ jobs:
   publish-pypi:
     name: Publish to PyPI (main branch)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [ make-wheels, make-sdist ]
+    needs: [ make-sdist, test-wheels ]
     runs-on: ubuntu-latest
     environment:
       name: pypi
