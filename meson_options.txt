@@ -6,4 +6,4 @@ option('fvsvariants', type: 'array',
   # value: ['pn',],
   # value: ['ws',],
   description: 'FVS variants to build'
-  )
+)

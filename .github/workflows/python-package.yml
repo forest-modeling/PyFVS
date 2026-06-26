@@ -4,26 +4,24 @@
 
 name: Build Packages
 
-on:
-  push:
-    branches: [ "main", "dev" ]
-  pull_request:
-    branches: [ "main", "dev" ]
+on: [push, pull_request]
 
 jobs:
   make-wheels:
-    name: Build wheels on ${{ matrix.os }} (compiler ${{ matrix.compiler-version }})
+    name: Build wheels for ${{ matrix.python }} on ${{ matrix.os }} (compiler ${{ matrix.compiler-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['cp310', 'cp311', 'cp312', 'cp313', 'cp314']
         include:
           - os: ubuntu-latest
             compiler: gcc
             compiler-version: 15
           - os: windows-latest
             compiler: gcc
-            compiler-version: 13
+            compiler-version: 15
 
     steps:
     - name: Fortran Setup
@@ -47,8 +45,7 @@ jobs:
     - name: Build wheels
       uses: pypa/cibuildwheel@v3.4.1
       env:
-        # Build for Python 3.10–3.13, 64-bit only
-        CIBW_BUILD: cp310-* cp311-* cp312-* cp313-* cp314-*
+        CIBW_BUILD: ${{ matrix.python }}-*
         CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux*"
         CIBW_ARCHS_LINUX: x86_64
         CIBW_ARCHS_WINDOWS: AMD64
@@ -73,7 +70,7 @@ jobs:
     - name: Store wheels
       uses: actions/upload-artifact@v7
       with:
-        name: pyfvs-${{ matrix.os }}-wheels
+        name: pyfvs-${{ matrix.os }}-${{ matrix.python }}-wheels
         path: dist/*.whl
         if-no-files-found: warn
         overwrite: true

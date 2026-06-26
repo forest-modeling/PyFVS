@@ -14,7 +14,7 @@
 
 Python wrappers and utilities for using the Forest Vegetation Simulator
 
-``` Text
+```Text
   _____            ______ __      __  _____ 
  |  __ \          |  ____|\ \    / / / ____|
  | |__) | _    _  | |__    \ \  / / | (____  
@@ -34,7 +34,9 @@ Python wrappers and utilities for using the Forest Vegetation Simulator
 
 - [![Monthly Downloads](https://pepy.tech/badge/PyFVS/month)](https://pepy.tech/project/PyFVS)
 
-The PyFVS [FVS source code](https://github.com/forest-modeling/ForestVegetationSimulator/tree/open-dev) is forked from the [USFS FVS GitHub](https://github.com/USDAForestService/ForestVegetationSimulator) repository, [open-dev](https://github.com/USDAForestService/ForestVegetationSimulator/tree/open-dev) branch
+PyFVS wraps a [fork](https://github.com/forest-modeling/ForestVegetationSimulator) of the official [FVS code](https://github.com/USDAForestService/ForestVegetationSimulator) with minimal, non-core, modifications.
+
+PyFVS currently supports Windows and Linux using the GCC family of compilers.
 
 ## Documentation
 
@@ -43,20 +45,52 @@ Check out the AI generated documentation [wiki](https://deepwiki.com/forest-mode
 ## Features
 
  - FVS Class
-   - FVS Step API - Iterate projection cycles
-   - Initialize inventory trees from arrays
-   - Access to all FVS internal arrays and variables
+   - FVS Step API
+     - Growth cycle interation
+     - Within-cycle blocking callbacks for fine-grained inspection and sub-model interaction
+   - Initialize inventory trees from arrays and dataframes
+   - Runtime interaction with FVS internal arrays and variables
+     - Facilitates out-of-core event logic
+     - Sub-cycle analysis of model components and data
 
- - Keywords - Object based FVS keyword file generation
+ - Keyword Generator:
+   - Object oriented FVS keyword file generation
+   - Automates keyword file formatting and runtime handling
 
  - Command line interface
 
-Documentation forthcoming
+## Variants
+
+Not all FVS variants are currently implement. More will be added as time allows.
+
+ - PN - Pacific Northwest Coast
+ - WC - Westside Cascades
+ - SO - South Central Oregon and Northeast California
+ - OP - ORGANON Pacific Northwest
+ - OC - ORGANON Southwest
+ - EC - East Cascades
+ - CA - Inland California and Southern Cascades
+ - NC - Klamath Mountains (Northern California)
+ - BM - Blue Mountains
+ - IE - Inland Empire (Northern Idaho)
+ - CI - Central Idaho
+ - AK - Alaska
+ - WS - Western Sierra Nevada
+
+## Parity with Official Binaries
+
+PyFVS is designed to be consistent with the official FVS 
+binaries. Before a release all variants are run through a series 
+of unit test to ensure functionality and equivalence with 
+official FVS binaries.
+
+ - Variant specific unit tests from official FVS releases
+ - Additional unit tests for specific functionality
 
 ## Usage
 
 **NOTE:** The PyFVS API is beta. Names and arguments may change as
-features evolve. Deprecation warnings will be raise when possible.
+features evolve. Deprecation warnings will be raised when possible.
 However, there is guarantee of backward compatibility.
 
 ### Command Line
@@ -106,4 +140,58 @@ kw += est
 f.run()
 # Print the summary table
 print(f.summary)
+```
+
+### Development
+
+Clone the 'dev' branch, including all submodules
+```bash
+git clone --branch dev --recurse-submodules https://github.com/forest-modeling/PyFVS.git
+```
+
+For local development a Pixi environment is included in `pyproject.toml`.
+
+```bash
+# Install Pixi on Linux
+curl -fsSL https://pixi.sh/install.sh | sh
+```
+
+```powershell
+# Install Pixi on Windows
+powershell -ExecutionPolicy Bypass -c "irm -useb https://pixi.sh/install.ps1 | iex"
+```
+
+Initialize the environment in the root of the project
+```bash
+pixi init --pyproject
+```
+```bash
+pixi shell
+```
+
+#### Local Development Build
+The Pixi environment includes GCC and GFortran compilers from Conda-Forge. Use the included Pixi task to install PyFVS in the
+current environment in development mode. Pass an optional comma separated list of lower case variant abbreviations to restrict the build to target variants. Additionally, an optional build mode can be passed, debug or release.
+
+```bash
+pixi run dev "pn,wc" debug
+```
+
+Development mode in Pixi is consistent with Pip. Additionally, 
+PyFVS is built with Meson and Meson-Python. Changes to source files, Python 
+or Fortran, will trigger a recompile on the next import. 
+Alternatively, you can trigger a build by calling the dev task
+again.
+
+#### Run Tests
+
+```bash
+pixi run test
+```
+
+#### Build Wheels
+Wheel files for the current system will be placed in the dist folder along with an sdist source archive.
+
+```bash
+pixi run build "pn,wc"
 ```
