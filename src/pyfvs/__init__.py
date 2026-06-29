@@ -147,7 +147,6 @@ def list_variants():
             mod = importlib.import_module(lib)
             status = 'OK'
         except:
-            # raise
             status = 'Failed'
 
         vars[varname] = {'lib':lib, 'status':status}

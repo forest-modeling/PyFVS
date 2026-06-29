@@ -4,7 +4,13 @@
 
 name: Build Packages
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "main", "dev" ]
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   make-wheels:
@@ -143,7 +149,8 @@ jobs:
 
   publish-pypi:
     name: Publish to PyPI (main branch)
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Run on push to main branch or on tag push (for releases)
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     needs: [ make-wheels, make-sdist ]
     runs-on: ubuntu-latest
     environment:
