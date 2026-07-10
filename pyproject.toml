@@ -18,7 +18,7 @@ build-backend = "mesonpy"
 name = "pyfvs"
 description = "Python wrappers and utilities for using the Forest Vegetation Simulator"
 authors = [
-  {name="Tod Haren", email="tod.haren@gmail.com"},
+  {name="Tod Haren", email="2239672+tharen@users.noreply.github.com"},
   ]
 license = {file="LICENSE"}
 readme = {file="README.md", content-type="text/markdown"}
@@ -48,8 +48,6 @@ dependencies = [
   "pandas",
   "numpy",
   "typing-extensions", # required by confuse
-  "ninja",
-  "patchelf; sys_platform == 'linux'"
   ]
 
 [project.urls]
