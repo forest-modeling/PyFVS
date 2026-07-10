@@ -1,3 +1,3 @@
 # Contributors
 
-* Tod Haren [tod.haren@gmail.com](mailto:tod.haren@gmail.com)
+* Tod Haren [2239672+tharen@users.noreply.github.com](mailto:2239672+tharen@users.noreply.github.com)

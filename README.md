@@ -137,7 +137,7 @@ est += keywords.PLANT(1,'DF',350)
 # Add the ESTAB keywordset to the simulation
 kw += est
 # Execute the simulation
-f.run()
+f.grow_all()
 # Print the summary table
 print(f.summary)
 ```
