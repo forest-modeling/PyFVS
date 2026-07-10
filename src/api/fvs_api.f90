@@ -25,6 +25,27 @@ module fvs_api
 
   contains
 
+  subroutine reset()
+    calc_forest_type=.true.
+    fast_age_search=.false.
+    use_fvs_morts=.false.
+
+    use_api_mrules=.false.
+    mrule_cor = (/'N','N'/)
+    mrule_evod = (2, 2)
+    mrule_maxlen = (40.0, 32.0)
+    mrule_minlen = (12.0, 8.0)
+    mrule_minlent = (12.0, 8.0)
+    mrule_opt = (23, 23)
+    mrule_stump = (1.0, 1.0)
+    mrule_mtopp = (5.0, 6.0)
+    mrule_mtops = (2.0, 2.0)
+    mrule_trim = (1.0, 1.0)
+    mrule_merchl = (12.0, 8.0) ! min sawtimber length
+    mrule_minbfd = (8.0, 10.0) ! min tree dbh for sawtimber
+
+  end subroutine reset
+
   function get_mrule_idx(spp) result(idx)
     integer :: spp, idx
 

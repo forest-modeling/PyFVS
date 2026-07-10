@@ -10,7 +10,6 @@ Created on Nov 29, 2014
 """
 
 from dataclasses import field
-from distutils.log import debug
 import os
 import sys
 import re
@@ -317,6 +316,9 @@ class FVS(object):
 
         # Ensure there aren't any inventory records hanging around from previous runs
         self.fvslib.inventory_trees.reset()
+
+        # Reset the FVS API to clear any existing data and state
+        self.fvs_api.reset()
 
     # TODO: Add species code translation methods.
     @property

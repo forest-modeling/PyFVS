@@ -1,114 +1,180 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+# This workflow builds binary wheels using cibuildwheel and a source distribution.
+# cibuildwheel handles manylinux and Windows wheel building across Python versions.
+# Publishes to TestPyPI on pushes to dev, and PyPI on pushes to main.
 
 name: Build Packages
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
+    tags:
+      - 'v*.*.*'
   pull_request:
     branches: [ "main" ]
 
 jobs:
   make-wheels:
-
+    name: Build wheels for ${{ matrix.python }} on ${{ matrix.os }} (compiler ${{ matrix.compiler-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10","3.11","3.12","3.13"]
-        os: [ubuntu-latest, windows-latest] #, macos-latest]
-        compiler: [gcc]
-        compiler-version: [13, 15]
-        exclude:
-          - os: windows-latest
-            compiler-version: 15
+        os: [ubuntu-latest, windows-latest]
+        python: ['cp310', 'cp311', 'cp312', 'cp313', 'cp314']
+        include:
           - os: ubuntu-latest
-            compiler-version: 13
+            compiler: gcc
+            compiler-version: 15
+          - os: windows-latest
+            compiler: gcc
+            compiler-version: 15
 
     steps:
     - name: Fortran Setup
       uses: fortran-lang/setup-fortran@v1
       id: setup-fortran
       with:
-        compiler: ${{ matrix.toolchain.compiler }}
-        version: ${{ matrix.toolchain.version }}
+        compiler: ${{ matrix.compiler }}
+        version: ${{ matrix.compiler-version }}
 
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
-        
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ matrix.python-version }}
-        architecture: 'x64'
-        cache: 'pip'
-        
-    - name: show-versions
+        fetch-depth: 0
+
+    - name: Show compiler versions
       run: |
         gcc --version
         gfortran --version
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install click numpy pandas matplotlib build wheel setuptools setuptools_scm meson-python pytest ninja
 
-    - name: Install Patchelf
-      if: runner.os == 'Linux'
-      run: |
-        python -m pip install patchelf
-        
-    - name: Build and package
-      run: |
-        python -m build --wheel --no-isolation
-        
-    - name: Store Wheel
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v3.4.1
+      env:
+        CIBW_BUILD: ${{ matrix.python }}-*
+        CIBW_SKIP: "*-win32 *-manylinux_i686 *-musllinux*"
+        CIBW_ARCHS_LINUX: x86_64
+        CIBW_ARCHS_WINDOWS: AMD64
+
+        # Use manylinux_2_28 to get a gfortran-15-capable image
+        CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux_2_28_x86_64
+
+        # Install build dependencies inside the wheel-build environment
+        CIBW_BEFORE_BUILD_LINUX: |
+          dnf install -y gcc-gfortran ninja-build &&
+          pip install click numpy pandas build wheel setuptools setuptools_scm meson-python ninja patchelf
+
+        CIBW_BEFORE_BUILD_WINDOWS: |
+          pip install click numpy pandas build wheel setuptools setuptools_scm meson-python ninja
+
+        CIBW_BUILD_FRONTEND: "build"
+        CIBW_BUILD_VERBOSITY: 1
+
+      with:
+        output-dir: dist
+
+    - name: Store wheels
       uses: actions/upload-artifact@v7
       with:
-        name: pyfvs-${{ runner.os }}-py${{ matrix.python-version }}-wheels
+        name: pyfvs-${{ matrix.os }}-${{ matrix.python }}-wheels
         path: dist/*.whl
         if-no-files-found: warn
         overwrite: true
 
   make-sdist:
+    name: Build source distribution
     runs-on: ubuntu-latest
-    # needs: make-wheels
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
-        
+        fetch-depth: 0
+
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
-        python-version: 3.13
-        architecture: 'x64'
-        cache: 'pip'
-        
-    # TODO: Add steps to gather wheels and publish to PyPI
-    # TODO: Merge artifacts, uses: [actions/upload-artifact/merge@v4](https://github.com)
-    # Store the source distribution one time per build
-    - name: Install dependencies
+        python-version: "3.13"
+        architecture: x64
+        cache: pip
+
+    - name: Install build dependencies
       run: |
-        python -m pip install click numpy pandas matplotlib build wheel setuptools setuptools_scm meson-python pytest ninja
-        
-    - name: Install Patchelf
-      if: runner.os == 'Linux'
-      run: |
-        python -m pip install patchelf
-        
+        python -m pip install --upgrade pip
+        python -m pip install click numpy pandas build wheel \
+          setuptools setuptools_scm meson-python ninja patchelf
+
     - name: Create sdist
-      run: |
-        python -m build --sdist --no-isolation
-        
-    - name: Store Sdist
+      run: python -m build --sdist --no-isolation
+
+    - name: Store sdist
       uses: actions/upload-artifact@v7
       with:
         name: pyfvs-sdist
         path: dist/*.tar.gz
         if-no-files-found: warn
         overwrite: true
+
+  publish-testpypi:
+    name: Publish to TestPyPI (dev branch)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    needs: [ make-wheels, make-sdist ]
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/pyfvs
+    permissions:
+      id-token: write  # Required for OIDC trusted publishing
+
+    steps:
+    - name: Download all wheels
+      uses: actions/download-artifact@v4
+      with:
+        pattern: pyfvs-*-wheels
+        path: dist
+        merge-multiple: true
+
+    - name: Download sdist
+      uses: actions/download-artifact@v4
+      with:
+        name: pyfvs-sdist
+        path: dist
+
+    - name: Publish to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
+        skip-existing: true
+        verbose: true
+
+  publish-pypi:
+    name: Publish to PyPI (main branch)
+    # Run on push to main branch or on tag push (for releases)
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    needs: [ make-wheels, make-sdist ]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pyfvs
+    permissions:
+      id-token: write  # Required for OIDC trusted publishing
+
+    steps:
+    - name: Download all wheels
+      uses: actions/download-artifact@v4
+      with:
+        pattern: pyfvs-*-wheels
+        path: dist
+        merge-multiple: true
+
+    - name: Download sdist
+      uses: actions/download-artifact@v4
+      with:
+        name: pyfvs-sdist
+        path: dist
+
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        skip-existing: true
+        verbose: true
