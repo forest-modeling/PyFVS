@@ -15,6 +15,7 @@ import types
 import collections
 import string
 import random
+import warnings
 
 # import the parent class module
 from ._fields import *
@@ -422,7 +423,7 @@ class KeywordBase(with_metaclass(KeywordMetaClass, object)):
 
         return s  # '%s\n' % s.rstrip()
 
-class AddHocKeyword(KeywordBase):
+class AdHocKeyword(KeywordBase):
     def __init__(self, mnemonic, field_vals=(), format=0, supplemental=()
                  , name='', comment='', end_block=False, end_statement='END'
                  , **kargs):
@@ -1179,15 +1180,15 @@ class TREELIST(KeywordBase):
         """
         Produce the treelist file
 
-        @param firstCycle:  First simulation cycle to report
-        @param fileNum:  Fortran file reference number
-        @param headerStyle:  Tree data column header style
+        @param first_cycle:  First simulation cycle to report
+        @param file_num:  Fortran file reference number
+        @param header_style:  Tree data column header style
                                 1=encoded;0=human;-1=None
-        @param cycleZero:  Control output of cycle zero tree data
+        @param cycle_zero:  Control output of cycle zero tree data
                                 0=all; 1=one only; 2=zero only
-        @param liveDead:  Request dead tree record report, not just current cycle mortality
+        @param live_dead:  Request dead tree record report, not just current cycle mortality
 
-        @param dbhIncrement:  Include diamter growth estimates
+        @param dbh_increment:  Include diamter growth estimates
         """
         self.first_cycle = first_cycle
         self.file_num = file_num
@@ -2748,6 +2749,19 @@ class THINBTA(KeywordBase):
         self.min_ht = min_ht
         self.max_ht = max_ht
 
+## Handle deprecated class names
+def __getattr__(name):
+    if name == "AddHocKeyword":
+        warnings.warn(
+            "AddHocKeyword is deprecated (spelling). Use AdHocKeyword instead.",
+            category=DeprecationWarning,
+            stacklevel=2
+        )
+        return AdHocKeyword
+
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+    
 def print_test():
     # #TODO: implement better testing
 

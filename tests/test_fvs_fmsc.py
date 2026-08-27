@@ -30,6 +30,9 @@ fmsc_params = [p for p in fmsc_params if p[0] in variants]
 
 @pytest.mark.parametrize(('variant', 'kwd_path', 'sum_path'), fmsc_params)
 def test_fmsc(variant, kwd_path, sum_path):
+    print('Test FMSC Keywords:', kwd_path)
+    print('Test FMSC Summary:', sum_path)
+
     ## NOTE: FMSC tests are in the FVS subfolder, which won't be available with an out-of-source build
     if not os.path.exists(kwd_path):
         pytest.skip('FMSC keyword file not found: {}'.format(kwd_path))

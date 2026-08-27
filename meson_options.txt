@@ -1,9 +1,9 @@
 option('fvsvariants', type: 'array',
   choices: ['pn','wc','so','op','oc','ec','ca','nc','bm','ie','ci','ak','ws'], #,'em','tt','cr','ut','ls','cs','sn','ne'],
-  value:   ['pn','wc','so','op','oc','ec','ca','nc','bm','ie','ci','ak','ws'], #,'em','tt','cr','ut','ls','cs','sn','ne'],
-  # value:   ['pn','wc','so','op','oc','ec','ca','nc','bm'],
+  # value:   ['pn','wc','so','op','oc','ec','ca','nc','bm','ie','ci','ak','ws'], #,'em','tt','cr','ut','ls','cs','sn','ne'],
+  # value:   ['pn','wc','so','ca','op','oc','ec','ca','nc','bm'],
   # value: ['ie','ci','ak',],
-  # value: ['pn',],
+  value: ['pn','wc','ca','so'],
   # value: ['ws',],
   description: 'FVS variants to build'
 )

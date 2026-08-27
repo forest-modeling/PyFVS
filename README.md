@@ -38,6 +38,15 @@ PyFVS wraps a [fork](https://github.com/forest-modeling/ForestVegetationSimulato
 
 PyFVS currently supports Windows and Linux using the GCC family of compilers.
 
+  _____            ______ __      __  _____ 
+ |  __ \          |  ____|\ \    / / / ____|
+ | |__) | _    _  | |__    \ \  / / | (____  
+ |  ___/ | |  | | |  __|    \ \/ /   \___  \ 
+ | |     | |__| | | |        \  /    ____) |
+ |_|      \____ | |_|         \/    |______/ 
+            __/ |                            
+           |___/
+
 ## Documentation
 
 Check out the AI generated documentation [wiki](https://deepwiki.com/forest-modeling/PyFVS).
