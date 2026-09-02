@@ -2584,35 +2584,41 @@ class MINHARV(KeywordBase):
     """
     Specify a minimum harvest volume to implement a thinning
     """
-    cycle = IntegerField('Cycle')
-    min_mcuft = IntegerField('Minimum Merch. CuFt VPA')
-    min_bdft = IntegerField('Minimum BdFt VPA')
+    cycle = IntegerField('Year/Cycle.')
     min_baa = IntegerField('Minimum BAA')
-    min_tcuft = IntegerField('Minimum Total CuFt VPA')
-
+    min_total_cuft = IntegerField('Minimum Total CuFt VPA')
+    min_merch_cuft = IntegerField('Minimum Merch. CuFt VPA')
+    min_saw_cuft = IntegerField('Minimum Sawlog CuFt VPA')
+    min_bdft = IntegerField('Minimum BdFt VPA')
+    
     def __init__(self, cycle=1
-            , min_mcuft=0, min_bdft=0
-            , min_baa=0, min_tcuft=0
-            , **kargs):
+            , min_baa=0
+            , min_total_cuft=0
+            , min_merch_cuft=0
+            , min_saw_cuft=0
+            , min_bdft=0
+            ):
         """
         MINHARV - Minimum Acceptable Harvest Volume
 
         @param cycle: First year/cycle the minimum harvest applies.
-        @param min_mcuft: Minimum merch. cubic foot volume per acre.
-        @param min_bdft: Minimum board foot volume per acre.
         @param min_baa: Minimum basal area per acre.
-        @param min_tcuft: Minimum total cubic foot volume per acre.
+        @param min_total_cuft: Minimum total cubic foot volume per acre.
+        @param min_merch_cuft: Minimum merchantable cubic foot volume per acre.
+        @param min_saw_cuft: Minimum sawlog cubic foot volume per acre.
+        @param min_bdft: Minimum board foot volume per acre.
         """
 
         KeywordBase.__init__(self, 'MINHARV', 'Minimum Harvest Threshold'
                                  , format=KW_FMT_ONELINE
-                                 , **kargs
                                  )
         self.cycle = cycle
-        self.min_mcuft = min_mcuft
-        self.min_bdft = min_bdft
         self.min_baa = min_baa
-        self.min_tcuft = min_tcuft
+        self.min_total_cuft = min_total_cuft
+        self.min_merch_cuft = min_merch_cuft
+        self.min_saw_cuft = min_saw_cuft
+        self.min_bdft = min_bdft
+        
 
 class CUTEFF(KeywordBase):
     """
@@ -2760,7 +2766,6 @@ def __getattr__(name):
         return AdHocKeyword
 
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
     
 def print_test():
     # #TODO: implement better testing
