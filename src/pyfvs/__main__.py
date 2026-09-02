@@ -131,24 +131,10 @@ def run(ctx,
 def list_variants():
     'List the supported FVS variants'
     vars = pyfvs.list_variants()
-    msg = 'Supported FVS variants:\nVariant - (Library) - Status - FVS Tag (Date)\n'
-    for v,s in vars.items():
-        version_info = s['fvs_version']
-        if version_info is None:
-            version_info = dict(
-                variant = v
-                , compile_date = 'N/A'
-                , compile_time = 'N/A'
-                , revision_tag = 'N/A'
-                , revision_date = 'N/A'
-            )
-        msg += '  {} - ({}) - {} - {} ({})\n'.format(
-            v,
-            s['lib'],
-            s['status'],
-            version_info['revision_tag'],
-            version_info['revision_date']
-            )
+    msg = 'Installed FVS variants:\nVariant - (Library) - Status - FVS Tag (Date)\n'
+    for vn,var in vars.items():
+        f = FVS(vn)
+        msg += f'  {vn} - ({var["lib"]}) - {var["status"]} - {f.version_info["revision_tag"]} ({f.version_info["revision_date"]})\n'
 
     print(msg)
     sys.exit(0)
