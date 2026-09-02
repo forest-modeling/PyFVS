@@ -75,8 +75,8 @@ def test_tree_data(variant, kwd_path, sum_path):
     # TPA +/- 1
     tpa = np.round(np.sum(f.tree_data.live_tpa[:, :ncyc+1], axis=0), 0).astype(int)
     check_tpa = sum_check.loc[:, 'tpa'].values
-    print(tpa)
-    print(check_tpa)
+    # print(tpa)
+    # print(check_tpa)
     assert np.all(np.isclose(check_tpa, tpa, atol=1))
 
     # Cut TPA +/- 1
@@ -108,6 +108,9 @@ def test_tree_data(variant, kwd_path, sum_path):
     bdft = f.tree_data.bdft_net[:, :ncyc + 1]
     tot_bdft = np.round(np.sum(tpa * bdft, axis=0), 0).astype(int)
     check_bdft = sum_check.loc[:, 'merch_bdft'].values
+    # print(tot_bdft)
+    # print(check_bdft)
+    # print(f.summary)
     assert np.all(np.isclose(check_bdft, tot_bdft, atol=1))
 
     # Cut TPA +/ 1

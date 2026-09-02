@@ -1,7 +1,7 @@
 @echo off
 :: Refresh the *.sum.save files from the official FVS release.
 
-set fvs_bin=c:\tools\FVS\FVSbin
+set fvs_bin=c:\tools\FVS\FVSbin_20260701
 
 set variants=pn wc so ca op oc ec bm nc ws ie ci ak
 
