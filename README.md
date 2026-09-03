@@ -38,18 +38,8 @@ PyFVS wraps a [fork](https://github.com/forest-modeling/ForestVegetationSimulato
 
 PyFVS currently supports Windows and Linux using the GCC family of compilers.
 
-  _____            ______ __      __  _____ 
- |  __ \          |  ____|\ \    / / / ____|
- | |__) | _    _  | |__    \ \  / / | (____  
- |  ___/ | |  | | |  __|    \ \/ /   \___  \ 
- | |     | |__| | | |        \  /    ____) |
- |_|      \____ | |_|         \/    |______/ 
-            __/ |                            
-           |___/
-
-## Documentation
-
-Check out the AI generated documentation [wiki](https://deepwiki.com/forest-modeling/PyFVS).
+> **Disclaimer**
+> PyFVS is an independent project. It is **not affiliated with or supported by** the USFS staff or service center.
 
 ## Features
 
@@ -96,6 +86,38 @@ official FVS binaries.
  - Variant specific unit tests from official FVS releases
  - Additional unit tests for specific functionality
 
+## Documentation
+
+Check out the AI generated documentation [wiki](https://deepwiki.com/forest-modeling/PyFVS).
+
+## Installation
+
+PyFVS is available through PyPI for Windows and Linux. In addition, packages for OS X are available through conda-forge.
+
+### PyPI
+
+``` bash
+>python -m pip install pyfvs
+```
+
+or with Pixi 
+
+``` bash
+>pixi add --pypi pyfvs
+```
+
+### conda-forge
+**NOTE:** Releases to conda-forge may lag behind PyPI
+
+``` bash
+>conda install pyfvs
+```
+or with Pixi
+
+``` bash
+pixi add pyfvs
+```
+
 ## Usage
 
 **NOTE:** The PyFVS API is beta. Names and arguments may change as
@@ -106,6 +128,7 @@ However, there is guarantee of backward compatibility.
 
 ``` bash
 >pyfvs --help
+>pyfvs list-variants
 >pyfvs run PN -k path/to/keywords.key
 ```
 
