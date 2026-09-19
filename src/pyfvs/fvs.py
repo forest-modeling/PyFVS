@@ -9,13 +9,12 @@ Created on Nov 29, 2014
 @author: tod.haren@gmail.com
 """
 
+from pathlib import Path
 from dataclasses import field
 import os
-import sys
 import re
 import shutil
 import logging
-import logging.config
 import random
 import importlib
 import tempfile
@@ -23,6 +22,7 @@ import warnings
 import datetime
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import pandas.io
 
@@ -101,8 +101,14 @@ class FVS(object):
         30: 'GCB_POST_GROW'
     }
 
+    _workspace = None
+    _root_path = None
+    _title = None
+    _keywords_path = None
+    _random_seed = 42  # Default FVS random number seed
+
     def __init__(self, variant, stochastic=False, bootstrap=0, cleanup=True, treelist_format=None
-            , workspace=None, title=''):
+            , workspace=None, title=None):
         """
         Initialize a FVS variant library.
         """
@@ -112,22 +118,14 @@ class FVS(object):
         self.stochastic = stochastic
         self.bootstrap = bootstrap
         self.cleanup = cleanup
-        self.workspace = workspace
-        self.title = title
-
-        self.root = None
-        self.keywords_file = None
+        self._workspace = workspace
+        self._title = title
 
         # Resolve the confuse configuration files
         self.config = pyfvs.config
 
-        self._random_seed = 55329  # Default FVS random number seed
-
         self.fvslib_path = None
         self.fvslib = None
-
-        if self._workspace is None:
-            self._workspace = self.config['workspace'].get()
 
         if treelist_format is None:
             # Use the default PyFVS treelist template
@@ -169,8 +167,10 @@ class FVS(object):
         self._artifacts = []
 
         # print(self.workspace)
-        
-        self.version_info = dict(
+    
+    @property
+    def version_info(self):
+        info = dict(
             variant = self.variant
             , compile_date = self.fvslib.version.compile_date.tobytes().decode().strip()
             , compile_time = self.fvslib.version.compile_time.tobytes().decode().strip()
@@ -178,7 +178,11 @@ class FVS(object):
             , revision_date = self.fvslib.revise(self.variant).decode().strip()
             )
         
-        self.fvs_version = self.version_info
+        return info
+
+    @property
+    def fvs_version(self):
+        return self.version_info
 
     def fvs_callback(self, stage):
         """
@@ -217,7 +221,7 @@ class FVS(object):
         return self.fvslib.inventory_trees
 
     @inventory_trees.setter
-    def inventory_trees(self, trees):
+    def inventory_trees(self, trees: pd.DataFrame|npt.NDArray):
         """
         Set the inventory trees dataframe
         """
@@ -256,8 +260,12 @@ class FVS(object):
 
         # Now load the arrays
         inv = self.fvslib.inventory_trees
+        
+        # Calling initialize resets the inventory arrays
         nrows = trees.shape[0]
         inv.initialize(nrows)
+
+        assert inv.row_count()==nrows
 
         inv.plot_id = trees['plot_id']
         inv.tree_id = trees['tree_id'] #.astype(int)
@@ -406,18 +414,26 @@ class FVS(object):
         """
 
         if seed is None:
-            self._random_seed = random.choice(range(1, 100000, 2))
+            self._random_seed = random.seed()
         else:
             self._random_seed = seed
 
         # Seed the FVS random number generator
-        self.ransed(True, self._random_seed)
+        self.fvslib.ransed(True, self._random_seed)
 
         # Seed the numpy and python random number generators as well
         np.random.seed(self._random_seed)
         random.seed(self._random_seed)
 
     def _init_fvs(self, keywords):
+        warnings.warn(
+            'FVS._init_fvs is deprecated. Use FVS._init_fvs_cmd.',
+            category=DeprecationWarning,
+            stacklevel=2 # Points the warning to the caller's line of code instead of this block
+        )
+        self._init_fvs_cmd(keywords)
+
+    def _init_fvs_cmd(self, keywords):
         """
         Initialize FVS with the given keywords file.
 
@@ -434,34 +450,92 @@ class FVS(object):
         self.fvslib.fvssetcmdline('--keywordfile={}'.format(keywords))
 
     @property
+    def title(self):
+        if self._title is None:
+            now = datetime.datetime.strftime(
+                    datetime.datetime.now(), '%Y%m%d_%H%M%S')
+            self._title = '{}_{}'.format(self.variant, now)
+
+        return self._title
+
+    @title.setter
+    def title(self, title: str):
+        self._title = title
+
+    @property
+    def clean_title(self):
+        return self.title.replace(' ', '_')
+    
+    @property
+    def root_path(self):
+        """
+        Return the path of the folder containing the simulation files
+
+        The default is the workspace + title (sanitized)
+        """
+        if self._root_path is None:
+            self.root_path = self.workspace / self.clean_title
+
+        return self._root_path
+
+    @root_path.setter
+    def root_path(self, root_path: str):
+        p = Path(root_path)
+        if not p.exists():
+            try:
+                p.mkdir(parents=False, exist_ok=False)
+                self._artifacts.append(p)
+            except:
+                IOError(f'Unable to create root path: {root_path}')
+
+        self._root_path = p
+
+    @property
     def workspace(self):
         """
         Return the current workspace folder.
         """
-        pfx = self.config['prefix'].get()
-        if (self._workspace is None
-                or not os.path.exists(self._workspace)):
-            self._workspace = tempfile.mkdtemp(prefix=pfx)
+        # If a workspace was not set then create a temp folder
+        if self._workspace is None:
+            self._workspace = Path(
+                tempfile.mkdtemp(prefix=self.config['prefix'].get())
+                )
             self._artifacts.append(self._workspace)
-
+            
         return self._workspace
 
     @workspace.setter
-    def workspace(self, workspace):
+    def workspace(self, workspace: str|Path):
         """
         Set the current workspace folder.
 
         Args:
             workspace: Path to set as the current FVS workspace.
         """
-        if not workspace is None and not os.path.exists(workspace):
-            raise ValueError('Workspace folder must already exist.')
 
-        self._workspace = workspace
+        if not Path(workspace).is_dir():
+            raise ValueError(f'Workspace folder does not exist: {workspace}')
 
-    # TODO: Further define how KeywordSet objects are used by and FVS instance
-    #       They should be the preferred source, instead of a path to an
-    #       existing file.
+        self._workspace = Path(workspace)
+
+    @property
+    def keywords_path(self):
+        if self._keywords_path is None:
+            self._keywords_path = (self.root_path / self.clean_title).with_suffix('.key')
+
+        return self._keywords_path
+
+    @keywords_path.setter
+    def keywords_path(self, path: str|Path):
+        self._keywords_path = Path(path)
+
+    @property
+    def treelist_path(self):
+        if self.fvslib.inventory_trees.row_count()>0:
+            return None
+        
+        return self.keywords_path.with_suffix('.tre')
+
     @property
     def keywords(self):
         """
@@ -473,18 +547,27 @@ class FVS(object):
         return self._keywords
 
     @keywords.setter
-    def keywords(self, keywords):
+    def keywords(self, keywords: kw.KeywordSet | str | bytes):
         """
         Set the current keywords instance.
 
         Args:
-            keywords: Instance of KeywordSet class.
+            keywords: Instance of KeywordSet, string, or path.
         """
 
-        if not isinstance(keywords, kw.KeywordSet):
-            raise TypeError('kwd object must be an instance of KeywordSet')
+        # If a file path is passed then read it and store it
+        p = Path(keywords)
+        if p.is_file():
+            self._keywords_path = p
+            with open(p) as f:
+                self._keywords = f.read()
 
-        self._keywords = keywords
+        elif isinstance(keywords, kw.KeywordSet):
+            self._keywords = keywords
+
+        # Finally, a keyword file string must contain at minimum a "PROCESS" keyword
+        else:
+            self._keywords = keywords
 
     def init_keywords(self, title='', comment=''):
         """
@@ -500,107 +583,117 @@ class FVS(object):
         if not title:
             title = self.title
 
-        if not title:
-            now = datetime.datetime.strftime(
-                    datetime.datetime.now(), '%Y%m%d_%H%M%S')
-            title = '{}_{}'.format(self.variant,now)
+        else:
+            self.title = title
 
         self._keywords = kw.KeywordSet(
                 title=title, comment=comment, top_level=True
                 )
         return self._keywords
 
-    def init_projection(self, keywords=None, trees=None):
+    def init_projection(
+            self,
+            keywords: str|kw.KeywordSet|None=None,
+            trees: str|pd.DataFrame|npt.ArrayLike|None=None
+            ):
         """
-        Initialize a projection with the provided keywords.
+        Initialize a projection
 
         Args:
-            keywords: Path to the FVS keywords file, or a KeywordSet instance.
-                    If None then use self.keywords.
-            trees: Inventory treelist instance.
+            keywords: KeywordSet instance, path to a keywords file, or string value
+                (Default is self.keywords)
+            trees: Inventory treelist instance
         """
-        # print('***** HERE *******')
 
         if keywords is None:
             keywords = self.keywords
 
-        if keywords is None:
-            print('Run has no Keywords')
+        # Pass the argument to the keywords setter for validation
+        else:
+            self.keywords = keywords
+            
+        # Have initial tree records already been loaded?
+        ## TODO: Set a flag when inventory trees have been loaded
+        has_inv = self.fvslib.inventory_trees.row_count()>0
 
+        if not trees is None and has_inv:
+            raise IOError('Passing inventory trees conflicts with tree records that have already been loaded.')
+
+        # Write out the keywords file if using a KeywordSet
         if isinstance(keywords, kw.KeywordSet):
 
             # FIXME: keyword implicitly know their relative position
             keywords.top_level = True
             keywords.parent = None
 
-            # TODO: Add option to raise exceptions for missing keywords
+            # TODO: Add option to raise exceptions for important keywords
             if not keywords.find('STDINFO') and not keywords.find('STANDSQL'):
-                print('No STDINFO keyword')
+                RuntimeWarning(f'No STDINFO keyword: {self.title}')
 
             if not keywords.find('DESIGN') and not keywords.find('STANDSQL'):
-                print('No DESIGN keyword')
+                RuntimeWarning(f'No DESIGN keyword: {self.title}')
 
-            if not keywords.find('TREEFMT') and not keywords.find('TREESQL'):
+            if (not trees is None
+                and not keywords.find('TREEFMT')
+                and not keywords.find('TREESQL')
+                ):
                 keywords += kw.TREEFMT(self.treelist_fmt)
 
-            fn = keywords.title.lower()
-            fn = fn.replace(' ', '_')
-            self.root = os.path.join(self.workspace, fn)
-            if not os.path.exists(self.root):
-                os.makedirs(self.root)
-                self._artifacts.append(self.root)
+            # if not self.root.exists():
+            #     try:
+            #         self.root.mkdir(parents=False, exist_ok=False)
+            #     except:
+            #         IOError(f'Not able to create root folder: {self.root}')
 
-            keywords_fn = os.path.join(
-                    self.root
-                    , '{}.key'.format(fn)
-                    )
-            log.debug(f'Keywords File: {keywords_fn}')
-            keywords.write(keywords_fn)
+            #     self._artifacts.append(self.root)
 
-            self._artifacts.append(keywords_fn)
+            log.debug(f'Keywords File: {self.keywords_path}')
+            keywords.write(self.keywords_path)
 
-            # Write out the inventory trees
-            has_inv = self.fvslib.inventory_trees.row_count()>0
-            notrees = keywords.find('NOTREES')
-            if not has_inv and not keywords.find('TREESQL') and not notrees:
-                # print('***NO TREESQL')
-                pth, fn = os.path.split(keywords_fn)
-                fn, ext = os.path.splitext(fn)
-                trees_fn = os.path.join(
-                        self.root
-                        , '{}.tre'.format(fn)
-                        )
-                if not trees is None:
-                    self.write_treelist(trees, trees_fn)
-                    self._artifacts.append(trees_fn)
+            self._artifacts.append(self.keywords_path)
 
-                elif not self.inventory_trees is None:
-                    self.write_treelist(self.inventory_trees, trees_fn)
-                    self._artifacts.append(trees_fn)
-
-                else:
-                    if not os.path.exists(trees_fn):
-                        log.info('No inventory tree records, assume a bareground projection.')
-                        keywords += kw.NOTREES()
+            notrees = keywords.find('NOTREES')!=[]
+            treesql = keywords.find('TREESQL')!=[]
 
         else:
             # Handle keywords as a file path
-            self.root = os.path.dirname(keywords)
-            keywords_fn = keywords
+            if not self.keywords_path.is_file():
+                raise IOError(f'Keywords file does not exist: {self.keywords_path}')
 
-        if not os.path.isfile(keywords_fn):
-            msg = 'The keyword file does not exist: {}'.format(keywords_fn)
-            log.error(msg)
-            raise ValueError(msg)
+            notrees = keywords.find('NOTREES')>-1
+            treesql = keywords.find('TREESQL')>-1
+
+        # Ensure only one source of inventory trees is presented
+        if not trees is None and (notrees or treesql):
+            raise IOError('Passing inventory trees conflicts with keyword NOTREES|TREESQL.')
+
+        if has_inv and (notrees or treesql):
+            raise IOError('Keyword NOTREES|TREESQL conflicts with loaded tree records')
+
+        # Finally write out the inventory trees alongside the keywords file
+        if isinstance(trees, (np.ndarray, pd.DataFrame)):
+            self.write_treelist(trees, self.treelist_path)
+            self._artifacts.append(self.treelist_path)
+
+            # elif not self.inventory_trees is None:
+            #     self.write_treelist(self.inventory_trees, trees_fn)
+            #     self._artifacts.append(trees_fn)
+
+        elif not has_inv and not notrees and not treesql:
+            if not self.treelist_path.is_file():
+                raise IOError(f'No trees loaded and no keyword NOTREES|TREESQL. Expected file: {self.treelist_path}')
 
         # Set the grow callback
         # self.fvs_step.set_grow_callback(fvs_callback)
         # self.fvs_step.grow_callback_ptr = fvs_callback
 
+        if self.stochastic:
+            self.set_random_seed()
+
         # fvs_init requires a path
         # print('****', keywords_fn)
         # r = self.fvs_step.fvs_init(keywords_fn, fvs_callback)
-        r = self.fvs_step.fvs_init(keywords_fn)
+        r = self.fvs_step.fvs_init(self.keywords_path)
 
         # TODO: Handle and format error codes
         fvs_error_codes = {
@@ -609,13 +702,8 @@ class FVS(object):
         }
         if not r == 0:
             err = fvs_error_codes.get(r, 'Unknown')
-            msg = f'FVS Error {r}: {err}\n{keywords_fn}'
-            raise IOError(f'FVS ERROR: {r}\n{keywords_fn}')
-
-        if self.stochastic:
-            self.set_random_seed()
-
-        self.keywords_file = keywords_fn
+            msg = f'FVS Error {r}: {err}\n{self.keywords_path}'
+            raise IOError(f'FVS ERROR: {r}\n{self.keywords_path}')
 
     def iter_projection(self):
         """
