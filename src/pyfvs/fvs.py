@@ -502,7 +502,7 @@ class FVS(object):
                 )
             self._artifacts.append(self._workspace)
             
-        return self._workspace
+        return Path(self._workspace)
 
     @workspace.setter
     def workspace(self, workspace: str|Path):
@@ -555,19 +555,23 @@ class FVS(object):
             keywords: Instance of KeywordSet, string, or path.
         """
 
+        self._keywords = None
+
         # If a file path is passed then read it and store it
-        p = Path(keywords)
-        if p.is_file():
-            self._keywords_path = p
-            with open(p) as f:
-                self._keywords = f.read()
-
-        elif isinstance(keywords, kw.KeywordSet):
+        if isinstance(keywords, kw.KeywordSet):
             self._keywords = keywords
+            self._keywords_path = None
 
-        # Finally, a keyword file string must contain at minimum a "PROCESS" keyword
         else:
-            self._keywords = keywords
+            p = Path(keywords)
+            if p.is_file():
+                self._keywords_path = p
+                with open(p) as f:
+                    self._keywords = f.read()
+
+            else:
+                self._keywords = keywords
+                self._keywords_path = None
 
     def init_keywords(self, title='', comment=''):
         """
@@ -660,8 +664,8 @@ class FVS(object):
             if not self.keywords_path.is_file():
                 raise IOError(f'Keywords file does not exist: {self.keywords_path}')
 
-            notrees = keywords.find('NOTREES')>-1
-            treesql = keywords.find('TREESQL')>-1
+            notrees = self.keywords.find('NOTREES')>-1
+            treesql = self.keywords.find('TREESQL')>-1
 
         # Ensure only one source of inventory trees is presented
         if not trees is None and (notrees or treesql):
@@ -726,7 +730,7 @@ class FVS(object):
             # TODO: Check return code and raise execption for critical errors
             yield n
 
-        self.end_projection()
+        r = self.end_projection()
 
     def grow_projection(self, cycles=1):
         deprecation('FVS.grow_projection is deprecated, use FVS.grow.', level=2)
@@ -742,7 +746,8 @@ class FVS(object):
         """
 
         self.grow(cycles=0)
-        self.end_projection()
+        r = self.end_projection()
+        return r
 
     def grow(self, cycles=1):
         """
