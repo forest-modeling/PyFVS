@@ -102,10 +102,12 @@ cmd = [
   "--no-build-isolation", "--verbose", 
   "-Csetup-args=-Dfvsvariants={{ variants }}",
   "-Csetup-args=-Dbuildtype={{ mode }}",
+  "-Cbuild-dir={{ builddir }}"
   ]
 args = [
     {"arg" = "variants", default="pn,wc,so,op,oc,ec,ca,nc,bm,ie,ci,ak,ws"},
-    {"arg" = "mode", default="debug"}
+    {"arg" = "mode", default="debug"},
+    {"arg" = "builddir", default="build"}
   ]
 
 [tool.pixi.tasks.build]
@@ -114,10 +116,12 @@ cmd = [
   "--no-isolation", "--verbose", 
   "-Csetup-args=-Dfvsvariants={{ variants }}",
   "-Csetup-args=-Dbuildtype={{ mode }}",
+  "-Cbuild-dir={{ builddir }}"
   ]
 args = [
     {"arg" = "variants", default="pn,wc,so,op,oc,ec,ca,nc,bm,ie,ci,ak,ws"},
-    {"arg" = "mode", default="release"}
+    {"arg" = "mode", default="release"},
+    {"arg" = "builddir", default="build"}
   ]
 
 [tool.pixi.tasks.test]
