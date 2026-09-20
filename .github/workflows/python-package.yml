@@ -10,7 +10,10 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+    types:
+      - closed
 
 jobs:
   make-wheels:
@@ -150,7 +153,9 @@ jobs:
   publish-pypi:
     name: Publish to PyPI (main branch)
     # Run on push to main branch or on tag push (for releases)
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') && !contains(github.ref, '+')
+    if: |
+      ( github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') && !contains(github.ref, '+')) ||
+      ( github.event_name == 'pull_request' && github.event.pull_request.merged == true && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') && !contains(github.ref, '+'))
     needs: [ make-wheels, make-sdist ]
     runs-on: ubuntu-latest
     environment:
