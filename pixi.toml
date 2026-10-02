@@ -4,7 +4,7 @@ platforms = ["linux-64", "win-64"]
 
 [tasks.dev]
 cmd = [
-  "python", "-m", "pip", "install", "-e", ".", 
+  "python", "-m", "pip", "install", "--editable", ".", 
   "--no-build-isolation", "--verbose", 
   "-Csetup-args=-Dfvsvariants={{ variants }}",
   "-Csetup-args=-Dbuildtype={{ mode }}",
@@ -35,26 +35,28 @@ cmd = "pytest tests"
 
 [dependencies]
 # Python runtime and build tools
-python = "3.14.*"
+python = ">=3.14.7,<3.15"
 # Build system dependencies
-wheel = ">=0.47.0,<0.48"
-meson = ">=1.11.1,<2"
-meson-python = ">=0.20.0,<0.21"
-setuptools = ">=82.0.1,<83"
-setuptools_scm = ">=10.2.0,<11"
-pip = ">=26.1.2,<27"
+wheel = ">=0.48.0,<0.49"
+meson = ">=1.12.1,<2"
+meson-python = ">=0.22.1,<0.23"
+setuptools = ">=84.0.0,<85"
+setuptools_scm = ">=10.3.4,<11"
+pip = ">=26.2.1,<27"
 # Compilers and toolchain
-gcc = ">=15.2.0,<15.3"
-gxx = ">=15.2.0,<15.3"
-gfortran = ">=15.2.0,<15.3"
+gcc = ">=16.2.0,<16.3"
+gxx = ">=16.2.0,<16.3"
+gfortran = ">=16.2.0,<16.3"
 # Project runtime and dev dependencies (pinned for reproducibility)
 # These should be kept in sync with [project] dependencies and [dependency-groups]
-numpy = ">=2.5.0,<3"
-pandas = ">=3.0.3,<4"
-click = ">=8.4.1,<9"
-confuse = ">=2.2.0,<3"
+numpy = ">=2.5.3,<3"
+pandas = ">=3.0.6,<4"
+click = ">=8.5.0,<9"
+confuse = ">=2.3.0,<3"
 pytest = ">=9.1.1,<10"
 openpyxl = ">=3.1.5,<4"
+packaging = ">=26.3,<27"
+pyproject-metadata = ">=0.12.1,<0.13"
 
 [pypi-dependencies]
-build = ">=1.5.0, <2"
+build = ">=1.6.1, <2"

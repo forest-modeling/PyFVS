@@ -1,4 +1,5 @@
 module fvs_api
+  use iso_c_binding
   implicit none
 
   ! FVS functionality controls
@@ -56,5 +57,39 @@ module fvs_api
     end if
 
   end function get_mrule_idx
+
+  ! Wrappers for subroutines in apisubs.f
+  subroutine dim_sizes(ntrees,ncycles,nplots,maxtrees,maxspecies,maxplots,maxcycles)
+    integer, intent(out) :: ntrees,ncycles,nplots,maxtrees,maxspecies,maxplots,maxcycles
+    call fvsdimsizes(ntrees,ncycles,nplots,maxtrees,maxspecies,maxplots,maxcycles)
+  end subroutine dim_sizes
+
+  ! Wrappers for FVS library routines
+
+  function calc_height(ifor, ispc, diameter) result(height)
+    integer, intent(in) :: ifor, ispc
+    real, intent(in) :: diameter
+    real :: height, dbh
+    integer :: mode
+    external :: htdbh
+
+    dbh = diameter
+    height = 0.0
+    mode = 0
+    call htdbh(ifor, ispc, dbh, height, mode)
+  end function calc_height
+
+  function calc_dbh(ifor, ispc, height) result(diameter)
+    integer, intent(in) :: ifor, ispc
+    real, intent(in) :: height
+    real :: diameter, tree_height
+    integer :: mode
+    external :: htdbh
+
+    diameter = 0.0
+    tree_height = height
+    mode = 1
+    call htdbh(ifor, ispc, diameter, tree_height, mode)
+  end function calc_dbh
 
 end module fvs_api
