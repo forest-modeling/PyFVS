@@ -1,0 +1,29 @@
+name: Package Release with Submodules
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout the repository along with all submodules
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # 2. Archive the repository files and submodules together
+      - name: Create Archive
+        run: |
+          # Exclude the internal .git metadata directories
+          tar --exclude='.git*' -czf source-with-submodules.tar.gz .
+
+      # 3. Upload the archive directly onto the GitHub Release page
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: source-with-submodules.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
