@@ -36,6 +36,7 @@ finally:
 # from pyfvs.fvs import *
 # from pyfvs.keywords import *
 
+# TODO: Switch to the built-in config file (ini) handler to avoid the unecessary confuse dependency
 # Configuration is stored in a YAML file
 # Package defaults will be in ./config_default.yaml
 # NOTE: Confuse uses the concept of "views" where the contents of the configuration
@@ -46,6 +47,7 @@ config = confuse.LazyConfig('PyFVS', __name__)
 
 # print(config['treelist_format'].get()['template'])
 
+## TODO: Remove support for text file treelist format and template. Treelists should be passed only as dataframes or similar.
 # Default FVS Treelist format
 # template is the Python string format
 # fvs_format is the FVS keyword fields to read the formatted string

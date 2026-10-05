@@ -1,6 +1,7 @@
 prefix: pyfvs
 workspace: '%TEMP%'
 treelist_format:
+  ## TODO: Remove support for text file treelist format and template. Treelists should be passed only as dataframes or similar.
   # Python string template with keywords
   # Must print as a single fixed format line.
   # newlines and spaces will be stripped
