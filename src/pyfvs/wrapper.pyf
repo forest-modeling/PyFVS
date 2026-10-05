@@ -1,0 +1,30 @@
+! -*- f90 -*-
+! Manual wrappers for FVS routines that can't be handled with inline F2PY directives
+
+! Wrap version subroutines because F2PY ignores `dimension(buflen)` and replaces it with `dimension(*)` triggering a runtime error
+    module fvsversion
+        use iso_c_binding
+        character(len=*), parameter,optional :: fvsver_version=fvs_git_version
+        character(len=*), parameter,optional :: fvsver_org=fvs_git_org
+        character(len=*), parameter,optional :: fvsver_hash=fvs_git_hash
+        character(len=*), parameter,optional :: fvsver_date=fvs_git_date
+        character(len=*), parameter,optional :: fvsver_branch=fvs_git_branch
+        character(len=*), parameter,optional :: fvsver_remote=fvs_git_remote
+        integer(kind=c_int), parameter,optional :: fvs_version_buflen=64
+        integer(kind=c_int), parameter,optional :: fvs_buildinfo_buflen=512
+
+        subroutine fvsgetversion(buf, buflen, nch)
+          use, intrinsic :: iso_c_binding, only: c_char, c_int
+          character(kind=c_char), dimension(buflen), intent(out), depend(buflen) :: buf
+          integer(kind=c_int), intent(in) :: buflen
+          integer(kind=c_int), intent(out) :: nch
+        end subroutine fvsgetversion
+
+        subroutine fvsgetbuildinfo(buf, buflen, nch)
+          use, intrinsic :: iso_c_binding, only: c_char, c_int
+          character(kind=c_char), dimension(buflen), intent(out), depend(buflen) :: buf
+          integer(kind=c_int), intent(in) :: buflen
+          integer(kind=c_int), intent(out) :: nch
+        end subroutine fvsgetbuildinfo
+      
+    end module fvsversion

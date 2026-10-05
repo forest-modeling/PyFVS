@@ -100,6 +100,108 @@ src_prefix = ''
 #   arguments: [meson.project_source_root() / '_build_utils/convert_f77.py','@INPUT@', '@OUTPUT@', '@OUTDIR@']
 # )
 
+#### Set FVS Git version variables ####
+# Ported from core fvs CMakeLists.txt 10/5/2026
+git = find_program('git', required : false)
+
+fvs_root = meson.current_source_dir() + '\\fvs'
+message('FVS Root:  @0@'.format(fvs_root))
+
+# Assumes fvs_root is defined earlier (e.g., fvs_root = meson.current_source_dir() or a custom path)
+fvs_git_remote = 'unknown'
+fvs_git_org = 'unknown'
+fvs_git_version = 'unknown'
+fvs_git_hash = 'unknown'
+fvs_git_date = 'unknown'
+fvs_git_branch = 'unknown'
+
+if git.found()
+  # 1. Get remote URL
+  res = run_command(git, '-C', fvs_root, 'remote', 'get-url', 'origin', check : false)
+  if res.returncode() == 0 and res.stdout().strip() != ''
+    fvs_git_remote = res.stdout().strip()
+  endif
+
+  # Equivalent to CMake's REGEX REPLACE for extracting organization name
+  if fvs_git_remote != 'unknown'
+    url = fvs_git_remote
+    if url.endswith('.git')
+      url = url.substring(0, -4)
+    endif
+    
+    parts = url.split('/')
+    if parts.length() >= 2
+      fvs_git_org = parts[parts.length() - 2]
+    else
+      colon_parts = url.split(':')
+      if colon_parts.length() > 1
+        subparts = colon_parts[1].split('/')
+        if subparts.length() >= 2
+          fvs_git_org = subparts[subparts.length() - 2]
+        endif
+      endif
+    endif
+  endif
+  if fvs_git_org == ''
+    fvs_git_org = 'unknown'
+  endif
+
+  # 2. Get version (tags exact match, with fallback to latest tag)
+  res = run_command(git, '-C', fvs_root, 'describe', '--tags', '--exact-match', check : false)
+  if res.returncode() != 0 or res.stdout().strip() == ''
+    res = run_command(git, '-C', fvs_root, 'describe', '--tags', check : false)
+  endif
+  if res.returncode() == 0 and res.stdout().strip() != ''
+    fvs_git_version = res.stdout().strip()
+  endif
+
+  # 3. Get short commit hash
+  res = run_command(git, '-C', fvs_root, 'rev-parse', '--short', 'HEAD', check : false)
+  if res.returncode() == 0 and res.stdout().strip() != ''
+    fvs_git_hash = res.stdout().strip()
+  endif
+
+  # 4. Get commit date (YYYYMMDD)
+  res = run_command(git, '-C', fvs_root, 'log', '-1', '--format=%cd', '--date=format:%Y%m%d', check : false)
+  if res.returncode() == 0 and res.stdout().strip() != ''
+    fvs_git_date = res.stdout().strip()
+  endif
+
+  # 5. Get current branch name
+  res = run_command(git, '-C', fvs_root, 'rev-parse', '--abbrev-ref', 'HEAD', check : false)
+  if res.returncode() == 0 and res.stdout().strip() != ''
+    fvs_git_branch = res.stdout().strip()
+  endif
+
+  # 6. Check for uncommitted changes (dirty state)
+  res = run_command(git, '-C', fvs_root, 'status', '--porcelain', check : false)
+  if res.returncode() == 0 and res.stdout().strip() != ''
+    fvs_git_version += '-dirty'
+    fvs_git_hash += '-dirty'
+    warning('WARNING: working tree has uncommitted changes.')
+    warning('WARNING: Version will be marked -dirty.')
+    warning('WARNING: Do not use this build in production or deliverable contexts.')
+  endif
+endif
+
+message('FVS_GIT_REMOTE:  @0@'.format(fvs_git_remote))
+message('FVS_GIT_ORG:     @0@'.format(fvs_git_org))
+message('FVS_GIT_VERSION: @0@'.format(fvs_git_version))
+message('FVS_GIT_HASH:    @0@'.format(fvs_git_hash))
+message('FVS_GIT_DATE:    @0@'.format(fvs_git_date))
+message('FVS_GIT_BRANCH:  @0@'.format(fvs_git_branch))
+
+#### End Git Version Info ####
+
+compiler_args = [
+  '-DFVS_GIT_ORG="@0@"'.format(fvs_git_org),
+  '-DFVS_GIT_VERSION="@0@"'.format(fvs_git_version),
+  '-DFVS_GIT_HASH="@0@"'.format(fvs_git_hash),
+  '-DFVS_GIT_DATE="@0@"'.format(fvs_git_date),
+  '-DFVS_GIT_BRANCH="@0@"'.format(fvs_git_branch),
+  '-DFVS_GIT_REMOTE="@0@"'.format(fvs_git_remote),
+]
+
 ############## From scipy/meson.build subdir ###################
 # Platform detection
 is_mingw = is_windows and cc.get_id() == 'gcc'
@@ -257,7 +359,14 @@ foreach variant : variants
   inc_include_dirs = []
   f90_inc_dirs = []
 
-  skip_sources = ['main.f','apisubsc.c']
+  #skip_sources = ['main.f','apisubsc.c']
+  skip_sources = ['main.f',]
+  skip_funcs = [
+    'fvsTreeAttrC', 'fvsSpeciesAttrC', 'fvsEvmonAttrC',
+    'fvsSpeciesCodeC', 'fvsCloseFileC', 'fvsSVSObjDataC',
+    'fvsFFEAttrsC', 'fvsUnitConversionC',
+    #'fvsgetversion', 'fvsgetbuildinfo'
+  ]
 
   api_sources = []
   api_names = [
@@ -270,7 +379,8 @@ foreach variant : variants
     'keywds.f',
     'esblkd.f',
     'blkdat.f',
-    'fmcblk.f'
+    'fmcblk.f',
+    #'version.f90'
     ]
 
   # src_root = project_folder / 'fvs'
@@ -379,7 +489,7 @@ foreach variant : variants
   # Additional API files to compile
   # f90_sources += 'src/api/apisubs.f90'
 
-  f90_sources += 'src/api/version.f90'
+  #f90_sources += 'src/api/version.f90'
   f90_sources += 'src/api/fvs_api.f90'
   # f90_sources += 'src/api/sim_monitor.f90'
   # f90_sources += 'src/api/initialize.f90'
@@ -436,6 +546,7 @@ foreach variant : variants
 
   # Generate the PYF signature file
   f2py_pyf_pre = '@0@_pre.pyf'.format(lib_name)
+  skip_funcs = ' '.join(skip_funcs)
   cmd = [
     py3.full_path(), '-m', 'numpy.f2py',
     '-m', lib_name,
@@ -446,7 +557,7 @@ foreach variant : variants
     # '--f2cmap',
     # '--include-paths', f2py_path_sep.join(f2py_inc_dirs),
     '@INPUT@',
-    # 'skip: fvssetcmdlinec :',
+    f'skip: @skip_funcs@ :'
     # 'only: init_tree_data fvs_init fvs_grow fvs_end :'
   ]
 
@@ -459,19 +570,23 @@ foreach variant : variants
     command : cmd,
     install : false
     )
-
-  # Post-process the PYF to strip common blocks
   f2py_pyf_name = '@0@.pyf'.format(lib_name)
+
+  # 1) Post-process the PYF to strip common blocks
+  # 2) Patch the PYF with the manual wrappers
+  #    Manually wrapped functions need to be excluded from the automated PYF generation
   strip_common = files('_build_utils/strip_common.py')
+  wrapper_pyf = files('src/pyfvs/wrapper.pyf')
   f2py_pyf_strip = custom_target(
     'strip_common_'+variant,
     input: f2py_pyf_gen[0],
     output: [f2py_pyf_name],
     command: [
       py3,
-      strip_common,
-      f2py_pyf_gen[0],
-      f2py_pyf_name
+      strip_common, # script
+      f2py_pyf_gen[0], # input file
+      f2py_pyf_name, # output file
+      wrapper_pyf # wrapper patch
       ]
     )
 
@@ -506,8 +621,8 @@ foreach variant : variants
     c_sources + cpp_sources + f_sources + for_sources + f90_sources,
     # dependencies: f90_gen_files,
     include_directories : fvs_include_dirs,
-    c_args : variant_args,
-    fortran_args : variant_args,
+    c_args : variant_args + compiler_args,
+    fortran_args : variant_args + compiler_args,
     install : false,
     )
 

@@ -2,6 +2,12 @@ module fvs_api
   use iso_c_binding
   implicit none
 
+  ! Values to be set by the compiler
+  ! NOTE: These are for GNU compilers
+  !       Add the '-cpp' compiler argument for gfortran
+  character(len=11), parameter :: compile_date = __DATE__
+  character(len=8), parameter :: compile_time = __TIME__
+
   ! FVS functionality controls
   logical :: calc_forest_type=.true.
   logical :: fast_age_search=.false.
@@ -59,10 +65,18 @@ module fvs_api
   end function get_mrule_idx
 
   ! Wrappers for subroutines in apisubs.f
-  subroutine dim_sizes(ntrees,ncycles,nplots,maxtrees,maxspecies,maxplots,maxcycles)
-    integer, intent(out) :: ntrees,ncycles,nplots,maxtrees,maxspecies,maxplots,maxcycles
-    call fvsdimsizes(ntrees,ncycles,nplots,maxtrees,maxspecies,maxplots,maxcycles)
-  end subroutine dim_sizes
+  function dim_sizes() result(sizes)
+    integer :: sizes(7)
+
+    sizes = 0
+
+    !ntrees,ncycles,nplots,maxtrees,maxspecies,maxplots,maxcycles
+    call fvsdimsizes( &
+      sizes(1), sizes(2), sizes(3), sizes(4), &
+      sizes(5), sizes(6), sizes(7) &
+      )
+
+  end function dim_sizes
 
   ! Wrappers for FVS library routines
 

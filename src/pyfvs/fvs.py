@@ -172,17 +172,29 @@ class FVS(object):
     def version_info(self):
         info = dict(
             variant = self.variant
-            , compile_date = self.fvslib.version.compile_date.tobytes().decode().strip()
-            , compile_time = self.fvslib.version.compile_time.tobytes().decode().strip()
-            , revision_tag = self.fvslib.globals.svn.tobytes().decode().strip()
-            , revision_date = self.fvslib.revise(self.variant).decode().strip()
+            , compile_date = self.fvslib.fvs_api.compile_date.tobytes().decode().strip()
+            , compile_time = self.fvslib.fvs_api.compile_time.tobytes().decode().strip()
+            , revision_tag = self.fvslib.globals.svn.tobytes().decode('utf-8').strip()
+            , revision_date = self.fvslib.revise(self.variant).decode('utf-8').strip()
             )
         
         return info
 
     @property
     def fvs_version(self):
-        return self.version_info
+        """Return the version info for the FVS core"""
+        buflen=64
+        buf,nch = self.fvslib.fvsversion.fvsgetversion(buflen)
+        return b''.join(buf[:nch]).decode('utf-8')
+
+    @property
+    def fvs_build_info(self):
+        """Return the build info for the FVS core"""
+        buflen=512
+        buf,nch = self.fvslib.fvsversion.fvsgetbuildinfo(buflen)
+        build_info = [v.split(':',1) for v in b''.join(buf[:nch]).decode('utf-8').splitlines()]
+        build_info = {k.lower().strip():v.strip() for k,v in build_info}
+        return build_info
 
     def fvs_callback(self, stage):
         """

@@ -9,8 +9,6 @@ module globals
 
     character(len=10) :: svn
 
-    !INCLUDE 'INCLUDESVN.F90'
-
     INCLUDE 'PRGPRM.F90'
     ! INCLUDE 'CONTRL.F90'
     INCLUDE 'COEFFS.F90'
