@@ -28,7 +28,11 @@ module fvs_step
         ! CONTRL
         icl1,icl6,icyc,irec2,itable,itrn,iy,jostnd,lflag,lstart,ncyc, &
         ! ARRAYS
-        bfv,cfv,ind,prob,wk1,wk3, &
+        bfv,cfv,mcfv,scfv,ind,prob,wk3, &
+        abvgrd_bio,merch_bio,cubsaw_bio,foli_bio, &
+        abvgrd_carb,merch_carb,cubsaw_carb,foli_carb, &
+        osccur,oagbiocur,omerbiocur,ocsawbiocur,ofolibio, &
+        oagcarbcur,omercarbcur,ocsawcarbcur,ofolicarb, &
         !PLOT
         mgmid,nplt,sdiac,sdiac2, &
         !WORKCM
@@ -299,15 +303,45 @@ module fvs_step
         DO I=1,ITRN
           CFV(I)=CFV(I)*PROB(I)
           BFV(I)=BFV(I)*PROB(I)
-          WK1(I)=WK1(I)*PROB(I)
+          MCFV(I)=MCFV(I)*PROB(I)
+          SCFV(I)=SCFV(I)*PROB(I)
+          ABVGRD_BIO(I)=ABVGRD_BIO(I)*PROB(I)
+          MERCH_BIO(I)=MERCH_BIO(I)*PROB(I)
+          CUBSAW_BIO(I)=CUBSAW_BIO(I)*PROB(I)
+          FOLI_BIO(I)=FOLI_BIO(I)*PROB(I)
+          ABVGRD_CARB(I)=ABVGRD_CARB(I)*PROB(I)
+          MERCH_CARB(I)=MERCH_CARB(I)*PROB(I)
+          CUBSAW_CARB(I)=CUBSAW_CARB(I)*PROB(I)
+          FOLI_CARB(I)=FOLI_CARB(I)*PROB(I)
         ENDDO
       ENDIF
+      
       CALL PCTILE(ITRN,IND,CFV,WK3,OCVCUR(7))
       CALL DIST(ITRN,OCVCUR,WK3)
       CALL PCTILE(ITRN,IND,BFV,WK3,OBFCUR(7))
       CALL DIST(ITRN,OBFCUR,WK3)
-      CALL PCTILE(ITRN,IND,WK1,WK3,OMCCUR(7))
+      CALL PCTILE(ITRN,IND,MCFV,WK3,OMCCUR(7))
       CALL DIST(ITRN,OMCCUR,WK3)
+      CALL PCTILE(ITRN,IND,SCFV,WK3,OSCCUR(7))
+      CALL DIST(ITRN,OSCCUR,WK3)
+!     COMPUTE BIOMASS AND CARBON
+      CALL PCTILE(ITRN,IND,ABVGRD_BIO,WK3,OAGBIOCUR(7))
+      CALL DIST(ITRN,OAGBIOCUR,WK3)
+      CALL PCTILE(ITRN,IND,MERCH_BIO,WK3,OMERBIOCUR(7))
+      CALL DIST(ITRN,OMERBIOCUR,WK3)
+      CALL PCTILE(ITRN,IND,CUBSAW_BIO,WK3,OCSAWBIOCUR(7))
+      CALL DIST(ITRN,OCSAWBIOCUR,WK3)
+      CALL PCTILE(ITRN,IND,FOLI_BIO,WK3,OFOLIBIO(7))
+      CALL DIST(ITRN,OFOLIBIO,WK3)
+
+      CALL PCTILE(ITRN,IND,ABVGRD_CARB,WK3,OAGCARBCUR(7))
+      CALL DIST(ITRN,OAGCARBCUR,WK3)
+      CALL PCTILE(ITRN,IND,MERCH_CARB,WK3,OMERCARBCUR(7))
+      CALL DIST(ITRN,OMERCARBCUR,WK3)
+      CALL PCTILE(ITRN,IND,CUBSAW_CARB,WK3,OCSAWCARBCUR(7))
+      CALL DIST(ITRN,OCSAWCARBCUR,WK3)
+      CALL PCTILE(ITRN,IND,FOLI_CARB,WK3,OFOLICARB(7))
+      CALL DIST(ITRN,OFOLICARB,WK3)
 
       !IF THERE ARE TREE RECORDS, THEN: CONVERT CFV TO A PER TREE
       !REPRESENTATION.
@@ -315,7 +349,16 @@ module fvs_step
         DO I=1,ITRN
           CFV(I)=CFV(I)/PROB(I)
           BFV(I)=BFV(I)/PROB(I)
-          WK1(I)=WK1(I)/PROB(I)
+          MCFV(I)=MCFV(I)/PROB(I)
+          SCFV(I)=SCFV(I)/PROB(I)
+          ABVGRD_BIO(I)=ABVGRD_BIO(I)/PROB(I)
+          MERCH_BIO(I)=MERCH_BIO(I)/PROB(I)
+          CUBSAW_BIO(I)=CUBSAW_BIO(I)/PROB(I)
+          FOLI_BIO(I)=FOLI_BIO(I)/PROB(I)
+          ABVGRD_CARB(I)=ABVGRD_CARB(I)/PROB(I)
+          MERCH_CARB(I)=MERCH_CARB(I)/PROB(I)
+          CUBSAW_CARB(I)=CUBSAW_CARB(I)/PROB(I)
+          FOLI_CARB(I)=FOLI_CARB(I)/PROB(I)
         ENDDO
       ENDIF
 

@@ -20,6 +20,18 @@ forest_code = 612
 
 class TreesTest(unittest.TestCase):
 
+    def test_calc_height(self):
+        fm = fvs.FVS('PN')
+        sp = fm.spp_seq['DF']
+        ht = fm.fvs_api.calc_height(0,sp,24)
+        assert int(ht)==138
+
+    def test_calc_dbh(self):
+        fm = fvs.FVS('PN')
+        sp = fm.spp_seq['DF']
+        dbh = fm.fvs_api.calc_dbh(0,sp,139)
+        assert int(dbh)==24
+
     def test_mrule(self):
 
         try:

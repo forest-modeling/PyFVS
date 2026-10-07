@@ -12,7 +12,7 @@ module globals
 
     character(len=10) :: svn
 
-    INCLUDE '@variant@_INCLUDESVN.F90'
+    ! INCLUDE '@variant@_INCLUDESVN.F90'
 
     INCLUDE '@variant@_PRGPRM.F90'
     ! INCLUDE '@variant@_CONTRL.F90'

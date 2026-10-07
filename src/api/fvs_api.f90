@@ -1,5 +1,12 @@
 module fvs_api
+  use iso_c_binding
   implicit none
+
+  ! Values to be set by the compiler
+  ! NOTE: These are for GNU compilers
+  !       Add the '-cpp' compiler argument for gfortran
+  character(len=11), parameter :: compile_date = __DATE__
+  character(len=8), parameter :: compile_time = __TIME__
 
   ! FVS functionality controls
   logical :: calc_forest_type=.true.
@@ -56,5 +63,47 @@ module fvs_api
     end if
 
   end function get_mrule_idx
+
+  ! Wrappers for subroutines in apisubs.f
+  function dim_sizes() result(sizes)
+    integer :: sizes(7)
+
+    sizes = 0
+
+    !ntrees,ncycles,nplots,maxtrees,maxspecies,maxplots,maxcycles
+    call fvsdimsizes( &
+      sizes(1), sizes(2), sizes(3), sizes(4), &
+      sizes(5), sizes(6), sizes(7) &
+      )
+
+  end function dim_sizes
+
+  ! Wrappers for FVS library routines
+
+  function calc_height(ifor, ispc, diameter) result(height)
+    integer, intent(in) :: ifor, ispc
+    real, intent(in) :: diameter
+    real :: height, dbh
+    integer :: mode
+    external :: htdbh
+
+    dbh = diameter
+    height = 0.0
+    mode = 0
+    call htdbh(ifor, ispc, dbh, height, mode)
+  end function calc_height
+
+  function calc_dbh(ifor, ispc, height) result(diameter)
+    integer, intent(in) :: ifor, ispc
+    real, intent(in) :: height
+    real :: diameter, tree_height
+    integer :: mode
+    external :: htdbh
+
+    diameter = 0.0
+    tree_height = height
+    mode = 1
+    call htdbh(ifor, ispc, diameter, tree_height, mode)
+  end function calc_dbh
 
 end module fvs_api

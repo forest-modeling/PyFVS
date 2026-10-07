@@ -11,7 +11,7 @@ module tree_data
         grospc, &
         !ARRAYS
         idtree, itre, isp, prob, dbh, dg, ht, &
-        ht2td, htg, cfv, bfv, wk1, defect, crwdth, icr, pct, abirth, &
+        ht2td, htg, cfv, mcfv, scfv, bfv, defect, crwdth, icr, pct, abirth, &
         imc, kutkod, &
         !VARCOM
         ptbalt, &
@@ -19,7 +19,7 @@ module tree_data
         work1, &
         !ARRAYS
         wk2,wk3,wk4
-
+! CFV(I),MCFV(I),SCFV(I),BFV(I),ICDF,IBDF,
     implicit none
 
     !!TODO: Perhaps the api tree data could be represented by an array
@@ -30,7 +30,7 @@ module tree_data
     real, dimension(maxtre,maxcy1) :: &
             live_tpa,cut_tpa,mort_tpa,live_dbh,dbh_incr,ba_pctl,pnt_bal &
             ,ht_total,ht_merch_cuft,ht_merch_bdft,ht_incr,cr_width,cr_ratio &
-            ,cuft_total,cuft_net,bdft_net,defect_cuft,defect_bdft
+            ,cuft_total,cuft_net,cuft_saw,bdft_net,defect_cuft,defect_bdft
 
     ! Flag used to indicate that tree details are to be collected at run time
     logical :: save_tree_data=.true.
@@ -61,6 +61,7 @@ module tree_data
         ht_incr(:,:) = 0.0
         cuft_total(:,:) = 0.0
         cuft_net(:,:) = 0.0
+        cuft_saw(:,:) = 0.0
         bdft_net(:,:) = 0.0
         defect_cuft(:,:) = 0.0
         defect_bdft(:,:) = 0.0
@@ -119,7 +120,8 @@ module tree_data
         ht_incr(:itrn,i) = htg(:itrn)
 
         cuft_total(:itrn,i) = cfv(:itrn)
-        cuft_net(:itrn,i) = wk1(:itrn)
+        cuft_net(:itrn,i) = mcfv(:itrn)
+        cuft_saw(:itrn,i) = scfv(:itrn)
         bdft_net(:itrn,i) = bfv(:itrn)
 
         defect_cuft(:itrn,i) = (defect(:itrn) - mod(defect(:itrn),100)) / 10000.0

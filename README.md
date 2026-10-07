@@ -60,7 +60,7 @@ PyFVS currently supports Windows and Linux using the GCC family of compilers.
 
 ## Variants
 
-Not all FVS variants are currently implement. More will be added as time allows.
+Currently PyFVS supports a subset of FVS variants. More will be added as time allows.
 
  - PN - Pacific Northwest Coast
  - WC - Westside Cascades

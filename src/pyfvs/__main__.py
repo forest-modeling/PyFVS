@@ -69,7 +69,7 @@ def run(ctx,
         sys.exit(r)
 
     if keywords is None and not prompt:
-        raise click.UsageError('A keyword file must be provided unless prompt is True')
+        raise click.UsageError('A keyword file must be provided unless `prompt` is True')
 
     if not os.path.exists(keywords):
         msg = 'The keyword file is does not exist: {}'.format(keywords)
