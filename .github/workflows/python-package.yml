@@ -27,10 +27,10 @@ jobs:
         include:
           - os: ubuntu-latest
             compiler: gcc
-            compiler-version: 15
+            compiler-version: [15, 16]
           - os: windows-latest
             compiler: gcc
-            compiler-version: 15
+            compiler-version: [15, 16]
 
     steps:
     - name: Fortran Setup
